@@ -25,8 +25,8 @@ paths:
          summary: Liste des opérations disponibles.
          operationId: getOperations
          description: "Opération ... le composant ANS esignsante-psc. "
-#         tags:
-#         - client
+         tags:
+         - client
          responses:
             '200':
                description: Requête en succès.

@@ -19,11 +19,11 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * Test des EndPoints offerts par l'API esignsante-psc.
  */
-
 @ContextConfiguration
 @SpringBootTest
 @AutoConfigureMockMvc
 @ComponentScan("fr.ans.api.sign.esignsante.psc.api")
+
 public class DefaultApiIntegrationTest {
 
     /** The mock mvc. */

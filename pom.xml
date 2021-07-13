@@ -30,10 +30,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<dependency>
+<!--    		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
+		</dependency>    -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -145,7 +145,19 @@
 		</dependency>
 
 		<!-- FIN OPENAPI et ces dependences -->
-
+		
+<!-- <dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
+		
 	</dependencies>
 
 	<build>
@@ -249,8 +261,11 @@
 				<configuration>
 					<source>11</source>
 					<target>16</target>
-					<!-- <compilerArgument>-Xlint:deprecation</compilerArgument> -->
-
+					<compilerArgs>
+             <!-- <arg>-Xlint:deprecation</arg>-->
+             
+        </compilerArgs>
+					
 				</configuration>
 			</plugin>
 			
@@ -276,6 +291,8 @@
 				</configuration>
 			</plugin>
 			<!--  FIN license pour Hook SVN -->
+			
+			
 			
 		</plugins>
 	</build>
