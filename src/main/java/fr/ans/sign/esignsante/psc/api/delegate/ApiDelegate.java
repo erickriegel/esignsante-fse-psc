@@ -1,4 +1,4 @@
-package fr.ans.sign.esignsantepsc.api.delegate;
+package fr.ans.sign.esignsante.psc.api.delegate;
 
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
