@@ -71,7 +71,7 @@
 		</dependency>
 
 
-		<!-- OPENAPI et ces dependences -->
+		<!-- OPENAPI et ses dependences -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
