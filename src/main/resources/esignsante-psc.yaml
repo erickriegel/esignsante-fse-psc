@@ -1,0 +1,43 @@
+openapi: 3.0.2
+# Added by API Auto Mocking Plugin
+servers:
+-  description: SwaggerHub API Auto Mocking
+   url: https://esignsante-psc.sign.ans.fr{basePath}/
+   variables:
+      port:
+         enum:
+         - '8080'
+         default: '8080'
+      basePath:
+         default: /
+info:
+   description: TODO API esignsante-psc API du composant eSignSante-psc....
+   version: 1.0.0.0
+   title: eSignSantePSC
+   contact:
+      email: esignsante@asipsante.fr
+tags:
+-  name: client
+   description: Ressources offertes au client.
+paths:
+   /:
+      get:
+         summary: Liste des opérations disponibles.
+         operationId: getOperations
+         description: "Opération ... le composant ANS esignsante-psc. "
+#         tags:
+#         - client
+         responses:
+            '200':
+               description: Requête en succès.
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           type: string
+            '400':
+               description: Requête mal formée.
+            '500':
+               description: Erreur interne du serveur.
+
