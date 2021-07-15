@@ -1,4 +1,4 @@
-package fr.ans.sign.esignsante.psc.api;
+package fr.ans.api.sign.esignsante.psc.api;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;

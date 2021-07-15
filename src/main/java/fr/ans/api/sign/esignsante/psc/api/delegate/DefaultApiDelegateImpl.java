@@ -1,4 +1,4 @@
-package fr.ans.sign.esignsante.psc.api.delegate;
+package fr.ans.api.sign.esignsante.psc.api.delegate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
