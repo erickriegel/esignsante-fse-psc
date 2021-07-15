@@ -13,41 +13,37 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The Class DefaultApiDelegateImpl.
- * Implementation du EndPopint racine
+ * The Class DefaultApiDelegateImpl. Implementation du EndPopint racine
  */
 
 @Service
-public class DefaultApiDelegateImpl extends ApiDelegate implements DefaultApiDelegate  {
-	
-	final String HEADER_TYPE="application/json";
-	
-	 /**
-     * The log.
-     */
-    Logger log = LoggerFactory.getLogger(DefaultApiDelegateImpl.class);
-	
-	    /**
-	     * Gets the operations.
-	     *
-	     * @return the operations
-	     */
-	    @Override
-	    public ResponseEntity<List<String>> getOperations() {
-	        final Optional<String> acceptHeader = getAcceptHeader();
-	        ResponseEntity<List<String>> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-	        if (acceptHeader.isPresent() && acceptHeader.get().contains(HEADER_TYPE)) {
-	            final List<String> methods = new ArrayList<>();
-	            methods.add("/");
-	         //   methods.add("/notexist");
-	            re = new ResponseEntity<>(methods, HttpStatus.OK);
-	        } else {
-	            log.warn("ObjectMapper or HttpServletRequest not configured in default DefaultApi interface,"
-	                    + " so no example is generated");
-	           // System.err.println("coucou");
-	        }
-	        return re;
-	    }
+public class DefaultApiDelegateImpl extends ApiDelegate implements DefaultApiDelegate {
+
+	final String HEADER_TYPE = "application/json";
+
+	/**
+	 * The log.
+	 */
+	Logger log = LoggerFactory.getLogger(DefaultApiDelegateImpl.class);
+
+	/**
+	 * Gets the operations.
+	 *
+	 * @return the operations
+	 */
+	@Override
+	public ResponseEntity<List<String>> getOperations() {
+		final Optional<String> acceptHeader = getAcceptHeader();
+		ResponseEntity<List<String>> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		if (acceptHeader.isPresent() && acceptHeader.get().contains(HEADER_TYPE)) {
+			final List<String> methods = new ArrayList<>();
+			methods.add("/");
+			// methods.add("/notexist");
+			re = new ResponseEntity<>(methods, HttpStatus.OK);
+		} else {
+			log.warn("ObjectMapper or HttpServletRequest not configured in default DefaultApi interface,"
+					+ " so no example is generated");
+		}
+		return re;
 	}
-
-
+}
