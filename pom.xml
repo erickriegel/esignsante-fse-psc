@@ -50,11 +50,29 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- CJU -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<!-- <version>5.3.8</version> -->
+			<scope>test</scope>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.junit.jupiter</groupId> <artifactId>junit-jupiter-api</artifactId> 
+			<scope>test</scope> </dependency> <dependency> <groupId>org.junit.jupiter</groupId> 
+			<artifactId>junit-jupiter-engine</artifactId> <scope>test</scope> </dependency> -->
+
+		<!-- FIN CJU -->
+
+
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
@@ -168,11 +186,14 @@
 				</includes>
 			</testResource>
 		</testResources>
+
 		<plugins>
+			<!-- Generation doc par Spring restdocs -->
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.8</version>
+				<!-- <version>1.5.8</version> -->
+				<!-- <version>2.1.0</version> -->
 				<executions>
 					<execution>
 						<id>generate-docs</id>
@@ -194,6 +215,8 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<!-- FIN Generation doc par Spring restdocs -->
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -206,6 +229,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
@@ -238,6 +263,8 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- compilation -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -247,11 +274,10 @@
 					<target>16</target>
 					<compilerArgs>
 						<!-- <arg>-Xlint:deprecation</arg> -->
-
 					</compilerArgs>
-
 				</configuration>
 			</plugin>
+			<!-- FIN compilation -->
 
 			<!-- license pour Hook SVN -->
 			<plugin>
