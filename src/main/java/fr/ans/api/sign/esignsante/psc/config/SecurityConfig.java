@@ -22,9 +22,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(final WebSecurity web) {
         web.ignoring().antMatchers("/**"); // turn off web security for all requests
     }
+    
 
     /**
-     * Http CSRF security configuration.
+     * Http securityCSRF security configuration.
+     * permit all and CSRF security configuration.
      *
      * @param http HttpSecurity
      */
@@ -32,6 +34,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(final HttpSecurity http) throws Exception {
         // storing the CSRF token in the cookie as required by swagger
         http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        
+        //CJU TEST 
+       // http.authorizeRequests().antMatchers("/").permitAll();
+       //http.csrf().disable().authorizeRequests().anyRequest().permitAll();
     }
 
 }

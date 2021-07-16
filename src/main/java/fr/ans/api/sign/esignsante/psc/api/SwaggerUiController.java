@@ -22,6 +22,7 @@ public class SwaggerUiController {
      */
     @RequestMapping(value = "swagger-ui.html", method = RequestMethod.GET)
     public void getSwagger(final HttpServletResponse httpResponse) {
+    	System.err.println("profil non swagger");
         httpResponse.setStatus(HttpStatus.NOT_FOUND.value());
     }
 }

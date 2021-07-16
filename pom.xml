@@ -30,10 +30,10 @@
 		</dependency>
 		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-mongodb</artifactId> 
 			</dependency> -->
-		<dependency>
+ 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
-		</dependency>
+		</dependency> 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -166,10 +166,14 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources/</directory>
+				 <excludes>
+				  <exclude>esignsante-psc.yaml</exclude>
+				 </excludes>
+				
 			</resource>
-			<resource>
-				<directory>src/main/resources/${dist}</directory>
-			</resource>
+			<!-- <resource> -->
+				<!-- <directory>src/main/resources/${dist}</directory> -->
+			<!-- </resource> -->
 		</resources>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testResources>
@@ -216,6 +220,8 @@
 				</dependencies>
 			</plugin>
 			<!-- FIN Generation doc par Spring restdocs -->
+			
+
 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -278,6 +284,18 @@
 				</configuration>
 			</plugin>
 			<!-- FIN compilation -->
+			
+			<!-- assembly -->
+			<!-- <plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/install.xml</descriptor>
+						<descriptor>src/main/assembly/directories.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin> -->
+			<!-- FIN assembly -->
 
 			<!-- license pour Hook SVN -->
 			<plugin>
@@ -302,42 +320,21 @@
 			</plugin>
 			<!-- FIN license pour Hook SVN -->
 
-
-
 		</plugins>
 	</build>
-	<!-- <profiles> <profile> <activation> <os> <family>Windows</family> </os> 
-		</activation> <id>dev</id> <properties> proxy BT <artifactory.hostname>http://repo.proxy-dev-forge.asip.hst.fluxus.net</artifactory.hostname> 
-		résaux ANS <artifactory.hostname>https://repo.forge.ans.henix.fr/</artifactory.hostname> 
-		<ldap.server.url>ldap://annuaire.asipsante.fr</ldap.server.url> <docker.registry>registry.repo.forge.ans.henix.fr</docker.registry> 
-		<image.registry>esignsante-registry.repo.forge.ans.henix.fr</image.registry> 
-		</properties> <distributionManagement> <repository> <id>github-ans</id> <name>GitHub 
-		ansforge Apache Maven Packages</name> <url>https://maven.pkg.github.com/ansforge/esignsante</url> 
-		</repository> </distributionManagement> </profile> <profile> <activation> 
-		<os> <family>Linux</family> </os> </activation> <id>jenkins</id> <properties> 
-		<artifactory.username>jenkins</artifactory.username> <artifactory.password>password</artifactory.password> 
-		<artifactory.hostname>http://st-forge.asipsante.fr:8081</artifactory.hostname> 
-		<ldap.server.url>ldap://annuaire-igc.esante.gouv.fr:389</ldap.server.url> 
-		<docker.registry>registry.repo.asip.asipsante.fr</docker.registry> <image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry> 
-		<image.registry>registry.repo.docker.asip.hst.fluxus.net</image.registry> 
-		</properties> <distributionManagement> <repository> <id>artifactory</id> 
-		<url>${distributionRepositoryJenkinsfile}</url> </repository> <repository> 
-		<id>artifactory</id> <url>${artifactory.hostname}/artifactory/asip-releases</url> 
-		</repository> <snapshotRepository> <id>artifactory</id> <url>${artifactory.hostname}/artifactory/asip-snapshots</url> 
-		</snapshotRepository> </distributionManagement> <build> <plugins> <plugin> 
-		<groupId>org.codehaus.mojo</groupId> <artifactId>build-helper-maven-plugin</artifactId> 
-		<version>1.8</version> <executions> <execution> <id>parse-version</id> <goals> 
-		<goal>parse-version</goal> </goals> </execution> </executions> </plugin> 
-		<plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-release-plugin</artifactId> 
-		<version>3.0.0-M1</version> <configuration> <username>${svn.username}</username> 
-		<password>${svn.password}</password> <checkModificationExcludes> <checkModificationExclude>pom.xml</checkModificationExclude> 
-		<checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude> 
-		</checkModificationExcludes> <tagBase>http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-ws/applicatif/tags</tagBase> 
-		<tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat> </configuration> 
-		</plugin> </plugins> </build> </profile> <profile> <activation> <property> 
-		<name>pa4</name> </property> </activation> <id>dev-pa4</id> <properties> 
-		<artifactory.hostname>http://repo.proxy-dev-forge.asip.hst.fluxus.net</artifactory.hostname> 
-		<ldap.server.url>ldap://annuaire-igc.esante.gouv.fr</ldap.server.url> <docker.registry>registry.repo.proxy-dev-forge.asip.hst.fluxus.net</docker.registry> 
-		<image.registry>registry.repo.proxy-dev-forge.asip.hst.fluxus.net</image.registry> 
-		</properties> </profile> </profiles> -->
-</project>
+	
+	<!--  ************************* profils *********************************** -->
+		<profiles>
+		<profile>
+        <id>swagger</id>
+        <activation>
+            <activeByDefault>false</activeByDefault>
+        </activation>
+        <properties>
+            <spring.profiles.active>swagger</spring.profiles.active>
+        </properties>
+    </profile>
+	</profiles>
+	
+	
+	</project>
