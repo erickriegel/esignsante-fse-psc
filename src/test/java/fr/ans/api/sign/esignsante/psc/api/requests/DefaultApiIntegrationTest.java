@@ -61,7 +61,8 @@ public class DefaultApiIntegrationTest {
     @Test
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
-    	final String body = "[\"/\"]";
+    	//final String body = "[\"/\"]";
+    	final String body = "[\"/\",\"/signature/test\"]";
 //        mockMvc.perform(get("/").accept("application/json"))
 //                .andExpect(status().isOk()).andExpect(content().json(body)).andDo(print());
     	

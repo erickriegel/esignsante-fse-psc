@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 public class DefaultApiDelegateImpl extends ApiDelegate implements DefaultApiDelegate {
 
-	final String HEADER_TYPE = "application/json";
+//	final String HEADER_TYPE = "application/json";
 
 	/**
 	 * The log.
@@ -38,7 +38,7 @@ public class DefaultApiDelegateImpl extends ApiDelegate implements DefaultApiDel
 		if (acceptHeader.isPresent() && acceptHeader.get().contains(HEADER_TYPE)) {
 			final List<String> methods = new ArrayList<>();
 			methods.add("/");
-			// methods.add("/notexist");
+			methods.add("/signature/test"); //TODO: how TO ne pas renseigner manuellement ... 
 			re = new ResponseEntity<>(methods, HttpStatus.OK);
 		} else {
 			log.warn("ObjectMapper or HttpServletRequest not configured in default DefaultApi interface,"

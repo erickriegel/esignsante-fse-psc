@@ -12,6 +12,8 @@ import java.util.Optional;
  * générique des requêtes
  */
 public class ApiDelegate {
+	
+	final protected String HEADER_TYPE = "application/json";
 
 	/**
 	 * Gets the request.

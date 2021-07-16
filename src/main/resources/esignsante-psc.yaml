@@ -19,6 +19,9 @@ info:
 tags:
 -  name: client
    description: Ressources offertes au client.
+-  name: testsign
+   description: POST pour test tehnique .
+
 paths:
    /:
       get:
@@ -41,3 +44,57 @@ paths:
             '500':
                description: Erreur interne du serveur.
 
+   /signature/test:
+      post:
+         summary: demande de signature de PSC.
+         operationId: signeDocument
+         description: "Pour test fonctionnement du composant (datas IN et OUT). Simule un post reçu de PSC pour une demande de signature. "
+         tags:
+         - testsign
+         requestBody:
+            content:
+               application/json:
+                  schema:
+                     $ref: '#/components/schemas/RequeteSignatureRecue'
+         responses:
+            '200':
+               description: Requête en succès.
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        $ref: '#/components/schemas/ReponseDocumentSigne'
+            '201':
+               description: Token non confirmé par PSC. Requête refusée.
+            '400':
+               description: Erreur sur les paramètres reçus en entrée.
+            '500':
+               description: Erreur interne du serveur.
+components:
+   schemas:
+      RequeteSignatureRecue:
+         type: object
+         description: Demande de signature reçue
+         required:
+         - token
+         - documentASigner
+         properties:
+            token:
+               description: token PSC transmis
+               type: string
+            documentASigner:
+               description: document à signer reçu de PSC 
+               type: string
+      ReponseDocumentSigne:
+         type: object
+         description: Document signer par PSC
+         required:
+         - idMongoDB
+         - documentSigne
+         properties:
+            idMongoDB:
+               description: identifiant de la sauveagrde de la preuve
+               type: string
+            documentSigne:
+               description: document signé par esignsante à renvoyer au client
+               type: string
