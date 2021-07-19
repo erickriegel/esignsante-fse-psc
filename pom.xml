@@ -377,8 +377,8 @@
 							<tag>${project.version}</tag>
 						</tags>
 						 <auth>
-                        <username>${artificatory.username}</username>
-                        <password>${artificatory.password}</password>
+                        <username>${artifactory.username}</username>
+                        <password>${artifactory.password}</password>
                     </auth>
 <!-- 						<jib.to.auth.username>${artificatory.username}</jib.to.auth.username>
 						<jib.to.auth.password>${artificatory.password}</jib.to.auth.password> -->
