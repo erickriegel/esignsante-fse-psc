@@ -368,7 +368,7 @@
 				<configuration>
 				
 					<from>
-						<image>${docker.registry}/openjdk:11-slim-buster</image>				
+						<image>${docker.registry}/openjdk:16-slim-buster</image>				
 					</from>
 					<to>
 						<image>${image.registry}/cybersante/esignsante-psc</image>
