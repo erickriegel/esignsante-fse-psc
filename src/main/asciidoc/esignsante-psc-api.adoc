@@ -1,0 +1,18 @@
+= POC esignsante-psc 
+
+Description de l'API
+URL racine http://localhost:8080:/esignsante-psc/v1
+
+
+.request
+include::{snippets}/Liste_des_services/http-request.adoc[]
+
+.response
+include::{snippets}/Liste_des_services/http-response.adoc[]
+
+= YYYY
+start class (from POM properties)=>:: {start-class}
+
+
+
+

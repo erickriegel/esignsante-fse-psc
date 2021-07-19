@@ -12,12 +12,14 @@
 	<groupId>fr.ans.sign</groupId>
 	<artifactId>esignsante-psc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<!-- <version>${project-version}</version> -->
 	<name>esignsante-psc</name>
 
 	<packaging>jar</packaging>
 
 	<description>webservice REST de signature à partir d&apos;un jeton prosante connect</description>
 	<properties>
+		<!-- <project-version>0.0.1-SNAPSHOT</project-version> -->
 		<springfox-version>3.0.0</springfox-version>
 		<jackson-version>2.12.3</jackson-version>
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
@@ -28,12 +30,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+
 		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-mongodb</artifactId> 
 			</dependency> -->
- 		<dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -166,13 +170,13 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources/</directory>
-				 <excludes>
-				  <exclude>esignsante-psc.yaml</exclude>
-				 </excludes>
-				
+				<excludes>
+					<exclude>esignsante-psc.yaml</exclude>
+				</excludes>
+
 			</resource>
 			<!-- <resource> -->
-				<!-- <directory>src/main/resources/${dist}</directory> -->
+			<!-- <directory>src/main/resources/${dist}</directory> -->
 			<!-- </resource> -->
 		</resources>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -197,20 +201,57 @@
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
 				<!-- <version>1.5.8</version> -->
-				<!-- <version>2.1.0</version> -->
+				<version>2.1.0</version>
+
 				<executions>
 					<execution>
-						<id>generate-docs</id>
+						<id>generated-output-html</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>process-asciidoc</goal>
 						</goals>
+
 						<configuration>
+
+							<sourceDocumentName>esignsante-psc-api.adoc</sourceDocumentName> <!-- CJU doit être dans src/main/asciidoc et contenir les snippets à intégrer -->
+
 							<backend>html</backend>
 							<doctype>book</doctype>
+							<sourceHighlighter>prettify</sourceHighlighter>
+							<attributes>
+								<toc>left</toc>
+								<icons>font</icons>
+								<sectanchors>true</sectanchors>
+								<!-- set the idprefix to blank -->
+								<idprefix />
+
+
+								<snippets>${project.build.directory}/generated-snippets</snippets> <!-- CJU -->
+							</attributes>
+
+							<!-- CJU TODO ASCIIDOC -->
+							<project>
+<!-- 								<name> TODO POM.xml: NOM du PROJET</name>
+								<artifactId>@{project.artifactId}</artifactId>
+								<description>TODO POM.xml: description</description>
+								<version>@{project.version}</version> -->
+							</project>
+							<!-- FIN CJU TODO ASCIIDOC -->
+
 						</configuration>
+
 					</execution>
+
+
+					<!-- <execution> <id>generated-output-pdf</id> <phase>generate-resources</phase> 
+						<goals> <goal>process-asciidoc</goal> </goals> <configuration> <backend>pdf</backend> 
+						<sourceHighlighter>coderay</sourceHighlighter> <doctype>book</doctype> <attributes> 
+						<icons>font</icons> <pagenums/> <toc/> <idprefix/> <idseparator>-</idseparator> 
+						<pdf-fontsdir>data/fonts</pdf-fontsdir> <pdf-stylesdir>data/themes</pdf-stylesdir> 
+						<pdf-style>cn</pdf-style> </attributes> </configuration> </execution> -->
+
 				</executions>
+
 				<dependencies>
 					<dependency>
 						<groupId>org.springframework.restdocs</groupId>
@@ -220,13 +261,17 @@
 				</dependencies>
 			</plugin>
 			<!-- FIN Generation doc par Spring restdocs -->
-			
+
 
 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<jvmArguments>
+						<!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 -->
+						<!-- -add-opens java.base/java.lang=ALL-UNNAMED -illegal-access=permit -->
+					</jvmArguments>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -274,7 +319,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<!-- <version>3.8.0</version> -->
 				<configuration>
 					<source>11</source>
 					<target>16</target>
@@ -284,18 +329,90 @@
 				</configuration>
 			</plugin>
 			<!-- FIN compilation -->
-			
-			<!-- assembly -->
-			<!-- <plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
+
+			<!-- copie des restdocs dans le folder static -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+	<!-- 			<version>2.7</version> -->
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.outputDirectory}/static/docs
+							</outputDirectory>
+							<resources>
+								<resource>
+									<directory>
+										${project.build.directory}/generated-docs
+									</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- FIN copie des restdocs dans le folder static -->
+
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>2.1.0</version>
 				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/install.xml</descriptor>
-						<descriptor>src/main/assembly/directories.xml</descriptor>
-					</descriptors>
+					<from>
+						<image>${docker.registry}/openjdk:11-slim-buster</image>				
+					</from>
+					<to>
+						<image>${image.registry}/cybersante/esignsante-psc</image>
+						<tags>
+							<tag>latest</tag>
+							<tag>${project.version}</tag>
+						</tags>
+					</to>
+					<container>
+						<user>daemon:daemon</user>
+						<mainClass>fr.ans.sign.esignsantepsc.EsignsantePscApplication</mainClass>
+						<args>
+							<arg>--server.servlet.context-path=/esignsante-psc/v1</arg>
+						</args>
+						<ports>
+							<port>8080</port>
+						</ports>
+						<format>Docker</format>
+						<!--this sacrifices reproducibility since the timestamp will change 
+							with every build -->
+						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+						<!--<creationTime>2020-09-01T10:15:30+09:00</creationTime> -->
+					</container>
+					<allowInsecureRegistries>true</allowInsecureRegistries>
 				</configuration>
-			</plugin> -->
+			</plugin>
+
+			<!-- assembly -->
+			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
+				<descriptors> <descriptor>src/main/assembly/install.xml</descriptor> <descriptor>src/main/assembly/directories.xml</descriptor> 
+				</descriptors> </configuration> </plugin> -->
 			<!-- FIN assembly -->
+
+			<!-- CJU TEST POUR BUG avec MOngoDB -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<argLine>--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens
+								java.base/java.io=ALL-UNNAMED --illegal-access=permit</argLine>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- FIN CJU TEST POUR BUG avec MOngoDB -->
 
 			<!-- license pour Hook SVN -->
 			<plugin>
@@ -322,19 +439,82 @@
 
 		</plugins>
 	</build>
-	
-	<!--  ************************* profils *********************************** -->
-		<profiles>
+
+	<!-- ************************* profils *********************************** -->
+	<profiles>
 		<profile>
-        <id>swagger</id>
-        <activation>
-            <activeByDefault>false</activeByDefault>
-        </activation>
-        <properties>
-            <spring.profiles.active>swagger</spring.profiles.active>
-        </properties>
-    </profile>
+			<id>swagger</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<spring.profiles.active>swagger</spring.profiles.active>
+			</properties>
+		</profile>
+			<profile>
+			<activation>
+				<os>
+					<family>Linux</family>
+				</os>
+			</activation>
+			<id>jenkins</id>
+			<properties>
+				<artifactory.username>jenkins</artifactory.username>
+				<artifactory.password>password</artifactory.password>
+				<artifactory.hostname>http://st-forge.asipsante.fr:8081</artifactory.hostname>
+				<ldap.server.url>ldap://annuaire-igc.esante.gouv.fr:389</ldap.server.url>
+				<docker.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</docker.registry>
+				<!--<image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry>-->
+				<image.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</image.registry>
+			</properties>
+			<distributionManagement>
+				<repository>
+					<id>artifactory</id>
+					<url>${distributionRepositoryJenkinsfile}</url>
+				</repository>
+				<!--<repository>
+					<id>artifactory</id>
+					<url>${artifactory.hostname}/artifactory/asip-releases</url>
+				</repository>-->
+				<snapshotRepository>
+					<id>artifactory</id>
+					<url>${artifactory.hostname}/artifactory/asip-snapshots</url>
+				</snapshotRepository>
+			</distributionManagement>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.8</version>
+						<executions>
+							<execution>
+								<id>parse-version</id>
+								<goals>
+									<goal>parse-version</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>3.0.0-M1</version>
+						<configuration>
+							<!--<username>${svn.username}</username>
+							<password>${svn.password}</password>-->
+							<checkModificationExcludes>
+								<checkModificationExclude>pom.xml</checkModificationExclude>
+								<checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude>
+							</checkModificationExcludes>
+							<tagBase>http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-ws/applicatif/tags</tagBase>
+							<tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
-	
-	
-	</project>
+
+
+</project>

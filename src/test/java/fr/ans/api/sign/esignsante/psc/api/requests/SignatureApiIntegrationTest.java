@@ -22,7 +22,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -122,12 +121,22 @@ public class SignatureApiIntegrationTest {
           	
               formatRequeteJson (requeteBody);
       	            
+//        	  ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.post(endPoint).accept(MediaType.APPLICATION_OCTET_STREAM)
+//        			  .contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotAcceptable());
+//        	  
+//                      assertTrue(true,"Code retour attendu : NotImplemented");
+//    	    	  returned.andDo(print()); //pour debug console: a supprimer
+//    	    	  returned.andDo(document(titreDocument));
+              
+              
         	  ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.post(endPoint).accept(MediaType.APPLICATION_OCTET_STREAM)
         			  .contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotAcceptable());
         	  
                       assertTrue(true,"Code retour attendu : NotImplemented");
     	    	  returned.andDo(print()); //pour debug console: a supprimer
-    	    	  returned.andDo(document(titreDocument));   	  
+    	    	  returned.andDo(document(titreDocument));  
+    	    	  
+
     }
     	 
           

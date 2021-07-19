@@ -54,7 +54,7 @@ public class DefaultApiIntegrationTest {
 	
 
     /**
-     * Vérification de la liste des services disponibles.
+     * VÃ©rification de la liste des services disponibles.
      *
      * @throws Exception the exception
      */
