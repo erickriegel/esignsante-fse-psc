@@ -451,6 +451,8 @@
 				<spring.profiles.active>swagger</spring.profiles.active>
 			</properties>
 		</profile>
+		
+		
 			<profile>
 			<activation>
 				<os>
@@ -507,7 +509,7 @@
 								<checkModificationExclude>pom.xml</checkModificationExclude>
 								<checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude>
 							</checkModificationExcludes>
-							<tagBase>http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-ws/applicatif/tags</tagBase>
+							<tagBase>http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-psc/tags</tagBase>
 							<tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
 						</configuration>
 					</plugin>
