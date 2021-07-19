@@ -366,6 +366,7 @@
 				<artifactId>jib-maven-plugin</artifactId>
 				<version>2.1.0</version>
 				<configuration>
+				
 					<from>
 						<image>${docker.registry}/openjdk:11-slim-buster</image>				
 					</from>
@@ -375,6 +376,12 @@
 							<tag>latest</tag>
 							<tag>${project.version}</tag>
 						</tags>
+						 <auth>
+                        <username>${artificatory.username}</username>
+                        <password>${artificatory.password}</password>
+                    </auth>
+<!-- 						<jib.to.auth.username>${artificatory.username}</jib.to.auth.username>
+						<jib.to.auth.password>${artificatory.password}</jib.to.auth.password> -->
 					</to>
 					<container>
 						<user>daemon:daemon</user>
