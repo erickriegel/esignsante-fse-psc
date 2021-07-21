@@ -1,17 +1,111 @@
 = POC esignsante-psc 
 
-Description de l'API
-URL racine http://localhost:8080:/esignsante-psc/v1
 
+== Introduction
+Ce site est la documentation de l'API esignsante-psc extraite des tests.
+
+Pour tester l'API, vous pouvez utiliser swagger: +
+http://localhost:8080:/esignsante-psc/v1/swagger-ui/ +
+Ne pas oublier d'activer le profil 'swagger' au démarrage de Spring: 
+java -jar *-Dspring.profiles.active=swagger* esignsante-psc-0.0.13-SNAPSHOT.jar .../application.properties ...
+
+== Pour DEV (à supprimer)
+URL racine http://localhost:8080:/esignsante-psc/v1 +
+version: +
+artifact: +
+
+start class (from POM properties)=>:: {start-class}
+
+<balise></balise>
+& é è " ^ $ à ç 
+
+== Interrogation de l'API
+Liste des services exposés
 
 .request
-include::{snippets}/Liste_des_services/http-request.adoc[]
+http:
+include::{snippets}/Liste_des_services/OK/http-request.adoc[]
+
+httpIE:
+include::{snippets}/Liste_des_services/OK/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/Liste_des_services/OK/curl-request.adoc[]
+
+
 
 .response
-include::{snippets}/Liste_des_services/http-response.adoc[]
+include::{snippets}/Liste_des_services/OK/http-response.adoc[]
 
-= YYYY
-start class (from POM properties)=>:: {start-class}
+Payload:
+include::{snippets}/Liste_des_services/OK/response-body.adoc[]
+
+
+
+== Demande de signature (mock pour test rest docs)
+
+=== Cas passant
+.request
+include::{snippets}/signature/OK/http-request.adoc[]
+
+payload:
+include::{snippets}/signature/OK/request-body.adoc[]
+
+
+.response
+include::{snippets}/signature/OK/http-response.adoc[]
+
+payload:
+include::{snippets}/signature/OK/response-body.adoc[]
+
+=== Cas passant 2
+.request
+include::{snippets}/signature/OK2/http-request.adoc[]
+
+payload:
+include::{snippets}/signature/OK2/request-body.adoc[]
+
+
+.response
+include::{snippets}/signature/OK2/http-response.adoc[]
+
+payload:
+include::{snippets}/signature/OK2/response-body.adoc[]
+
+
+=== Cas Token Invalid
+.request
+include::{snippets}/signature/TokenKo/http-request.adoc[]
+
+payload:
+include::{snippets}/signature/TokenKo/request-body.adoc[]
+
+
+.response
+include::{snippets}/signature/TokenKo/http-response.adoc[]
+
+=== Cas Header Accept non Json
+.request
+include::{snippets}/signature/HeaderKO/http-request.adoc[]
+
+payload:
+include::{snippets}/signature/HeaderKO/request-body.adoc[]
+
+
+.response
+include::{snippets}/signature/HeaderKO/http-response.adoc[]
+
+
+=== Cas Stream In KO
+.request
+include::{snippets}/signature/StreamKo/http-request.adoc[]
+
+
+.response
+include::{snippets}/signature/StreamKo/http-response.adoc[]
+
+
+
 
 
 

@@ -40,14 +40,13 @@ public class SignatureApiDelegateImpl extends ApiDelegate implements SignatureAp
 		
 			System.err.println("ReceiveDocument: " + requeteSignatureRecue.getDocumentASigner());
 			System.err.println("ReceiveToken: " + requeteSignatureRecue.getToken());
-			if (requeteSignatureRecue.getToken().contentEquals("nonValide")) {
-				System.err.println("++++++++: " + requeteSignatureRecue.getToken());
+			if (requeteSignatureRecue.getToken().contentEquals("nonValide")) {				
 				re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 			else {
 			final ReponseDocumentSigne returned = new ReponseDocumentSigne();
-			returned.setIdMongoDB("TiensTonIdMongoDB...");
-			returned.setDocumentSigne("Blabla..Ce document est signé");
+			returned.setIdMongoDB("Id de preuve revoyé par esignsante-psc");
+			returned.setDocumentSigne("Ceci est le docucument signé par esignsante xxxxxxx");
 			re = new ResponseEntity<>(returned, HttpStatus.OK); }
 		return re;
 	}

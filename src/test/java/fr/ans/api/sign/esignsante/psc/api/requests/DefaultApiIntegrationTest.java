@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 //import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 
 /**
@@ -54,26 +56,20 @@ public class DefaultApiIntegrationTest {
 	
 
     /**
-     * VÃ©rification de la liste des services disponibles.
+     * Vérification de la liste des services disponibles.
      *
      * @throws Exception the exception
      */
     @Test
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
-    	//final String body = "[\"/\"]";
+   
     	final String body = "[\"/\",\"/signature/test\"]";
-//        mockMvc.perform(get("/").accept("application/json"))
-//                .andExpect(status().isOk()).andExpect(content().json(body)).andDo(print());
-    	
-    	
-    	  ResultActions returned = mockMvc.perform(get("/").accept("application/json"))
+
+    	ResultActions returned = mockMvc.perform(get("/").accept("application/json"))
           .andExpect(status().isOk()).andExpect(content().json(body));
     	  
     	  returned.andDo(print()); //pour debug console: a supprimer
-    	  returned.andDo(document("Liste_des_services"));
-          
-    	  
-    }
-    
+    	  returned.andDo(document("Liste_des_services/OK"));  
+    }       
 }
