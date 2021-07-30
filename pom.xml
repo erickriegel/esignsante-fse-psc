@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -19,7 +21,7 @@
 		<!-- <developerConnection>scm:svn:http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-ws/applicatif/tags/esignsante-webservices-2.4.1.99</developerConnection> -->
 		<developerConnection>scm:svn:http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-psc/trunk</developerConnection>
 	</scm>
-	
+
 	<description>webservice REST de signature à partir d'un jeton prosante connect</description>
 	<properties>
 		<!-- <project-version>0.0.1-SNAPSHOT</project-version> -->
@@ -34,8 +36,10 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-<!-- 		 <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-mongodb</artifactId> 
-			</dependency> xx-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -204,7 +208,7 @@
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
 				<!-- <version>1.5.8</version> -->
-				<version>2.1.0</version> 
+				<version>2.1.0</version>
 
 				<executions>
 					<execution>
@@ -234,10 +238,8 @@
 
 							<!-- CJU TODO ASCIIDOC -->
 							<project>
-<!-- 								<name> TODO POM.xml: NOM du PROJET</name>
-								<artifactId>@{project.artifactId}</artifactId>
-								<description>TODO POM.xml: description</description>
-								<version>@{project.version}</version> -->
+								<!-- <name> TODO POM.xml: NOM du PROJET</name> <artifactId>@{project.artifactId}</artifactId> 
+									<description>TODO POM.xml: description</description> <version>@{project.version}</version> -->
 							</project>
 							<!-- FIN CJU TODO ASCIIDOC -->
 
@@ -335,7 +337,7 @@
 			<!-- copie des restdocs dans le folder static -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-					<executions>
+				<executions>
 					<execution>
 						<id>copy-resources</id>
 						<phase>prepare-package</phase>
@@ -357,7 +359,7 @@
 					</execution>
 				</executions>
 			</plugin>
-		 	<!-- FIN copie des restdocs dans le folder static -->
+			<!-- FIN copie des restdocs dans le folder static -->
 
 
 			<plugin>
@@ -365,9 +367,9 @@
 				<artifactId>jib-maven-plugin</artifactId>
 				<version>2.1.0</version>
 				<configuration>
-				
+
 					<from>
-						<image>${docker.registry}/openjdk:16-slim-buster</image>				
+						<image>${docker.registry}/openjdk:16-slim-buster</image>
 					</from>
 					<to>
 						<image>${image.registry}/cybersante/esignsante-psc</image>
@@ -375,12 +377,12 @@
 							<tag>latest</tag>
 							<tag>${project.version}</tag>
 						</tags>
-						 <auth>
-                        <username>jenkins</username>
-                        <password>${jenkins.password}</password>
-                    </auth>
-<!-- 						<jib.to.auth.username>${artificatory.username}</jib.to.auth.username>
-						<jib.to.auth.password>${artificatory.password}</jib.to.auth.password> -->
+						<auth>
+							<username>jenkins</username>
+							<password>${jenkins.password}</password>
+						</auth>
+						<!-- <jib.to.auth.username>${artificatory.username}</jib.to.auth.username> 
+							<jib.to.auth.password>${artificatory.password}</jib.to.auth.password> -->
 					</to>
 					<container>
 						<user>daemon:daemon</user>
@@ -408,17 +410,9 @@
 			<!-- FIN assembly -->
 
 			<!-- CJU TEST POUR BUG avec MOngoDB -->
-<!-- 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<executions>
-					<execution>
-						<configuration>
-							<argLine></argLine>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
+				<executions> <execution> <configuration> <argLine></argLine> </configuration> 
+				</execution> </executions> </plugin> -->
 			<!-- FIN CJU TEST POUR BUG avec MOngoDB -->
 
 			<!-- license pour Hook SVN -->
@@ -458,9 +452,9 @@
 				<spring.profiles.active>swagger</spring.profiles.active>
 			</properties>
 		</profile>
-		
-		
-			<profile>
+
+
+		<profile>
 			<activation>
 				<os>
 					<family>Linux</family>
@@ -473,14 +467,12 @@
 				<artifactory.hostname>http://st-forge.asipsante.fr:8081</artifactory.hostname>
 				<ldap.server.url>ldap://annuaire-igc.esante.gouv.fr:389</ldap.server.url>
 				<docker.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</docker.registry>
-				<!--<image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry>-->
+				<!--<image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry> -->
 				<image.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</image.registry>
 			</properties>
 			<distributionManagement>
-<!-- 				<repository>
-					<id>artifactory</id>
-					<url>${distributionRepositoryJenkinsfile}</url>
-				</repository> -->
+				<!-- <repository> <id>artifactory</id> <url>${distributionRepositoryJenkinsfile}</url> 
+					</repository> -->
 				<repository>
 					<id>artifactory</id>
 					<url>${artifactory.hostname}/artifactory/asip-releases</url>
@@ -505,7 +497,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-release-plugin</artifactId>
