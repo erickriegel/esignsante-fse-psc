@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 
 @Service
-public class DefaultApiDelegateImpl extends ApiDelegate implements DefaultApiDelegate {
+public class DefaultApiDelegateImpl extends AbstractApiDelegate implements DefaultApiDelegate {
 
 //	final String HEADER_TYPE = "application/json";
 

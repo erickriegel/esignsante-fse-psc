@@ -11,12 +11,12 @@ import java.util.Optional;
  * The Class ApiDelegate. Classe mère de tous les delegates. Traitement
  * générique des requêtes
  */
-public class ApiDelegate {
+abstract public class AbstractApiDelegate {
 	
 	final protected String HEADER_TYPE = "application/json";
 
 	/**
-	 * Gets the request.
+	 * Gets the request
 	 *
 	 * @return the request
 	 */

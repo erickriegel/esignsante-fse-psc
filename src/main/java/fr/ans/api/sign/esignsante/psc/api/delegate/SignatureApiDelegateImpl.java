@@ -13,7 +13,7 @@ import fr.ans.api.sign.esignsante.psc.model.ReponseDocumentSigne;
 import fr.ans.api.sign.esignsante.psc.model.RequeteSignatureRecue;
 
 @Service
-public class SignatureApiDelegateImpl extends ApiDelegate implements SignatureApiDelegate {
+public class SignatureApiDelegateImpl extends AbstractApiDelegate implements SignatureApiDelegate {
 	
 
 	/**
