@@ -29,6 +29,7 @@
 		<jackson-version>2.12.3</jackson-version>
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
 		<dist>docker</dist>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
