@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ContextConfiguration;
@@ -64,11 +65,19 @@ public class DefaultApiIntegrationTest {
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
    
-    	final String body = "[\"/\",\"/signature/test\"]";
+    	final String body =  "[{\"path\":\"/ca\",\"description\":\"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.\",\"payload\":\"\",\"requiredHeaders\":\"\"},{\"path\":\"/asksignature/xades\",\"description\":\"OpÃ©ration qui permet au client de demander de signer un document au format XADES Baseline-B.\",\"payload\":\"\",\"requiredHeaders\":\"Access_token, accept:json, usertoken\"},{\"path\":\"/\",\"description\":\"Liste des opérations disponibles\",\"payload\":\"\",\"requiredHeaders\":\"\"}]";
 
-    	ResultActions returned = mockMvc.perform(get("/").accept("application/json"))
-          .andExpect(status().isOk()).andExpect(content().json(body));
+    	
+//    	ResultActions returned = mockMvc.perform(get("/").accept("application/json"))
+//    	    .andExpect(status().isOk()).andExpect(content().json(body));
+
     	  
+    	
+    	ResultActions returned = mockMvc.perform(get("/")
+    			.contentType(MediaType.APPLICATION_JSON))
+        	    .andExpect(status().isOk()).andExpect(content().json(body));
+        // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
+    	
     	  returned.andDo(print()); //pour debug console: a supprimer
     	  returned.andDo(document("Liste_des_services/OK"));  
     }       

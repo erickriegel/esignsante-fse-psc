@@ -1,21 +1,23 @@
-openapi: 3.0.2
-servers:
-  - url: 'https://esignsante.psc.esante.gouv.fr/v1'
-    description: Sandbox
+openapi: 3.0.0
 info:
-  title: eSignSantePSC
+  title: esignsante-psc
   version: '1.0'
-  description: 'Public API for document digital signature'
+  description: This API can be used to sign PDF or XML documents with an A.N.S X509 certificate
+  contact:
+    email: esignsante@esante.gouv.fr
+servers:
+  - url: 'https://esignsante.psc.esante.gouv.fr'
+    description: Sandbox
 tags:
   - name: utils
   - name: signature
-  - name: checksignature 
+  - name: checksignature
 paths:
   /:
     get:
       summary: Your GET endpoint
-      tags: 
-      - utils
+      tags:
+        - utils
       responses:
         '200':
           description: Requête en succès.
@@ -25,8 +27,17 @@ paths:
                 type: array
                 description: ''
                 minItems: 1
-                uniqueItems: true 
-                items: 
+                uniqueItems: true
+                x-examples:
+                  example-1:
+                    - path: /
+                      description: Liste des opérations disponibles
+                    - path: /asksignsature/xades
+                      description: signe un document XML à la norme Xades
+                    - path: /asksignsature/pades
+                      description: signe un document PDF à la norme Pades
+                      body: fichier à signer....
+                items:
                   $ref: '#/components/schemas/Operation'
               examples:
                 example-1:
@@ -37,18 +48,485 @@ paths:
                       description: signe un document XML à la norme Xades
                     - path: /asksignsature/pades
                       description: signe un document PDF à la norme Pades
-                      body: fichier à signer....              
+                      body: fichier à signer....
         '400':
           description: Requête mal formée.
         '500':
           description: Erreur interne du serveur.
       operationId: get-operations
       description: 'Opération qui permet au client de lister les opérations offertes par le composant eSignSante-PSC.  '
+  /ca:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - utils
+      responses:
+        '200':
+          description: Requête en succès.
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Le DN des autorités de la chaîne de confiance utilisée par la plateforme
+                items:
+                  type: string
+        '400':
+          description: Requête mal formée.
+        '500':
+          description: Erreur interne du serveur.
+      operationId: get-ca
+      description: Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.
+  /asksignature/xades:
+    post:
+      summary: ''
+      operationId: post-asksignature-xades
+      responses:
+        '200':
+          description: Requête en succès.
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/Document'
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Requête mal formée.
+        '401':
+          description: Jeton non-valide.
+        '415':
+          description: Le format de document n'est pas supporté par le serveur.
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Service Unavailable
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Document'
+            examples:
+              example-1:
+                value:
+                  file: string
+        description: Le document à signer au format XML.
+      parameters:
+        - $ref: '#/components/parameters/UserInfo'
+      tags:
+        - signature
+      description: Opération qui permet au client de demander de signer un document au format XADES Baseline-B.
+      security:
+        - PRO-SanteConnect: []
+    parameters: []
+  /asksignature/pades:
+    post:
+      summary: ''
+      operationId: post-askSignature-pades
+      responses:
+        '200':
+          description: Requête en succès.
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/Document'
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Requête mal formée.
+        '401':
+          description: Jeton non-valide.
+        '415':
+          description: Le format de document n'est pas supporté par le serveur.
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Service Unavailable
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Document'
+        description: Le document à signer au format PDF.
+      parameters:
+        - $ref: '#/components/parameters/UserInfo'
+      tags:
+        - signature
+      description: Opération qui permet au client de demander de signer un document au format PADES Baseline-B.
+      security:
+        - PRO-SanteConnect: []
+    parameters: []
+  /checksignature/xades:
+    post:
+      summary: ''
+      operationId: post-checksignature-xades
+      responses:
+        '200':
+          description: Requête en succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: Requête mal formée.
+        '500':
+          description: Erreur interne du serveur (vérifier que le document est au bon format XML).
+        '501':
+          description: L'opération n'est pas supportée par le serveur.
+        '503':
+          description: Service Unavailable
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  $ref: '#/components/schemas/Document'
+        description: 'Le document à vérifier, il doit impérativement être au format XML.'
+      tags:
+        - checksignature
+      description: Opération qui permet au client de vérifier une signature au format XADES.
+  /checksignature/pades:
+    post:
+      summary: ''
+      operationId: post-checksignature-pades
+      responses:
+        '200':
+          description: Requête en succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '400':
+          description: Requête mal formée.
+        '500':
+          description: Erreur interne du serveur (vérifier que le document est au bon format PDF).
+        '501':
+          description: L'opération n'est pas supportée par le serveur.
+        '503':
+          description: Service Unavailable
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  $ref: '#/components/schemas/Document'
+        description: Le document à vérifier au format PDF.
+      tags:
+        - checksignature
+      description: Opération qui permet au client de vérifier une signature au format PADES.
 components:
   schemas:
+    UserInfo:
+      type: array
+      description: ''
+      minItems: 1
+      uniqueItems: true
+      x-examples:
+        example-1:
+          - codeProfession: '10'
+            codeCategorieProfessionnelle: C
+            codeCiviliteDexercice: M
+            nomDexercice: TOUBIB0023550
+            prenomDexercice: CYRIL
+            codeTypeSavoirFaire: ''
+            codeSavoirFaire: ''
+            activities:
+              - codeModeExercice: L
+                codeSecteurDactivite: SA07
+                codeSectionPharmacien: ''
+                codeRole: ''
+                numeroSiretSite: ''
+                numeroSirenSite: ''
+                numeroFinessSite: ''
+                numeroFinessetablissementJuridique: ''
+                identifiantTechniqueDeLaStructure: ''
+                raisonSocialeSite: CAB MED BIS TOUBIB0023550
+                enseigneCommercialeSite: ''
+                complementDestinataire: ''
+                complementPointGeographique: ''
+                numeroVoie: ''
+                indiceRepetitionVoie: ''
+                codeTypeDeVoie: R
+                libelleVoie: PARIS
+                mentionDistribution: ''
+                bureauCedex: ''
+                codePostal: '75009'
+                codeCommune: '75109'
+                codePays: ''
+                telephone: ''
+                telephone2: ''
+                telecopie: ''
+                adresseEMail: ''
+                codeDepartement: '75'
+                ancienIdentifiantDeLaStructure: ''
+                autoriteDenregistrement: ''
+              - codeModeExercice: L
+                codeSecteurDactivite: SA07
+                codeSectionPharmacien: ''
+                codeRole: ''
+                numeroSiretSite: ''
+                numeroSirenSite: ''
+                numeroFinessSite: ''
+                numeroFinessetablissementJuridique: ''
+                identifiantTechniqueDeLaStructure: ''
+                raisonSocialeSite: CABINET MEDICAL0023550
+                enseigneCommercialeSite: ''
+                complementDestinataire: ''
+                complementPointGeographique: ''
+                numeroVoie: '2'
+                indiceRepetitionVoie: ''
+                codeTypeDeVoie: R
+                libelleVoie: LIBERTA
+                mentionDistribution: ''
+                bureauCedex: ''
+                codePostal: '75009'
+                codeCommune: '75109'
+                codePays: ''
+                telephone: ''
+                telephone2: ''
+                telecopie: ''
+                adresseEMail: ''
+                codeDepartement: '75'
+                ancienIdentifiantDeLaStructure: ''
+                autoriteDenregistrement: ''
+              - codeModeExercice: S
+                codeSecteurDactivite: SA01
+                codeSectionPharmacien: ''
+                codeRole: ''
+                numeroSiretSite: ''
+                numeroSirenSite: ''
+                numeroFinessSite: ''
+                numeroFinessetablissementJuridique: ''
+                identifiantTechniqueDeLaStructure: ''
+                raisonSocialeSite: HOPITAL GENERIQUE
+                enseigneCommercialeSite: ''
+                complementDestinataire: ''
+                complementPointGeographique: ''
+                numeroVoie: '20'
+                indiceRepetitionVoie: ''
+                codeTypeDeVoie: R
+                libelleVoie: DE PARIS
+                mentionDistribution: ''
+                bureauCedex: ''
+                codePostal: '75020'
+                codeCommune: '75120'
+                codePays: ''
+                telephone: ''
+                telephone2: ''
+                telecopie: ''
+                adresseEMail: ''
+                codeDepartement: '75'
+                ancienIdentifiantDeLaStructure: ''
+                autoriteDenregistrement: ''
+              - codeModeExercice: S
+                codeSecteurDactivite: SA43
+                codeSectionPharmacien: ''
+                codeRole: ''
+                numeroSiretSite: '00000000016972'
+                numeroSirenSite: '000000000'
+                numeroFinessSite: ''
+                numeroFinessetablissementJuridique: ''
+                identifiantTechniqueDeLaStructure: ''
+                raisonSocialeSite: CONSEIL DES ORDRES
+                enseigneCommercialeSite: ''
+                complementDestinataire: ''
+                complementPointGeographique: ''
+                numeroVoie: '28'
+                indiceRepetitionVoie: ''
+                codeTypeDeVoie: R
+                libelleVoie: DES INVALIDES
+                mentionDistribution: ''
+                bureauCedex: ''
+                codePostal: '75009'
+                codeCommune: '75109'
+                codePays: ''
+                telephone: ''
+                telephone2: ''
+                telecopie: ''
+                adresseEMail: ''
+                codeDepartement: '75'
+                ancienIdentifiantDeLaStructure: ''
+                autoriteDenregistrement: ''
+              - codeModeExercice: S
+                codeSecteurDactivite: SA43
+                codeSectionPharmacien: ''
+                codeRole: ''
+                numeroSiretSite: '00000000079608'
+                numeroSirenSite: '000000000'
+                numeroFinessSite: ''
+                numeroFinessetablissementJuridique: ''
+                identifiantTechniqueDeLaStructure: ''
+                raisonSocialeSite: ORGANISME ND7960
+                enseigneCommercialeSite: ''
+                complementDestinataire: ''
+                complementPointGeographique: ''
+                numeroVoie: '2'
+                indiceRepetitionVoie: ''
+                codeTypeDeVoie: R
+                libelleVoie: MOULIN VERT
+                mentionDistribution: ''
+                bureauCedex: ''
+                codePostal: '75009'
+                codeCommune: '75109'
+                codePays: ''
+                telephone: ''
+                telephone2: ''
+                telecopie: ''
+                adresseEMail: ''
+                codeDepartement: '75'
+                ancienIdentifiantDeLaStructure: ''
+                autoriteDenregistrement: ''
+      items:
+        type: object
+        properties:
+          codeProfession:
+            type: string
+            minLength: 1
+          codeCategorieProfessionnelle:
+            type: string
+            minLength: 1
+          codeCiviliteDexercice:
+            type: string
+            minLength: 1
+          nomDexercice:
+            type: string
+            minLength: 1
+          prenomDexercice:
+            type: string
+            minLength: 1
+          codeTypeSavoirFaire:
+            type: string
+          codeSavoirFaire:
+            type: string
+          activities:
+            type: array
+            uniqueItems: true
+            minItems: 1
+            items:
+              type: object
+              properties:
+                codeModeExercice:
+                  type: string
+                  minLength: 1
+                codeSecteurDactivite:
+                  type: string
+                  minLength: 1
+                codeSectionPharmacien:
+                  type: string
+                codeRole:
+                  type: string
+                numeroSiretSite:
+                  type: string
+                numeroSirenSite:
+                  type: string
+                numeroFinessSite:
+                  type: string
+                numeroFinessetablissementJuridique:
+                  type: string
+                identifiantTechniqueDeLaStructure:
+                  type: string
+                raisonSocialeSite:
+                  type: string
+                  minLength: 1
+                enseigneCommercialeSite:
+                  type: string
+                complementDestinataire:
+                  type: string
+                complementPointGeographique:
+                  type: string
+                numeroVoie:
+                  type: string
+                indiceRepetitionVoie:
+                  type: string
+                codeTypeDeVoie:
+                  type: string
+                  minLength: 1
+                libelleVoie:
+                  type: string
+                  minLength: 1
+                mentionDistribution:
+                  type: string
+                bureauCedex:
+                  type: string
+                codePostal:
+                  type: string
+                  minLength: 1
+                codeCommune:
+                  type: string
+                  minLength: 1
+                codePays:
+                  type: string
+                telephone:
+                  type: string
+                telephone2:
+                  type: string
+                telecopie:
+                  type: string
+                adresseEMail:
+                  type: string
+                codeDepartement:
+                  type: string
+                  minLength: 1
+                ancienIdentifiantDeLaStructure:
+                  type: string
+                autoriteDenregistrement:
+                  type: string
+              required:
+                - codeModeExercice
+                - codeSecteurDactivite
+                - codeSectionPharmacien
+                - codeRole
+                - numeroSiretSite
+                - numeroSirenSite
+                - numeroFinessSite
+                - numeroFinessetablissementJuridique
+                - identifiantTechniqueDeLaStructure
+                - raisonSocialeSite
+                - enseigneCommercialeSite
+                - complementDestinataire
+                - complementPointGeographique
+                - numeroVoie
+                - indiceRepetitionVoie
+                - codeTypeDeVoie
+                - libelleVoie
+                - mentionDistribution
+                - bureauCedex
+                - codePostal
+                - codeCommune
+                - codePays
+                - telephone
+                - telephone2
+                - telecopie
+                - adresseEMail
+                - codeDepartement
+                - ancienIdentifiantDeLaStructure
+                - autoriteDenregistrement
+        required:
+          - codeProfession
+          - codeCategorieProfessionnelle
+          - codeCiviliteDexercice
+          - nomDexercice
+          - prenomDexercice
+          - codeTypeSavoirFaire
+          - codeSavoirFaire
+          - activities
     Operation:
-      title: Operation
       type: object
+      description: Available operation
+      x-examples:
+        example-1:
+          - path: /
+            description: Liste des opérations disponibles
+          - path: /asksignsature/xades
+            description: signe un document XML à la norme Xades
+          - path: /asksignsature/pades
+            description: signe un document PDF à la norme Pades
+            body: fichier à signer....
       properties:
         path:
           type: string
@@ -58,10 +536,45 @@ components:
           type: string
         requiredHeaders:
           type: string
+    Document:
+      title: Document
+      type: object
+      properties:
+        file:
+          type: string
+      description: Document to sign (XML or PDF)
+    Error:
+      title: Error
+      type: object
+      description: Error object returned when signature validation fails
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Result:
+      title: Result
+      type: object
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      description: Résultat d'une vérification de signature.
+  responses: {}
   securitySchemes:
     PRO-SanteConnect:
       type: openIdConnect
+      description: ''
       openIdConnectUrl: 'https://auth.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
     Pro-SanteConnect_BAS:
       type: openIdConnect
       openIdConnectUrl: 'https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
+  parameters:
+    UserInfo:
+      name: UserInfo
+      in: header
+      schema:
+        $ref: '#/components/schemas/UserInfo'
