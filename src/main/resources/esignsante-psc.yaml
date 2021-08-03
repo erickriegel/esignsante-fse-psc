@@ -1,100 +1,67 @@
 openapi: 3.0.2
-# Added by API Auto Mocking Plugin
 servers:
--  description: SwaggerHub API Auto Mocking
-   url: https://esignsante-psc.sign.ans.fr{basePath}/
-   variables:
-      port:
-         enum:
-         - '8080'
-         default: '8080'
-      basePath:
-         default: /
+  - url: 'https://esignsante.psc.esante.gouv.fr/v1'
+    description: Sandbox
 info:
-   description: TODO API esignsante-psc API du composant eSignSante-psc....
-   version: 1.0.0.0
-   title: eSignSantePSC
-   contact:
-      email: esignsante@asipsante.fr
+  title: eSignSantePSC
+  version: '1.0'
+  description: 'Public API for document digital signature'
 tags:
--  name: client
-   description: Ressources offertes au client.
--  name: testsign
-   description: POST pour test tehnique .
-
+  - name: utils
+  - name: signature
+  - name: checksignature 
 paths:
-   /:
-      get:
-         summary: Liste des opérations disponibles.
-         operationId: getOperations
-         description: "Opération ... le composant ANS esignsante-psc. "
-         tags:
-         - client
-         responses:
-            '200':
-               description: Requête en succès.
-               content:
-                  application/json:
-                     schema:
-                        type: array
-                        items:
-                           type: string
-            '400':
-               description: Requête mal formée.
-            '500':
-               description: Erreur interne du serveur.
-
-   /signature/test:
-      post:
-         summary: demande de signature de PSC.
-         operationId: signeDocument
-         description: "Pour test fonctionnement du composant (datas IN et OUT). Simule un post reçu de PSC pour une demande de signature. "
-         tags:
-         - testsign
-         requestBody:
-            content:
-               application/json:
-                  schema:
-                     $ref: '#/components/schemas/RequeteSignatureRecue'
-         responses:
-            '200':
-               description: Requête en succès.
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        $ref: '#/components/schemas/ReponseDocumentSigne'
-            '201':
-               description: Token non confirmé par PSC. Requête refusée.
-            '400':
-               description: Erreur sur les paramètres reçus en entrée.
-            '500':
-               description: Erreur interne du serveur.
+  /:
+    get:
+      summary: Your GET endpoint
+      tags: 
+      - utils
+      responses:
+        '200':
+          description: Requête en succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: ''
+                minItems: 1
+                uniqueItems: true 
+                items: 
+                  $ref: '#/components/schemas/Operation'
+              examples:
+                example-1:
+                  value:
+                    - path: /
+                      description: Liste des opérations disponibles
+                    - path: /asksignsature/xades
+                      description: signe un document XML à la norme Xades
+                    - path: /asksignsature/pades
+                      description: signe un document PDF à la norme Pades
+                      body: fichier à signer....              
+        '400':
+          description: Requête mal formée.
+        '500':
+          description: Erreur interne du serveur.
+      operationId: get-operations
+      description: 'Opération qui permet au client de lister les opérations offertes par le composant eSignSante-PSC.  '
 components:
-   schemas:
-      RequeteSignatureRecue:
-         type: object
-         description: Demande de signature reçue
-         required:
-         - token
-         - documentASigner
-         properties:
-            token:
-               description: token PSC transmis
-               type: string
-            documentASigner:
-               description: document à signer reçu de PSC 
-               type: string
-      ReponseDocumentSigne:
-         type: object
-         description: Document signer par PSC
-         required:
-         - idMongoDB
-         - documentSigne
-         properties:
-            idMongoDB:
-               description: identifiant de la sauveagrde de la preuve
-               type: string
-            documentSigne:
-               description: document signé par esignsante à renvoyer au client
-               type: string
+  schemas:
+    Operation:
+      title: Operation
+      type: object
+      properties:
+        path:
+          type: string
+        description:
+          type: string
+        payload:
+          type: string
+        requiredHeaders:
+          type: string
+  securitySchemes:
+    PRO-SanteConnect:
+      type: openIdConnect
+      openIdConnectUrl: 'https://auth.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
+    Pro-SanteConnect_BAS:
+      type: openIdConnect
+      openIdConnectUrl: 'https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
