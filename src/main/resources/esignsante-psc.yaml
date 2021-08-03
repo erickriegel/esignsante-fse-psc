@@ -6,7 +6,7 @@ info:
   contact:
     email: esignsante@esante.gouv.fr
 servers:
-  - url: 'https://esignsante.psc.esante.gouv.fr'
+  - url: 'https://esignsante.psc.esante.gouv.fr/v1'
     description: Sandbox
 tags:
   - name: utils
@@ -49,6 +49,12 @@ paths:
                     - path: /asksignsature/pades
                       description: signe un document PDF à la norme Pades
                       body: fichier à signer....
+                example-2:
+                  value:
+                    - path: /
+                      description: Liste des opérations disponibles
+                      payload: aucun
+                      requiredHeaders: Accept
         '400':
           description: Requête mal formée.
         '500':
@@ -113,6 +119,12 @@ paths:
         description: Le document à signer au format XML.
       parameters:
         - $ref: '#/components/parameters/UserInfo'
+        - schema:
+            type: string
+          in: header
+          name: Access_token
+          required: true
+      x-internal: false
       tags:
         - signature
       description: Opération qui permet au client de demander de signer un document au format XADES Baseline-B.
@@ -151,6 +163,12 @@ paths:
         description: Le document à signer au format PDF.
       parameters:
         - $ref: '#/components/parameters/UserInfo'
+        - schema:
+            type: string
+          in: header
+          name: Access_token
+          required: true
+      x-internal: false
       tags:
         - signature
       description: Opération qui permet au client de demander de signer un document au format PADES Baseline-B.
@@ -536,6 +554,7 @@ components:
           type: string
         requiredHeaders:
           type: string
+      x-extension-1: null
     Document:
       title: Document
       type: object
