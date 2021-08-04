@@ -29,7 +29,7 @@
 		<jackson-version>2.12.3</jackson-version>
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
 		<dist>docker</dist>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
 	</properties>
 	<dependencies>
 		<dependency>
@@ -225,7 +225,8 @@
 
 							<backend>html</backend>
 							<doctype>book</doctype>
-							<sourceHighlighter>prettify</sourceHighlighter>
+							<!--   <sourceHighlighter>prettify</sourceHighlighter> -->
+							<!-- <sourceHighlighter>coderay</sourceHighlighter> -->
 							<attributes>
 								<toc>left</toc>
 								<icons>font</icons>
@@ -238,10 +239,10 @@
 							</attributes>
 
 							<!-- CJU TODO ASCIIDOC -->
-							<project>
+						<!-- 	<project> -->
 								<!-- <name> TODO POM.xml: NOM du PROJET</name> <artifactId>@{project.artifactId}</artifactId> 
 									<description>TODO POM.xml: description</description> <version>@{project.version}</version> -->
-							</project>
+							<!-- </project> -->
 							<!-- FIN CJU TODO ASCIIDOC -->
 
 						</configuration>

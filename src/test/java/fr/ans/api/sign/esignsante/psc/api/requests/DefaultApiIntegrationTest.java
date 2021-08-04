@@ -4,7 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 
 public class DefaultApiIntegrationTest {
 
+	 private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
+	            MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
+	
 	/*
 	 * setUp pour restdocs
 	 */
@@ -65,20 +69,18 @@ public class DefaultApiIntegrationTest {
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
    
-    	final String body =  "[{\"path\":\"/ca\",\"description\":\"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.\",\"payload\":\"\",\"requiredHeaders\":\"\"},{\"path\":\"/asksignature/xades\",\"description\":\"OpÃ©ration qui permet au client de demander de signer un document au format XADES Baseline-B.\",\"payload\":\"\",\"requiredHeaders\":\"Access_token, accept:json, usertoken\"},{\"path\":\"/\",\"description\":\"Liste des opérations disponibles\",\"payload\":\"\",\"requiredHeaders\":\"\"}]";
-
+    	final String body =  "[{\"path\":\"/ca\",\"description\":\"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.\",\"payload\":\"\",\"requiredHeaders\":\"\"},{\"path\":\"/asksignature/xades\",\"description\":\"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.\",\"payload\":\"\",\"requiredHeaders\":\"Access_token, accept:json, usertoken\"},{\"path\":\"/\",\"description\":\"Liste des opérations disponibles\",\"payload\":\"\",\"requiredHeaders\":\"\"}]";
     	
-//    	ResultActions returned = mockMvc.perform(get("/").accept("application/json"))
-//    	    .andExpect(status().isOk()).andExpect(content().json(body));
-
-    	  
+       	    
     	
-    	ResultActions returned = mockMvc.perform(get("/")
+    	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/json")
     			.contentType(MediaType.APPLICATION_JSON))
         	    .andExpect(status().isOk()).andExpect(content().json(body));
-        // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
     	
+        // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
     	  returned.andDo(print()); //pour debug console: a supprimer
-    	  returned.andDo(document("Liste_des_services/OK"));  
+    	  returned.andDo(document("Liste_des_services/OK"));
+    	  
+
     }       
 }

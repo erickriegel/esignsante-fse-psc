@@ -56,6 +56,7 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 			re = new ResponseEntity<>(setOperations, HttpStatus.OK);
 
 		} else {
+			log.warn(" 777777777777777777777777777777777777");
 			log.warn("ObjectMapper or HttpServletRequest not configured in default DefaultApi interface,"
 					+ " so no example is generated");
 		}
