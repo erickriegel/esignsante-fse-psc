@@ -2,12 +2,12 @@ openapi: 3.0.0
 info:
   title: esignsante-psc
   version: '1.0'
-  description: This API can be used to sign PDF or XML documents with an A.N.S X509 certificate
+  description: Cette API permet de signer des documents PDF or XML avec un certificat X509 de l'A.N.S
   contact:
     email: esignsante@esante.gouv.fr
 servers:
   - url: 'https://esignsante.psc.esante.gouv.fr/v1'
-    description: Sandbox
+    description: Bas à sable
 tags:
   - name: utils
   - name: signature
@@ -15,7 +15,7 @@ tags:
 paths:
   /:
     get:
-      summary: Liste des opérations disponibles
+      summary: Liste des opérations disponibles.  
       tags:
         - utils
       responses:
@@ -45,7 +45,7 @@ paths:
       description: 'Opération qui permet au client de lister les opérations offertes par le composant eSignSante-PSC.  '
   /ca:
     get:
-      summary: Liste des autorités de certification
+      summary: Liste des chaines de confiances supportées
       tags:
         - utils
       responses:
@@ -71,33 +71,33 @@ paths:
       operationId: post-asksignature-xades
       responses:
         '200':
-          description: OK
+          description: Requête en succès.
           content:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Document'
         '400':
-          description: erreur 400
+          description: Requête mal formée.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '401':
-          description: erreur 401
+          description: Jeton non-valide.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '415':
-          description: erreur 415
+          description: Le format de document n'est pas supporté par le serveur.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal Server Error
+          description: Erreur interne du serveur
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
@@ -127,33 +127,33 @@ paths:
       operationId: post-askSignature-pades
       responses:
         '200':
-          description: OK
+          description: Requête en succès.
           content:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/Document'
         '400':
-          description: erreur 400
+          description: Requête mal formée.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '401':
-          description: erreur 401
+          description: Jeton non-valide.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '415':
-          description: erreur 415
+          description: Le format de document n'est pas supporté par le serveur.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal Server Error
+          description: Erreur interne du serveur
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
@@ -181,13 +181,13 @@ paths:
       operationId: post-checksignature-xades
       responses:
         '200':
-          description: OK
+          description: Requête en succès.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
         '400':
-          description: erreur 400
+          description: Requête mal formée.
           content:
             application/json:
               schema:
@@ -197,7 +197,7 @@ paths:
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
@@ -218,13 +218,13 @@ paths:
       operationId: post-checksignature-pades
       responses:
         '200':
-          description: OK
+          description: Requête en succès.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
         '400':
-          description: erreur 400
+          description: Requête mal formée.
           content:
             application/json:
               schema:
@@ -234,7 +234,7 @@ paths:
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
