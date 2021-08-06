@@ -24,19 +24,21 @@ import lombok.extern.slf4j.Slf4j;
 public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implements ChecksignatureApiDelegate {
 
 @Override
-public ResponseEntity<Result> postChecksignaturePades(@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false)  Document file) {
+public ResponseEntity<Result> postChecksignaturePades(@ApiParam(value = "", required=true) @Valid @RequestPart(value = "file", required = true)  Document file) {
 	final Optional<String> acceptHeader = getAcceptHeader();
 	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	log.trace(" 2222 Réception d'une demande Checksignature Pades");
-	return re;
+	//return re;
+	return null;
 }
 
 @Override
-public ResponseEntity<Result> postChecksignatureXades(@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false)  Document file) {
+public ResponseEntity<Result> postChecksignatureXades(@ApiParam(value = "", required=true) @Valid @RequestPart(value = "file", required = true)  Document file) {
 	final Optional<String> acceptHeader = getAcceptHeader();
 	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	log.trace(" 2323 Réception d'une demande Checksignature Xades");
-	return re;
+	//return re;
+	return null;
 }
 
 }

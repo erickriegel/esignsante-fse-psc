@@ -298,12 +298,18 @@
 						<goals>
 							<goal>generate</goal>
 						</goals>
+						
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/esignsante-psc.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<!-- <language>spring</language> -->
 							<library>spring-boot</library>
-							<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
+							<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>							
+				<!-- 			<generateModels>true</generateModels>		 -->		
+				
+				         <additionalProperties>
+				         <additionalProperty></additionalProperty>
+				         </additionalProperties>			
 							<configOptions>
 								<basePackage>fr.ans.api.sign.esignsante.psc</basePackage>
 								<configPackage>fr.ans.api.sign.esignsante.psc.config</configPackage>
@@ -315,6 +321,8 @@
 								<useBeanValidation>true</useBeanValidation>
 								<skipOverwrite>true</skipOverwrite>
 								<disableHtmlEscaping>true</disableHtmlEscaping>
+								<!-- param with no effect! <skipFormModel>false</skipFormModel> -->
+								
 							</configOptions>
 							<withXml>true</withXml>
 						</configuration>

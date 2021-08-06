@@ -2,12 +2,12 @@ openapi: 3.0.0
 info:
   title: esignsante-psc
   version: '1.0'
-  description: Cette API permet de signer des documents PDF or XML avec un certificat X509 de l'A.N.S
+  description: This API can be used to sign PDF or XML documents with an A.N.S X509 certificate
   contact:
     email: esignsante@esante.gouv.fr
 servers:
   - url: 'https://esignsante.psc.esante.gouv.fr/v1'
-    description: Bac à sable
+    description: Sandbox
 tags:
   - name: utils
   - name: signature
@@ -15,7 +15,7 @@ tags:
 paths:
   /:
     get:
-      summary: Endpoint racine
+      summary: Liste des opérations disponibles
       tags:
         - utils
       responses:
@@ -28,27 +28,9 @@ paths:
                 description: ''
                 minItems: 1
                 uniqueItems: true
-                x-examples:
-                  example-1:
-                    - path: /
-                      description: Liste des opérations disponibles
-                    - path: /asksignsature/xades
-                      description: signe un document XML à la norme Xades
-                    - path: /asksignsature/pades
-                      description: signe un document PDF à la norme Pades
-                      body: fichier à signer....
                 items:
                   $ref: '#/components/schemas/Operation'
               examples:
-                example-1:
-                  value:
-                    - path: /
-                      description: Liste des opérations disponibles
-                    - path: /asksignsature/xades
-                      description: signe un document XML à la norme Xades
-                    - path: /asksignsature/pades
-                      description: signe un document PDF à la norme Pades
-                      body: fichier à signer....
                 example-2:
                   value:
                     - path: /
@@ -63,7 +45,7 @@ paths:
       description: 'Opération qui permet au client de lister les opérations offertes par le composant eSignSante-PSC.  '
   /ca:
     get:
-      summary: Liste des chaines de confiances supportées
+      summary: Liste des autorités de certification
       tags:
         - utils
       responses:
@@ -85,43 +67,54 @@ paths:
       description: Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.
   /asksignature/xades:
     post:
-      summary: ''
+      summary: Signature au format Xades
       operationId: post-asksignature-xades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Document'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          description: Jeton non-valide.
+          description: erreur 401
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '415':
-          description: Le format de document n'est pas supporté par le serveur.
+          description: erreur 415
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Erreur interne du serveur
+          description: Internal Server Error
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Document'
-            examples:
-              example-1:
-                value:
-                  file: string
+              type: object
+              properties:
+                documenttosign:
+                  $ref: '#/components/schemas/RichDocument'
+              required:
+                - documenttosign
         description: Le document à signer au format XML.
       parameters:
-        - $ref: '#/components/parameters/UserInfo'
         - schema:
             type: string
           in: header
-          name: Access_token
+          name: access_token
           required: true
-      x-internal: false
       tags:
         - signature
       description: Opération qui permet au client de demander de signer un document au format XADES Baseline-B.
@@ -130,39 +123,52 @@ paths:
     parameters: []
   /asksignature/pades:
     post:
-      summary: ''
+      summary: Signature au format Pades
       operationId: post-askSignature-pades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/Document'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
-          description: Jeton non-valide.
+          description: erreur 401
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '415':
-          description: Le format de document n'est pas supporté par le serveur.
+          description: erreur 415
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Erreur interne du serveur
+          description: Internal Server Error
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Document'
+              type: object
+              properties:
+                documenttosign:
+                  $ref: '#/components/schemas/RichDocument'
         description: Le document à signer au format PDF.
       parameters:
-        - $ref: '#/components/parameters/UserInfo'
         - schema:
             type: string
           in: header
-          name: Access_token
+          name: access_token
           required: true
-      x-internal: false
       tags:
         - signature
       description: Opération qui permet au client de demander de signer un document au format PADES Baseline-B.
@@ -171,23 +177,27 @@ paths:
     parameters: []
   /checksignature/xades:
     post:
-      summary: ''
+      summary: Verification de signature au format Xades
       operationId: post-checksignature-xades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Erreur interne du serveur (vérifier que le document est au bon format XML).
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
@@ -196,29 +206,35 @@ paths:
               properties:
                 file:
                   $ref: '#/components/schemas/Document'
+              required:
+                - file
         description: 'Le document à vérifier, il doit impérativement être au format XML.'
       tags:
         - checksignature
       description: Opération qui permet au client de vérifier une signature au format XADES.
   /checksignature/pades:
     post:
-      summary: ''
+      summary: Vérification de signature au format Pades
       operationId: post-checksignature-pades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Erreur interne du serveur (vérifier que le document est au bon format PDF).
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
@@ -227,12 +243,243 @@ paths:
               properties:
                 file:
                   $ref: '#/components/schemas/Document'
+              required:
+                - file
         description: Le document à vérifier au format PDF.
       tags:
         - checksignature
       description: Opération qui permet au client de vérifier une signature au format PADES.
 components:
   schemas:
+    Exercice:
+      description: ''
+      type: object
+      properties:
+        codeProfession:
+          type: string
+          minLength: 1
+        codeCategorieProfessionnelle:
+          type: string
+          minLength: 1
+        codeCiviliteDexercice:
+          type: string
+          minLength: 1
+        nomDexercice:
+          type: string
+          minLength: 1
+        prenomDexercice:
+          type: string
+          minLength: 1
+        codeTypeSavoirFaire:
+          type: string
+          minLength: 1
+        codeSavoirFaire:
+          type: string
+          minLength: 1
+        activities:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Activitie'
+      required:
+        - codeProfession
+        - codeCategorieProfessionnelle
+        - codeCiviliteDexercice
+        - nomDexercice
+        - prenomDexercice
+        - codeTypeSavoirFaire
+        - codeSavoirFaire
+        - activities
+    Activitie:
+      description: ''
+      type: object
+      properties:
+        codeModeExercice:
+          type: string
+          minLength: 1
+        codeSecteurDactivite:
+          type: string
+          minLength: 1
+        codeSectionPharmacien:
+          type: string
+          minLength: 1
+        codeRole:
+          type: string
+          minLength: 1
+        numeroSiretSite:
+          type: string
+          minLength: 1
+        numeroSirenSite:
+          type: string
+          minLength: 1
+        numeroFinessSite:
+          type: string
+          minLength: 1
+        numeroFinessetablissementJuridique:
+          type: string
+          minLength: 1
+        identifiantTechniqueDeLaStructure:
+          type: string
+          minLength: 1
+        raisonSocialeSite:
+          type: string
+          minLength: 1
+        enseigneCommercialeSite:
+          type: string
+          minLength: 1
+        complementDestinataire:
+          type: string
+          minLength: 1
+        complementPointGeographique:
+          type: string
+          minLength: 1
+        numeroVoie:
+          type: string
+          minLength: 1
+        indiceRepetitionVoie:
+          type: string
+          minLength: 1
+        codeTypeDeVoie:
+          type: string
+          minLength: 1
+        libelleVoie:
+          type: string
+          minLength: 1
+        mentionDistribution:
+          type: string
+          minLength: 1
+        bureauCedex:
+          type: string
+          minLength: 1
+        codePostal:
+          type: string
+          minLength: 1
+        codeCommune:
+          type: string
+          minLength: 1
+        codePays:
+          type: string
+          minLength: 1
+        telephone:
+          type: string
+          minLength: 1
+        telephone2:
+          type: string
+          minLength: 1
+        telecopie:
+          type: string
+          minLength: 1
+        adresseEMail:
+          type: string
+          minLength: 1
+        codeDepartement:
+          type: string
+          minLength: 1
+        ancienIdentifiantDeLaStructure:
+          type: string
+          minLength: 1
+        autoriteDenregistrement:
+          type: string
+          minLength: 1
+      required:
+        - codeModeExercice
+        - codeSecteurDactivite
+        - codeSectionPharmacien
+        - codeRole
+        - numeroSiretSite
+        - numeroSirenSite
+        - numeroFinessSite
+        - numeroFinessetablissementJuridique
+        - identifiantTechniqueDeLaStructure
+        - raisonSocialeSite
+        - enseigneCommercialeSite
+        - complementDestinataire
+        - complementPointGeographique
+        - numeroVoie
+        - indiceRepetitionVoie
+        - codeTypeDeVoie
+        - libelleVoie
+        - mentionDistribution
+        - bureauCedex
+        - codePostal
+        - codeCommune
+        - codePays
+        - telephone
+        - telephone2
+        - telecopie
+        - adresseEMail
+        - codeDepartement
+        - ancienIdentifiantDeLaStructure
+        - autoriteDenregistrement
+      title: ''
+    Operation:
+      type: object
+      description: Available operation
+      properties:
+        path:
+          type: string
+        description:
+          type: string
+        payload:
+          type: string
+        requiredHeaders:
+          type: string
+    Document:
+      title: Document
+      type: object
+      description: Document to sign (XML or PDF)
+      properties:
+        file:
+          type: string
+          format: binary
+    Error:
+      title: Error
+      type: object
+      description: Error object returned when signature validation fails
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Result:
+      title: Result
+      type: object
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      description: Résultat d'une vérification de signature.
+    RichDocument:
+      title: RichDocument
+      type: object
+      properties:
+        document:
+          $ref: '#/components/schemas/Document'
+        userinfo:
+          $ref: '#/components/schemas/UserInfo'
+      required:
+        - document
+        - userinfo
+    SubjectRefPro:
+      description: ''
+      type: object
+      properties:
+        codeCivilite:
+          type: string
+          minLength: 1
+        exercices:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Exercice'
+      required:
+        - codeCivilite
+        - exercices
     UserInfo:
       description: ''
       type: object
@@ -250,6 +497,7 @@ components:
           minLength: 1
         Mode_Acces_Raison:
           type: string
+          minLength: 1
         preferred_username:
           type: string
           minLength: 1
@@ -266,156 +514,12 @@ components:
           type: string
           minLength: 1
         SubjectRefPro:
-          type: object
-          properties:
-            codeCivilite:
-              type: string
-              minLength: 1
-            exercices:
-              type: array
-              uniqueItems: true
-              minItems: 1
-              items:
-                required:
-                  - codeProfession
-                  - codeCategorieProfessionnelle
-                  - codeCiviliteDexercice
-                  - nomDexercice
-                  - prenomDexercice
-                  - codeTypeSavoirFaire
-                  - codeSavoirFaire
-                properties:
-                  codeProfession:
-                    type: string
-                    minLength: 1
-                  codeCategorieProfessionnelle:
-                    type: string
-                    minLength: 1
-                  codeCiviliteDexercice:
-                    type: string
-                    minLength: 1
-                  nomDexercice:
-                    type: string
-                    minLength: 1
-                  prenomDexercice:
-                    type: string
-                    minLength: 1
-                  codeTypeSavoirFaire:
-                    type: string
-                  codeSavoirFaire:
-                    type: string
-                  activities:
-                    type: array
-                    uniqueItems: true
-                    minItems: 1
-                    items:
-                      required:
-                        - codeModeExercice
-                        - codeSecteurDactivite
-                        - codeSectionPharmacien
-                        - codeRole
-                        - numeroSiretSite
-                        - numeroSirenSite
-                        - numeroFinessSite
-                        - numeroFinessetablissementJuridique
-                        - identifiantTechniqueDeLaStructure
-                        - raisonSocialeSite
-                        - enseigneCommercialeSite
-                        - complementDestinataire
-                        - complementPointGeographique
-                        - numeroVoie
-                        - indiceRepetitionVoie
-                        - codeTypeDeVoie
-                        - libelleVoie
-                        - mentionDistribution
-                        - bureauCedex
-                        - codePostal
-                        - codeCommune
-                        - codePays
-                        - telephone
-                        - telephone2
-                        - telecopie
-                        - adresseEMail
-                        - codeDepartement
-                        - ancienIdentifiantDeLaStructure
-                        - autoriteDenregistrement
-                      properties:
-                        codeModeExercice:
-                          type: string
-                          minLength: 1
-                        codeSecteurDactivite:
-                          type: string
-                          minLength: 1
-                        codeSectionPharmacien:
-                          type: string
-                        codeRole:
-                          type: string
-                        numeroSiretSite:
-                          type: string
-                        numeroSirenSite:
-                          type: string
-                        numeroFinessSite:
-                          type: string
-                        numeroFinessetablissementJuridique:
-                          type: string
-                        identifiantTechniqueDeLaStructure:
-                          type: string
-                        raisonSocialeSite:
-                          type: string
-                          minLength: 1
-                        enseigneCommercialeSite:
-                          type: string
-                        complementDestinataire:
-                          type: string
-                        complementPointGeographique:
-                          type: string
-                        numeroVoie:
-                          type: string
-                          minLength: 1
-                        indiceRepetitionVoie:
-                          type: string
-                        codeTypeDeVoie:
-                          type: string
-                          minLength: 1
-                        libelleVoie:
-                          type: string
-                          minLength: 1
-                        mentionDistribution:
-                          type: string
-                        bureauCedex:
-                          type: string
-                        codePostal:
-                          type: string
-                          minLength: 1
-                        codeCommune:
-                          type: string
-                          minLength: 1
-                        codePays:
-                          type: string
-                        telephone:
-                          type: string
-                        telephone2:
-                          type: string
-                        telecopie:
-                          type: string
-                        adresseEMail:
-                          type: string
-                        codeDepartement:
-                          type: string
-                          minLength: 1
-                        ancienIdentifiantDeLaStructure:
-                          type: string
-                        autoriteDenregistrement:
-                          type: string
-          required:
-            - codeCivilite
-            - exercices
+          $ref: '#/components/schemas/SubjectRefPro'
         SubjectOrganizationID:
           type: string
+          minLength: 1
         SubjectRole:
-          type: array
-          items:
-            properties: {}
+          $ref: '#/components/schemas/SubjectRole'
         PSI_Locale:
           type: string
           minLength: 1
@@ -442,287 +546,11 @@ components:
         - PSI_Locale
         - SubjectNameID
         - family_name
-      x-examples:
-        example-1:
-          Secteur_Activite: SA07^1.2.250.1.71.4.2.4
-          sub: 'f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700365812'
-          email_verified: false
-          SubjectOrganization: CABINET DE M. MAXIMAXIMAXIMAXIM0036581
-          Mode_Acces_Raison: ''
-          preferred_username: '899700365812'
-          given_name: MUMUMUMUMUMUMUMUMUMUMUMUMUM
-          Acces_Regulation_Medicale: FAUX
-          UITVersion: '1.0'
-          Palier_Authentification: APPPRIP3^1.2.250.1.213.1.5.1.1.1
-          SubjectRefPro:
-            codeCivilite: M
-            exercices:
-              - codeProfession: '10'
-                codeCategorieProfessionnelle: C
-                codeCiviliteDexercice: M
-                nomDexercice: MAXIMAXIMAXIMAXIMAXI0036581
-                prenomDexercice: MUMUMUMUMUMUMUMUMUMUMUMUMUM
-                codeTypeSavoirFaire: ''
-                codeSavoirFaire: ''
-                activities:
-                  - codeModeExercice: L
-                    codeSecteurDactivite: SA07
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: ''
-                    numeroSirenSite: ''
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: CABINET DE M. MAXIMAXIMAXIMAXIM0036581
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '4'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-                  - codeModeExercice: L
-                    codeSecteurDactivite: SA08
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: ''
-                    numeroSirenSite: ''
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: CG MAXI0036581
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '8'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-                  - codeModeExercice: L
-                    codeSecteurDactivite: SA09
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: '99999999800514'
-                    numeroSirenSite: '999999998'
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: SOCIETE MAXI
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '6'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-                  - codeModeExercice: L
-                    codeSecteurDactivite: SA29
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: ''
-                    numeroSirenSite: ''
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: LABO MAXI
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '7'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-                  - codeModeExercice: S
-                    codeSecteurDactivite: SA01
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: ''
-                    numeroSirenSite: ''
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: HOPITAL PUBLIC BEAULIEU
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '5'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-                  - codeModeExercice: S
-                    codeSecteurDactivite: SA03
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: ''
-                    numeroSirenSite: ''
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: CLINIQUE ROSE
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '9'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-                  - codeModeExercice: S
-                    codeSecteurDactivite: SA05
-                    codeSectionPharmacien: ''
-                    codeRole: ''
-                    numeroSiretSite: ''
-                    numeroSirenSite: ''
-                    numeroFinessSite: ''
-                    numeroFinessetablissementJuridique: ''
-                    identifiantTechniqueDeLaStructure: ''
-                    raisonSocialeSite: CS MAXI
-                    enseigneCommercialeSite: ''
-                    complementDestinataire: ''
-                    complementPointGeographique: ''
-                    numeroVoie: '7'
-                    indiceRepetitionVoie: ''
-                    codeTypeDeVoie: R
-                    libelleVoie: NOIR
-                    mentionDistribution: ''
-                    bureauCedex: ''
-                    codePostal: '75009'
-                    codeCommune: '75109'
-                    codePays: ''
-                    telephone: ''
-                    telephone2: ''
-                    telecopie: ''
-                    adresseEMail: ''
-                    codeDepartement: '75'
-                    ancienIdentifiantDeLaStructure: ''
-                    autoriteDenregistrement: ''
-          SubjectOrganizationID: ''
-          SubjectRole:
-            - 10^1.2.250.1.213.1.1.5.5
-          PSI_Locale: 1.2.250.1.213.1.3.1.1
-          SubjectNameID: '899700365812'
-          family_name: MAXIMAXIMAXIMAXIMAXI0036581
-    Operation:
-      type: object
-      description: Available operation
-      x-examples:
-        example-1:
-          - path: /
-            description: Liste des opérations disponibles
-          - path: /asksignsature/xades
-            description: signe un document XML à la norme Xades
-          - path: /asksignsature/pades
-            description: signe un document PDF à la norme Pades
-            body: fichier à signer....
-      properties:
-        path:
-          type: string
-        description:
-          type: string
-        payload:
-          type: string
-        requiredHeaders:
-          type: string
-    Document:
-      title: Document
-      type: object
-      description: Document à signer (XML ou PDF)
-      properties:
-        file:
-          type: string
-          format: binary
-    Error:
-      title: Error
-      type: object
-      description: Erreur retournée si la validation de signature est en echec
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-    Result:
-      title: Result
-      type: object
-      properties:
-        valid:
-          type: boolean
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Error'
-      description: Résultat d'une vérification de signature.
+    SubjectRole:
+      title: SubjectRole
+      type: array
+      items:
+        type: string
   responses: {}
   securitySchemes:
     PRO-SanteConnect:
@@ -732,9 +560,4 @@ components:
     Pro-SanteConnect_BAS:
       type: openIdConnect
       openIdConnectUrl: 'https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
-  parameters:
-    UserInfo:
-      name: UserInfo
-      in: header
-      schema:
-        $ref: '#/components/schemas/UserInfo'
+  parameters: {}

@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.model.Document;
+import fr.ans.api.sign.esignsante.psc.model.RichDocument;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -25,19 +26,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements AsksignatureApiDelegate  {
 	@Override
-	public ResponseEntity<Document> postAskSignaturePades(@ApiParam(value = "" ,required=true) @RequestHeader(value="Access_token", required=true) String accessToken,@ApiParam(value = "" ) @RequestHeader(value="UserInfo", required=false) UserInfo userInfo,@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {	
+	public ResponseEntity<Document> postAskSignaturePades(@ApiParam(value = "" ,required=true) @RequestHeader(value="access_token", required=true) String accessToken,@ApiParam(value = "") @Valid @RequestPart(value = "documenttosign", required = false)  RichDocument documenttosign) {	
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		log.trace(" 3333 Réception d'une demande de signature Pades");
-		return re;
+		//return re;
+		return null;
 	}
 
 	@Override
-	public ResponseEntity<Document> postAsksignatureXades(@ApiParam(value = "" ,required=true) @RequestHeader(value="Access_token", required=true) String accessToken,@ApiParam(value = "" ) @RequestHeader(value="UserInfo", required=false) UserInfo userInfo,@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {
+	public ResponseEntity<Document> postAsksignatureXades(@ApiParam(value = "" ,required=true) @RequestHeader(value="access_token", required=true) String accessToken,@ApiParam(value = "", required=true) @Valid @RequestPart(value = "documenttosign", required = true)  RichDocument documenttosign) {
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		log.trace(" 4444 Réception d'une demande de signature Xades");
-		return re;
+		//return re;
+		return null;
+		
 	}
 
 }
