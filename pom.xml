@@ -29,7 +29,7 @@
 		<jackson-version>2.12.3</jackson-version>
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
 		<dist>docker</dist>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -172,6 +172,16 @@
 
 		<!-- FIN OPENAPI et ces dependences -->
 
+		<!--  pour WebClient -->
+	  	<dependency>  
+			  <groupId>org.springframework.boot</groupId> 
+			  <artifactId>spring-boot-starter-webflux</artifactId>  
+		  </dependency>  
+		<!-- FIN pour WebClient -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
 	</dependencies>
 
 	<build>
@@ -225,7 +235,7 @@
 
 							<backend>html</backend>
 							<doctype>book</doctype>
-							<!--   <sourceHighlighter>prettify</sourceHighlighter> -->
+							<!-- <sourceHighlighter>prettify</sourceHighlighter> -->
 							<!-- <sourceHighlighter>coderay</sourceHighlighter> -->
 							<attributes>
 								<toc>left</toc>
@@ -239,9 +249,9 @@
 							</attributes>
 
 							<!-- CJU TODO ASCIIDOC -->
-						<!-- 	<project> -->
-								<!-- <name> TODO POM.xml: NOM du PROJET</name> <artifactId>@{project.artifactId}</artifactId> 
-									<description>TODO POM.xml: description</description> <version>@{project.version}</version> -->
+							<!-- <project> -->
+							<!-- <name> TODO POM.xml: NOM du PROJET</name> <artifactId>@{project.artifactId}</artifactId> 
+								<description>TODO POM.xml: description</description> <version>@{project.version}</version> -->
 							<!-- </project> -->
 							<!-- FIN CJU TODO ASCIIDOC -->
 
@@ -298,18 +308,18 @@
 						<goals>
 							<goal>generate</goal>
 						</goals>
-						
+
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/esignsante-psc.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<!-- <language>spring</language> -->
 							<library>spring-boot</library>
-							<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>							
-				<!-- 			<generateModels>true</generateModels>		 -->		
-				
-				         <additionalProperties>
-				         <additionalProperty></additionalProperty>
-				         </additionalProperties>			
+							<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
+							<!-- <generateModels>true</generateModels> -->
+
+							<additionalProperties>
+								<additionalProperty></additionalProperty>
+							</additionalProperties>
 							<configOptions>
 								<basePackage>fr.ans.api.sign.esignsante.psc</basePackage>
 								<configPackage>fr.ans.api.sign.esignsante.psc.config</configPackage>
@@ -322,7 +332,7 @@
 								<skipOverwrite>true</skipOverwrite>
 								<disableHtmlEscaping>true</disableHtmlEscaping>
 								<!-- param with no effect! <skipFormModel>false</skipFormModel> -->
-								
+
 							</configOptions>
 							<withXml>true</withXml>
 						</configuration>
@@ -461,6 +471,14 @@
 			<properties>
 				<spring.profiles.active>swagger</spring.profiles.active>
 			</properties>
+		</profile>
+
+
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 		</profile>
 
 

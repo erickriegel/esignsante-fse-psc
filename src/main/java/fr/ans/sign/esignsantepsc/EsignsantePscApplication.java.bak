@@ -8,9 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @EnableWebSecurity
-@SpringBootApplication (exclude= {EmbeddedMongoAutoConfiguration.class})
-@ComponentScan(basePackages = {"fr.ans.api.sign.esignsante.psc.api", "fr.ans.api.sign.esignsante.psc.config",
-		"fr.ans.api.sign.esignsante.psc.prosanteconnect", "fr.ans.api.sign.esignsante.psc.esignsantewebservices"})
+@SpringBootApplication //(exclude= {EmbeddedMongoAutoConfiguration.class})
+@ComponentScan(basePackages = {"fr.ans.api.sign.esignsante.psc.api", "fr.ans.api.sign.esignsante.psc.config"})
 
 public class EsignsantePscApplication {
 

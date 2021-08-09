@@ -13,9 +13,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -35,10 +39,11 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
  * Test des EndPoints offerts par l'API esignsante-psc.
  */
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // pour restdocs
-@ContextConfiguration
+//@ContextConfiguration
 @SpringBootTest
+//@DataMongoTest
 @AutoConfigureMockMvc
-@ComponentScan("fr.ans.api.sign.esignsante.psc.api")
+//@ComponentScan("fr.ans.api.sign.esignsante.psc.api")
 
 public class DefaultApiIntegrationTest {
 
@@ -59,6 +64,8 @@ public class DefaultApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 	
+//    @MockBean
+//    private MongoTemplate mongoTemplate;
 
     /**
      * Vérification de la liste des services disponibles.

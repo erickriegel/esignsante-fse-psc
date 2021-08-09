@@ -32,7 +32,7 @@ public class ProofStorage {
     private String family_name;
 	
 	@Setter
-	@CreatedDate
+//	@CreatedDate
     private Date timestamp;
 	
 	@Setter
