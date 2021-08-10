@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import com.mongodb.client.MongoClients;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TestEmbeddedMongoDBConfig implements BeforeAllCallback, AfterAllCallback {
 
 	MongodExecutable mongodExecutable = null;
+	MongodProcess mongod = null;
 
 //	private final static String IP = "localhost";
 //	private final static int PORT = 27022;
@@ -51,20 +53,40 @@ public class TestEmbeddedMongoDBConfig implements BeforeAllCallback, AfterAllCal
 
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
-		log.info("beforeAll");
-		if (mongodExecutable == null) {
-		startEmbeddedMongo();
-		}
-
+//		log.info("beforeAll");
+//		if (mongodExecutable == null) {
+//		startEmbeddedMongo();
+//		}
 	}
+
 
 	@Override
 	public void afterAll(ExtensionContext context) throws Exception {
 		log.info("afterAll");
-//		log.info("tmp pas d'arret de MongoDB");
-		if (mongodExecutable != null) {
-			mongodExecutable.stop();
+
+//		if (mongod != null)
+//		{
+//			log.info("stop mongo process");
+//			mongod.stop();
+//		}
+//
+//		if (mongodExecutable != null) {
+//		
+//			mongodExecutable.stop();
+//			if (mongod != null)
+//			{
+//				mongod.stop();
+//			}
+//		}
+		/*
+		try {
+			//TimeUnit.SECONDS.sleep(1);
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		*/
 	}
 
 	
@@ -86,14 +108,14 @@ public class TestEmbeddedMongoDBConfig implements BeforeAllCallback, AfterAllCal
 
 		MongodStarter starter = MongodStarter.getDefaultInstance();
 		mongodExecutable = starter.prepare(mongodConfig);
-		mongodExecutable.start();
+		mongod =mongodExecutable.start();
 		log.error("FFFFFFFFFFFFFFFFFFFFFFFF");
-		try {
-			TimeUnit.SECONDS.sleep(1);
+		/*try {
+			Thread.sleep(4000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 }
