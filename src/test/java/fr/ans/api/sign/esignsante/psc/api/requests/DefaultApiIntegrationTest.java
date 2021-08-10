@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import fr.ans.api.sign.esignsante.psc.storage.TestEmbeddedMongoDBConfig;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -42,7 +44,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // pour restdocs
 @SpringBootTest
 @AutoConfigureMockMvc
-
+@ExtendWith(TestEmbeddedMongoDBConfig.class)
 public class DefaultApiIntegrationTest {
 
 	 private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
@@ -70,7 +72,7 @@ public class DefaultApiIntegrationTest {
      *
      * @throws Exception the exception
      */
-//  @Test
+   @Test
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
    
@@ -85,7 +87,5 @@ public class DefaultApiIntegrationTest {
         // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
     	  returned.andDo(print()); //pour debug console: a supprimer
     	  returned.andDo(document("Liste_des_services/OK"));
-    	  
-
     }       
 }

@@ -84,8 +84,11 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 	}
 	
 	private void todelete() {
+		log.info("test ecriture BDD => use mongoTemplate ");
 		   ArchiveSignature arch1 = new ArchiveSignature( new Date(),"Transmis1","Med1" );
 		   ArchiveSignature arch2 = new ArchiveSignature( new Date(),"Transmis2","Med2" );
+		
+		
 		   mongoTemplate.save(arch1, "collTodelete");
 		   mongoTemplate.save(arch2, "collTodelete");
 	}

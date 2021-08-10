@@ -10,12 +10,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Service;
+
 import com.mongodb.client.MongoClients;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@EnableAutoConfiguration(exclude = { EmbeddedMongoAutoConfiguration.class })
+@EnableAutoConfiguration (exclude = { EmbeddedMongoAutoConfiguration.class })
+@Service
 /*
  * Connexion à MongoDb de production (ONline DBB)
  */
@@ -25,7 +28,7 @@ public class MongoDBConfig {
 	private String mongoHost;
 
 	@Value("${spring.data.mongodb.port}")
-	private String mongoPort;
+	private String /*int*/ mongoPort;
 
 	@Value("${spring.data.mongodb.database}")
 	private String mongoDatabase;
