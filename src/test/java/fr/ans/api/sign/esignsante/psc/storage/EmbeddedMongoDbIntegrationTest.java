@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.mongodb.client.MongoClients;
@@ -18,11 +19,11 @@ import de.flapdoodle.embed.mongo.distribution.Version;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ArchiveSignature;
 //import fr.ans.api.sign.esignsante.psc.storage.entity.ArchiveSignature;
 import lombok.extern.slf4j.Slf4j;
-
-//@SpringBootTest 
+/*
+ * Test démarrage manuel Embedded MongoDB
+ * test à supprimer -> hors projet
+ */
 @Slf4j
-//@DataMongoTest
-//@OverrideAutoConfiguration( enabled = true)
 public class EmbeddedMongoDbIntegrationTest {
 	 private static final String CONNECTION_STRING = "mongodb://%s:%d";
 
@@ -65,7 +66,7 @@ public class EmbeddedMongoDbIntegrationTest {
 	    }
 
 	    
-	 // @Test
+	  @Test
 	   void premierTestDev() {
 		   ArchiveSignature arch1 = new ArchiveSignature( new Date(),"DocumentTransmis1","Medecin1" );
 		   ArchiveSignature arch2 = new ArchiveSignature( new Date(),"DocumentTransmis2","Medecin2" );

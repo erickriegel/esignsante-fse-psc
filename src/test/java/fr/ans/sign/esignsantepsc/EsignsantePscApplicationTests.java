@@ -8,7 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration
 class EsignsantePscApplicationTests {
 
-	@Test
+	//@Test
 	void contextLoads() {
 	}
 

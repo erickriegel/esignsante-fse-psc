@@ -15,14 +15,11 @@ import com.mongodb.client.MongoClients;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-//@Profile(value = { "production" })
-//@Profile("!dev")
-//@Configuration
-//@EnableAutoConfiguration(exclude = { EmbeddedMongoAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { EmbeddedMongoAutoConfiguration.class })
+/*
+ * Connexion à MongoDb de production (ONline DBB)
+ */
 public class MongoDBConfig {
-
-//	@Value("${spring.profiles.active}")
-//	private String profileActive;
 
 	@Value("${spring.data.mongodb.host}")
 	private String mongoHost;
@@ -41,19 +38,7 @@ public class MongoDBConfig {
 	
 	@Bean
 	public MongoTemplate mongoTemplate() throws IOException {
-		log.error("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
-		log.info("connexion parameters to MongoDB used are: :  mongodb://"+ mongoHost + ":" + mongoPort + "  " + mongoDatabase);
+		log.info("création d'une connexion à MongoDB avec   mongodb://"+ mongoHost + ":" + mongoPort + "  " + mongoDatabase);
 		return new MongoTemplate(MongoClients.create( "mongodb://"+ mongoHost + ":" + mongoPort ), mongoDatabase);
 	}
-	
-	
-//	ImmutableMongodConfig mongodConfig = MongodConfig
-//            .builder()
-//            .version(Version.Main.PRODUCTION)
-//            .net(new Net("localhost", "27018", false))
-//            .build();
-//
-//        MongodStarter starter = MongodStarter.getDefaultInstance();
-//        mongodExecutable = starter.prepare(mongodConfig);
-//        mongodExecutable.start();
 }

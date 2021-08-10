@@ -1,13 +1,16 @@
-package fr.ans.api.sign.esignsante.psc.api.requests;
+package fr.ans.api.sign.esignsante.psc.storage;
 
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 //import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Service;
 
 import com.mongodb.client.MongoClients;
 
@@ -17,69 +20,49 @@ import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
-/*
-@Slf4j
-@Configuration
-@Import({MongoProperties.class, EmbeddedMongoProperties.class})
-*/
 
 @Slf4j
-@TestConfiguration
+
 //@Import({MongoProperties.class, EmbeddedMongoProperties.class})
-public class TestEmbeddedMongoDBConfig  {
+public class TestEmbeddedMongoDBConfig /*extends EmbeddedMongoAutoConfiguration*/ {
 
 //	@Value("${spring.profiles.active}")
 //	private String profileActive;
 
-	@Autowired
-    private MongodStarter mongodStarter;
+//	public TestEmbeddedMongoDBConfig(MongoProperties properties) {
+//		super(properties);
+//		// TODO Auto-generated constructor stub
+//	}
+
 	
-	//@Autowired
+//	@Autowired
+//    private MongodStarter mongodStarter;
+	
+	
 	MongodExecutable mongodExecutable;
 	
 	    
-    private String databaseName = "esignsante-psc-archives";
+ //   private String databaseName = "esignsante-psc-archives";
 	// private String databaseName = "archives";
     
     private final static String IP = "localhost";
-    private final static int PORT = 27020;
-//	@Value("${spring.data.mongodb.username}")
-//	private String mongoUser;
-//    @Value("${spring.data.mongodb.password}")
-//    private String mongoUserPassword;
-
-
-    @Bean
-    public MongodStarter mongodStarter() {
-        return MongodStarter.getDefaultInstance();
-    }
-
-    /*
-    @Bean
-	public MongoTemplate mongoTemplate() throws IOException {
-		ImmutableMongodConfig mongodConfig = MongodConfig
-	            .builder()
-	            .version(Version.Main.PRODUCTION)
-	            .net(new Net(IP, PORT, false))
-	            .build();
-		
-		
-		log.error("TTTTT   ICI CONFIG pour EMbeddedMongoDB");
-
-//		        MongodStarter starter = MongodStarter.getDefaultInstance();
-		        MongodExecutable mongodExecutable = mongodStarter.prepare(mongodConfig);
-		        mongodExecutable.start();
-		log.error("FFFFFFFFFFFFFFFFFFFFFFFF");
-		log.info("connexion parameters to MongoDB used are: :  mongodb://"+ IP + ":" + PORT + "  " + databaseName);
-		return new MongoTemplate(MongoClients.create( "mongodb://"+ IP + ":" + PORT ), databaseName);
-	}
-	*/
+    private final static int PORT = 27022;
     
-    @Bean
-	public void startEmbeddedMongo() throws IOException {
+    private String mongoDatabase = "esignsante-psc-archives";
+
+
+//    @Bean
+//    public MongodStarter mongodStarter() {
+//        return MongodStarter.getDefaultInstance();
+//    }
+
+      
+  
+	private void startEmbeddedMongo() throws IOException {
 		ImmutableMongodConfig mongodConfig = MongodConfig
 	            .builder()
 	            .version(Version.Main.PRODUCTION)
@@ -89,10 +72,22 @@ public class TestEmbeddedMongoDBConfig  {
 		
 		log.error("TTTTT   ICI CONFIG pour EMbeddedMongoDB");
 
-//		        MongodStarter starter = MongodStarter.getDefaultInstance();
-		        mongodExecutable = mongodStarter.prepare(mongodConfig);
+		        MongodStarter starter = MongodStarter.getDefaultInstance();
+		        mongodExecutable = starter.prepare(mongodConfig);
 		        mongodExecutable.start();
 		log.error("FFFFFFFFFFFFFFFFFFFFFFFF");
+	}
+	
+//		@Bean
+		public MongoTemplate mongoTemplate() throws IOException {
+			
+			log.error("LALALALALALA");
+			startEmbeddedMongo();
+			log.info("connexion parameters to MongoDB used are: :  mongodb://"+ IP + ":" + PORT + "  " + mongoDatabase);
+			return new MongoTemplate(MongoClients.create( "mongodb://"+ IP + ":" + PORT ), mongoDatabase);
+		}
+		
+		
 	}
     
     
@@ -130,4 +125,4 @@ public class TestEmbeddedMongoDBConfig  {
 //        MongodStarter starter = MongodStarter.getDefaultInstance();
 //        mongodExecutable = starter.prepare(mongodConfig);
 //        mongodExecutable.start();
-}
+

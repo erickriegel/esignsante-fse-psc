@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -39,11 +40,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
  * Test des EndPoints offerts par l'API esignsante-psc.
  */
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // pour restdocs
-//@ContextConfiguration
 @SpringBootTest
-//@DataMongoTest
 @AutoConfigureMockMvc
-//@ComponentScan("fr.ans.api.sign.esignsante.psc.api")
 
 public class DefaultApiIntegrationTest {
 
@@ -72,7 +70,7 @@ public class DefaultApiIntegrationTest {
      *
      * @throws Exception the exception
      */
-    @Test
+//  @Test
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
    

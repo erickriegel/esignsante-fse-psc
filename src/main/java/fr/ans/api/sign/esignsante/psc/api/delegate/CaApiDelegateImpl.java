@@ -38,6 +38,7 @@ public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDeleg
 		*/
 		try {
 			log.trace(" 11111 entree du try");
+			//test appel à esignsante
 			esignWS.getCa();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
