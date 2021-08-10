@@ -3,6 +3,9 @@ package fr.ans.api.sign.esignsante.psc.esignsantewebservices;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -24,15 +27,22 @@ public class EsignsanteWebservicesImpl implements EsignsanteWebServices {
 	
 	String basePath;
 	
-	public ResponseEntity<String> getCa() throws URISyntaxException {
+	public ResponseEntity<String[]> getCa() throws URISyntaxException {
+
 	RestTemplate restTemplate = new RestTemplate();
 	log.error("basepath du fichier de conf");
 	//String url="https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet/protocol/openid-connect/token/introspect";
 	String urles="http://localhost:8081/esignsante/v1";
 	URI uri = new URI(urles + "/ca");
 	log.error("avant appel");
-	ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
+	ResponseEntity <String[]> result = restTemplate.getForEntity(uri, String[].class);
 	log.error("result: " + result);
+	log.error("StatusCode " + result.getStatusCode());
+	log.error("StatusCodeValue " + result.getStatusCodeValue());
+	log.error("Body " + result.getBody());
+	List<String> resultAsList = new ArrayList<String>();
+	//resultAsList.add(Arrays.asList(result));
+	//Arrays.asList(result)
 	return result;
 	//URI uri = new URI(urles);
 	

@@ -1,6 +1,8 @@
 package fr.ans.api.sign.esignsante.psc.storage;
 
+import java.awt.desktop.ScreenSleepEvent;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -86,6 +88,12 @@ public class TestEmbeddedMongoDBConfig implements BeforeAllCallback, AfterAllCal
 		mongodExecutable = starter.prepare(mongodConfig);
 		mongodExecutable.start();
 		log.error("FFFFFFFFFFFFFFFFFFFFFFFF");
+		try {
+			TimeUnit.SECONDS.sleep(1);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
