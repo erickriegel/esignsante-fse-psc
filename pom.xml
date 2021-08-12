@@ -467,7 +467,7 @@
          <version>3.4.0</version> <!--2.2.1 par defaut -->
         <logging>console</logging>
         <!-- optional (file|console|none), default console -->
-     
+        <downloadPath>https://fastdl.mongodb.org/</downloadPath>
       
           </configuration>
     </execution>
