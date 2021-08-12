@@ -462,7 +462,7 @@
       <configuration>
         <port>27017</port>
         <!-- optional, default 27017 -->
-         <version>4.0.26</version> <!--2.2.1 par defaut -->
+         <version>3.6.23</version> <!--2.2.1 par defaut -->
         <logging>console</logging>
         <!-- optional (file|console|none), default console -->
         <downloadPath>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</downloadPath>
