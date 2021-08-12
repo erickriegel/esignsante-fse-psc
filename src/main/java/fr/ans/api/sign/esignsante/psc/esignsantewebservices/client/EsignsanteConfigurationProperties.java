@@ -1,4 +1,4 @@
-package fr.ans.api.sign.esignsante.psc.esignsantewebservices;
+package fr.ans.api.sign.esignsante.psc.esignsantewebservices.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

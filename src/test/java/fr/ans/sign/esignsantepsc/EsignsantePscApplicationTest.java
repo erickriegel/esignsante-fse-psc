@@ -10,7 +10,7 @@ import fr.ans.api.sign.esignsante.psc.storage.TestEmbeddedMongoDBConfig;
 @SpringBootTest
 @ContextConfiguration
 @ExtendWith(TestEmbeddedMongoDBConfig.class)
-class EsignsantePscApplicationTests {
+class EsignsantePscApplicationTest {
 
 	@Test
 	void contextLoads() {

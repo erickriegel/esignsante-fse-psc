@@ -28,6 +28,8 @@
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
 		<dist>docker</dist>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<embededMongoDownloadUrl>http://fastdl.mongodb.org/</embededMongoDownloadUrl> 
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -170,6 +172,7 @@
 
 		<!-- FIN OPENAPI et ces dependences -->
 
+  
 	</dependencies>
 
 	<build>
@@ -445,6 +448,50 @@
 				</configuration>
 			</plugin>
 			<!-- FIN license pour Hook SVN -->
+		
+		<!-- pour executer les tests dans la phase d'intégration et non la phase de test (plugin de démarrage de Embeded MongoDB) -->	
+<plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <!-- <version>2.22.0</version> -->
+                <configuration>
+                 <skipTests>true</skipTests> 
+                </configuration>
+                <executions>
+                 <execution>
+    
+      <phase>integration-test</phase>
+      <goals>
+        <goal>test</goal>
+      </goals>
+      <configuration>
+        <skipTests>false</skipTests>
+        <includes>
+          <include>**/*Test.java</include>
+        </includes>
+      </configuration>
+          </execution>
+          </executions>
+                        </plugin>
+            <!--  
+<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>>maven-failsafe-plugin</artifactId>
+           <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+      </plugin> -->
+        
+<!-- FIN pour executer les tests dans la phase d'intégration et non la phase de test (plugin de démarrage de Embeded MongoDB) -->
 
           <!--  demarrage- arret EmbeddedMongoDB pour les tests -->
           <!--  exemple de conf ICI: https://github.com/joelittlejohn/embedmongo-maven-plugin -->
@@ -455,7 +502,7 @@
   <executions>
     <execution>
       <id>start</id>
-     <phase>process-test-classes</phase> 
+    <!--  <phase>process-test-classes</phase>  -->
       <goals>
         <goal>start</goal>
       </goals>
@@ -465,13 +512,14 @@
          <version>3.4.24</version> <!--2.2.1 par defaut -->
         <logging>console</logging>
         <!-- optional (file|console|none), default console -->
-        <downloadPath>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</downloadPath>
-      
+        <!--      <downloadPath>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</downloadPath> -->
+        <downloadPath>${embededMongoDownloadUrl}</downloadPath>
+    
           </configuration>
     </execution>
        <execution>
       <id>stop</id>
-       <phase>post-integration-test</phase>
+   <!--     <phase>post-integration-test</phase> -->
       <goals>
         <goal>stop</goal>
       </goals>
@@ -520,6 +568,7 @@
 				<docker.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</docker.registry>
 				<!--<image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry> -->
 				<image.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</image.registry>
+				<embededMongoDownloadUrl>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</embededMongoDownloadUrl> 
 			</properties>
 			<distributionManagement>
 				<!-- <repository> <id>artifactory</id> <url>${distributionRepositoryJenkinsfile}</url> 

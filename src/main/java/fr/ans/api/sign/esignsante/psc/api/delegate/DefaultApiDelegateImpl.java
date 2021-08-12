@@ -1,5 +1,9 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -8,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -32,6 +38,8 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 
 	@Autowired
 	MongoTemplate mongoTemplate;
+	
+	
 	/**
 	 * The log.
 	 */
@@ -49,7 +57,7 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 		log.trace(" OOOOO Réception d'une demande des opérations disponibles");
 		
 		//tmp: test pour écriture MongoDB Online
-		 todelete();
+	//	 todelete();
 		 //fin tmp: test pour écriture MongoDB Online
 		 
 		if (acceptHeader.isPresent() && acceptHeader.get().contains(HEADER_TYPE)) {
@@ -71,6 +79,7 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 			log.warn("ObjectMapper or HttpServletRequest not configured in default DefaultApi interface,"
 					+ " so no example is generated");
 		}
+		
 		return re;
 	}
 
