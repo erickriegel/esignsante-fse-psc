@@ -1,4 +1,4 @@
-package fr.ans.api.sign.esignsante.psc.esignsantewebservices.client;
+package fr.ans.api.sign.esignsante.psc.esignsantewebservices.call;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +31,11 @@ public class EsignsanteConfigurationProperties {
 	
 	@Value("${esignsante.webservices.basepath")
 	private String basePath;
-
 	
+	@Value("${esignsante.webservices.appliantId}")
+	private String appliantId;
+	
+	@Value("${esignsante.webservices.proofTag}")
+	private String proofTag;
+
 }

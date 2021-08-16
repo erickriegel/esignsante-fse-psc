@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -36,22 +38,24 @@ public class MongoDBConfig {
 	@Value("${spring.data.mongodb.database}")
 	private String mongoDatabase;
 
-//	@Value("${spring.data.mongodb.username}")
-//	private String mongoUser;
-//    @Value("${spring.data.mongodb.password}")
-//    private String mongoUserPassword;
 
-//	MongoClient mongoClient = null;
-//	
 	@Bean
 	public MongoTemplate mongoTemplate() throws IOException {
 		MongoClient mongoClient = MongoClients.create( "mongodb://"+ mongoHost + ":" + mongoPort );
-		//MongoClient mongoClient = MongoClients.create( "mongodb://"+ mongoHost + ":" + mongoPort );
-		
-		log.info("création d'une connexion à MongoDB avec   mongodb://"+ mongoHost + ":" + mongoPort + "  " + mongoDatabase);
-	//	return new MongoTemplate(MongoClients.create( "mongodb://"+ mongoHost + ":" + mongoPort ), mongoDatabase);
+		log.info("création d'une connexion à MongoDB avec   mongodb://"+ mongoHost + ":" + mongoPort + " mongoDatabase: " + mongoDatabase);
 		return new MongoTemplate(mongoClient, mongoDatabase);
 	}
 	
-	
+	/*
+	//Validatation des données avant persistence
+	@Bean
+    public ValidatingMongoEventListener validatingMongoEventListener() {
+        return new ValidatingMongoEventListener(validator());
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean validator() {
+        return new LocalValidatorFactoryBean();
+    }
+	*/
 }

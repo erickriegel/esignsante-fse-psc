@@ -2,27 +2,20 @@ package fr.ans.api.sign.esignsante.psc.api.delegate;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.model.RichDocument;
-import fr.ans.api.sign.esignsante.psc.model.UserInfo;
-import fr.ans.api.sign.esignsante.psc.storage.entity.ArchiveSignature;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,0 +1,11 @@
+
+// RACINE (+test ecriture dans MongoDB)
+curl -X GET "http://localhost:8080/esignsante-psc/v1/" -H "accept: application/json"
+
+//CAs
+curl -X GET "http://localhost:8080/esignsante-psc/v1/ca" -H "accept: application/json"
+
+//SignatureXAdes
+curl -X POST "http://localhost:8080/esignsante-psc/v1/asksignature/xades" -H "accept: application/json" -H "access_token: sdd" -
+
+curl -X POST "http://localhost:8081/esignsante/v1/signatures/xadesbaselineb" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@pom.xml;type=text/xml" -F "idSignConf=1" -F "secret=password" -F "signers=medecin"

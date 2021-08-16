@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>fr.ans.sign</groupId>
 	<artifactId>esignsante-psc</artifactId>
-	<version>0.0.20-SNAPSHOT</version>
+	<version>0.0.16-SNAPSHOT</version>
 	<!-- <version>${project-version}</version> -->
 	<name>esignsante-psc</name>
 
@@ -30,8 +30,15 @@
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
 		<dist>docker</dist>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<embededMongoDownloadUrl>http://fastdl.mongodb.org/</embededMongoDownloadUrl>
-
+		
+		<!--  tmp pour recup esignsante client java généré par swagger  -->
+		   <swagger-core-version>2.0.0</swagger-core-version>
+    <okhttp-version>2.7.5</okhttp-version>
+    <gson-version>2.8.1</gson-version>
+    <gson-fire-version>1.8.3</gson-fire-version>
+    <threetenbp-version>1.3.5</threetenbp-version>
+    <!-- fin tmp pour recup esignsante client java généré par swagger  -->
+		
 	</properties>
 	<dependencies>
 		<dependency>
@@ -174,28 +181,43 @@
 
 		<!-- FIN OPENAPI et ces dependences -->
 
-		<!-- client esignsante -->
-		<dependency>
-			<groupId>fr.ans.esignsante</groupId>
-			<artifactId>esignsante-java-client</artifactId>
-			<version>2.5.0</version>
-		</dependency>
-	<!-- FIN client esignsante -->
-			
-			<!--  validation avant sauvegarde MongoDB -->
-<!-- 		<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-validator</artifactId>
-    <version>7.0.1.Final</version>
-</dependency> --> 
-<!--  	<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency> -->	
+<!--  tmp pour recup esignsante client java généré par swagger  -->
+<!-- 
+ <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <version>${swagger-core-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>${okhttp-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>logging-interceptor</artifactId>
+      <version>${okhttp-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.gsonfire</groupId>
+      <artifactId>gson-fire</artifactId>
+      <version>${gson-fire-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.threeten</groupId>
+      <artifactId>threetenbp</artifactId>
+      <version>${threetenbp-version}</version>
+    </dependency>
+    -->
+    <!--  fin tmp pour recup esignsante client java généré par swagger  -->
+    
+    
 	</dependencies>
-
-
-
 
 	<build>
 		<resources>
@@ -331,7 +353,7 @@
 							<!-- <generateModels>true</generateModels> -->
 
 							<additionalProperties>
-								<additionalProperty />
+								<additionalProperty></additionalProperty>
 							</additionalProperties>
 							<configOptions>
 								<basePackage>fr.ans.api.sign.esignsante.psc</basePackage>
@@ -442,6 +464,12 @@
 				</descriptors> </configuration> </plugin> -->
 			<!-- FIN assembly -->
 
+			<!-- CJU TEST POUR BUG avec MOngoDB -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
+				<executions> <execution> <configuration> <argLine></argLine> </configuration> 
+				</execution> </executions> </plugin> -->
+			<!-- FIN CJU TEST POUR BUG avec MOngoDB -->
+
 			<!-- license pour Hook SVN -->
 			<plugin>
 				<groupId>com.mycila</groupId>
@@ -465,73 +493,40 @@
 			</plugin>
 			<!-- FIN license pour Hook SVN -->
 
-			<!-- pour executer les tests dans la phase d'intégration et non la phase 
-				de test (plugin de démarrage de Embeded MongoDB) -->
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<!-- <version>2.22.0</version> -->
-				<configuration>
-					<skipTests>true</skipTests>
-				</configuration>
-				<executions>
-					<execution>
-
-						<phase>integration-test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<skipTests>false</skipTests>
-							<includes>
-								<include>**/*Test.java</include>
-							</includes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>>maven-failsafe-plugin</artifactId> 
-				<configuration> <includes> <include>**/*Test.java</include> </includes> </configuration> 
-				<executions> <execution> <goals> <goal>integration-test</goal> <goal>verify</goal> 
-				</goals> </execution> </executions> </plugin> -->
-
-			<!-- FIN pour executer les tests dans la phase d'intégration et non la 
-				phase de test (plugin de démarrage de Embeded MongoDB) -->
-
-			<!-- demarrage- arret EmbeddedMongoDB pour les tests -->
-			<!-- exemple de conf ICI: https://github.com/joelittlejohn/embedmongo-maven-plugin -->
-			<plugin>
-				<groupId>com.github.joelittlejohn.embedmongo</groupId>
-				<artifactId>embedmongo-maven-plugin</artifactId>
-				<version>0.4.2</version>
-				<executions>
-					<execution>
-						<id>start</id>
-						<!-- <phase>process-test-classes</phase> -->
-						<goals>
-							<goal>start</goal>
-						</goals>
-						<configuration>
-							<port>27017</port>
-							<!-- optional, default 27017 -->
-							<version>3.4.24</version> <!--2.2.1 par defaut -->
-							<logging>console</logging>
-							<!-- optional (file|console|none), default console -->
-							<!-- <downloadPath>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</downloadPath> -->
-							<downloadPath>${embededMongoDownloadUrl}</downloadPath>
-
-						</configuration>
-					</execution>
-					<execution>
-						<id>stop</id>
-						<!-- <phase>post-integration-test</phase> -->
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- FIN demarrage- arret EmbeddedMongoDB pour les tests -->
+          <!--  demarrage- arret EmbeddedMongoDB pour les tests -->
+          <!--  exemple de conf ICI: https://github.com/joelittlejohn/embedmongo-maven-plugin -->
+           <plugin>
+  <groupId>com.github.joelittlejohn.embedmongo</groupId>
+  <artifactId>embedmongo-maven-plugin</artifactId>
+  <version>0.4.2</version>
+  <executions>
+    <execution>
+      <id>start</id>
+     <phase>process-test-classes</phase> 
+      <goals>
+        <goal>start</goal>
+      </goals>
+      <configuration>
+        <port>27017</port>
+        <!-- optional, default 27017 -->
+         <version>3.4.0</version> <!--2.2.1 par defaut -->
+        <logging>console</logging>
+        <!-- optional (file|console|none), default console -->
+     
+      
+          </configuration>
+    </execution>
+       <execution>
+      <id>stop</id>
+       <phase>post-integration-test</phase>
+      <goals>
+        <goal>stop</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+           
+         <!--  FIN  demarrage- arret EmbeddedMongoDB pour les tests -->
 
 		</plugins>
 	</build>
@@ -548,6 +543,15 @@
 			</properties>
 		</profile>
 
+
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+		</profile>
+
+
 		<profile>
 			<activation>
 				<os>
@@ -563,7 +567,6 @@
 				<docker.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</docker.registry>
 				<!--<image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry> -->
 				<image.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</image.registry>
-				<embededMongoDownloadUrl>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</embededMongoDownloadUrl>
 			</properties>
 			<distributionManagement>
 				<!-- <repository> <id>artifactory</id> <url>${distributionRepositoryJenkinsfile}</url> 
