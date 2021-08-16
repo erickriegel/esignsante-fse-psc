@@ -58,7 +58,7 @@ public class DefaultApiIntegrationTest {
      *
      * @throws Exception the exception
      */
-   @Test
+ //  @Test
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
    

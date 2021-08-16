@@ -48,6 +48,7 @@ public class MongoDbTest {
 	  @Test
 	   public void sauvegardeEmbeddeMongoDB() {
 		   log.info("*** Test d'écriture ProofStorage dans MongoDB");
+		   log.error("noms des base utilisée, collection=> " + mongoTemplate.getDb().getName() + " , " + COLLECTION);
 		   log.error("nom de la base utilisée=> " + mongoTemplate.getDb().getName());
 		 			   
 		   //la collection doit être vide après le setup
@@ -72,11 +73,34 @@ public class MongoDbTest {
 		   
 		   List<ProofStorage> results = mongoTemplate.findAll(ProofStorage.class, COLLECTION);
 		   log.info("nb elements trouvés: " + results.size());
+
 		   
 		   
 		   results = repo.findBySubjectOrganizationWithOutBSON(prof1.getSubjectOrganization());
 		   log.info("nb elements trouvés: " + results.size());
 		   ProofStorage result = results.get(0);
+		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
+		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
+		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
+		   assertEquals(result.getTimestamp().compareTo(prof1.getTimestamp()), 0);
+		   assertTrue(result.getTimestamp().compareTo(new Date()) < 0);
+
+		   
+		  //TEST retrouver une preuve à partir de l'id généré
+		   log.info("id_bdd: " + result.getId());
+		   ProofStorage tmp = repo.findOneById(result.getId());
+		   log.info("tpm1 :" + tmp.getFamily_name());
+		   tmp = repo.findOneById("llloo");
+		   if (tmp == null)
+		   {
+			   log.info("non trouvé");
+			   }
+		   else {
+			   log.info("tpm2 :" + tmp.getFamily_name());			   
+		   }
+
+		   //
+		   log.info("id_bdd: " + result.getId());
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	

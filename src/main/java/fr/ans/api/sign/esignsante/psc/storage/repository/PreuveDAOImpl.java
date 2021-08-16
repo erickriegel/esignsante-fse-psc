@@ -2,26 +2,68 @@ package fr.ans.api.sign.esignsante.psc.storage.repository;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
+
+import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.esignsante.model.ESignSanteSignatureReport;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@Service
 public class PreuveDAOImpl implements PreuveDAO {
 
-	@Override
-	public void archivePreuve(UserInfo userInfo, ESignSanteSignatureReport report) {
-		ProofStorage proof = new ProofStorage(
-				userInfo.getSubjectOrganization(),
-				userInfo.getPreferredUsername(),
-				userInfo.getGivenName(),
-				userInfo.getFamilyName(),
-				new Date(),
-				null);// TODO Auto-generated method stub
-		
-	}
+	@Autowired
+	MongoTemplate mongoTemplate;
 	
-//	private ProofStorage UserInfoToProofStorage(UserInfo userInfo, ) {
-//		
-//	}
+	 @Autowired
+     ProofMongoRepository repo;
+
+	 
+	
+	@Override
+	/* sauvegarde de la requete entrante -> création d'un ID MongoDB */
+	public String archiveRequeteEntrantePreuve(ProofStorage proofIn) {
+		proofIn.setBsonProof(null);
+		mongoTemplate.save(proofIn);
+		log.debug("persistence d'une reqête entrante:\n " 
+		   + "idMongoDB: " +proofIn.getId() + "\n" 
+		   + "SubjectOrganization: " +proofIn.getSubjectOrganization() + "\n" 
+		   + "Preferred_username(): " +proofIn.getPreferred_username() + "\n" 
+		   + "Given_name: " +proofIn.getGiven_name() + "\n" 
+		   + "Family_name(): " +proofIn.getFamily_name() + "\n"
+		   + "Timestamp(): " +proofIn.getTimestamp() + "\n"
+			);
+	
+		return proofIn.getId();
+	}
+
+	@Override
+	/* update de la sauvegarde de la requete entrante à partir de l'IdMongoDB  
+	-> persistence de la preuve ernvoyé par esignsatewebservices en base */
+	public boolean archivePreuve(String idMongoDB, ProofStorage proof) {
+		log.debug("demande persistence de la preuve d'une demande de signature: \n"
+      	   + "idMongoDB: " +proof.getId() + "\n" 
+		   + "SubjectOrganization: " +proof.getSubjectOrganization() + "\n" 
+		   + "Preferred_username(): " +proof.getPreferred_username() + "\n" 
+		   + "Given_name: " +proof.getGiven_name() + "\n" 
+		   + "Family_name: " +proof.getFamily_name() + "\n"
+		   + "Timestamp (acceptation de la reqête): " +proof.getTimestamp() + "\n"
+		   + "BSON " + proof.getBsonProof().toJson().toString()
+		   );
+		Query query = Query.query(Criteria.where("id").is(idMongoDB));
+		Update update = new Update();
+		update.set("bsonProof", proof.getBsonProof());
+		mongoTemplate.updateFirst( query, update, ProofStorage.class);
+		return false;
+	}  
+	 
+	 
 
 }

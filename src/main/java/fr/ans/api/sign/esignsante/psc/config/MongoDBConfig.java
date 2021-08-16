@@ -38,7 +38,6 @@ public class MongoDBConfig {
 	@Value("${spring.data.mongodb.database}")
 	private String mongoDatabase;
 
-
 	@Bean
 	public MongoTemplate mongoTemplate() throws IOException {
 		MongoClient mongoClient = MongoClients.create( "mongodb://"+ mongoHost + ":" + mongoPort );

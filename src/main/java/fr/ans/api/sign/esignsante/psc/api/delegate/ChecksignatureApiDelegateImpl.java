@@ -1,6 +1,11 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -10,9 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.ChecksignatureApiDelegate;
-
+import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.model.Result;
 import io.swagger.annotations.ApiParam;
@@ -26,9 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implements ChecksignatureApiDelegate {
 
+	@Autowired
+	EsignsanteCall esignWS;
 	
 @Override
-public ResponseEntity<Result> postChecksignaturePades(@ApiParam(value = "", required=true) @Valid @RequestPart(value = "file", required = true)  Document file) {
+ 
+public ResponseEntity<Result> postChecksignaturePades(@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file) {
 	final Optional<String> acceptHeader = getAcceptHeader();
 	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	log.trace(" 2222 Réception d'une demande Checksignature Pades");
@@ -37,18 +46,51 @@ public ResponseEntity<Result> postChecksignaturePades(@ApiParam(value = "", requ
 }
 
 @Override
-public ResponseEntity<Result> postChecksignatureXades(@ApiParam(value = "", required=true) @Valid @RequestPart(value = "file", required = true)  Document file) {
+public ResponseEntity<Result> postChecksignatureXades(@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {
 	final Optional<String> acceptHeader = getAcceptHeader();
 	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-	log.trace(" 2323 Réception d'une demande Checksignature Xades");
+	log.trace("Réception d'une demande Checksignature Xades. fileName: "  );
+	File fileToCheck = null;
+	assert file!=null;
+	Path filepath = null;
+	try {
+		filepath = multipartFileToFile(file, FileSystems.getDefault().getPath("."));
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
 	
-	//TODO recup param
-	//tmp MIse au point => appel avec fichier des resources
-	 Long idVerifSignConf = 1L;
-	    File fileToCheck = null;
+//	try {
+//		fileToCheck = file.getResource().;
+//	} catch (IOException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//		log.debug("KOKO");
+//	}
+//	log.debug("file: " + file.getContentType());
+	
+	try {
+		log.debug("file: {} filepath {}", file.getResource().contentLength(), filepath.toString());
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+//	try {
+//		fileToCheck = File.createTempFile("MyAppName-", ".tmp");
+//		file.transferTo(fileToCheck);
+//		
+//	} catch (IOException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+	
+
+	
+	
 	log.debug("appel esignsante pour un contrôle de siganture en xades");
-	log.debug("paramètres:  idVerifSignConf: " + idVerifSignConf + "file: " + fileToCheck.getName() );
-	log.debug("fileExist:" + fileToCheck.exists() );
+	esignWS.chekSignatureXades();
+	log.debug("retour appel esignsante pour un contrôle de siganture en xades - formatage de la réponse");
+
 	
 	
 
@@ -58,4 +100,6 @@ public ResponseEntity<Result> postChecksignatureXades(@ApiParam(value = "", requ
 	return null;
 }
 
+
+ 
 }

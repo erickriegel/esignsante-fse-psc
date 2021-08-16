@@ -4,7 +4,11 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
@@ -39,4 +43,13 @@ abstract public class AbstractApiDelegate {
 	public Optional<String> getAcceptHeader() {
 		return getRequest().map(r -> r.getHeader("Accept"));
 	}
+	
+	protected Path multipartFileToFile(
+		    MultipartFile multipart, 
+		    Path dir
+		) throws IOException {
+		    Path filepath = Paths.get(dir.toString(), multipart.getOriginalFilename());
+		    multipart.transferTo(filepath);
+		    return filepath;
+		}
 }

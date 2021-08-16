@@ -18,18 +18,18 @@ import lombok.Getter;
 public class EsignsanteConfigurationProperties {
 
 	@Value("${esignsante.webservices.signature.confId}")
-	private int signatureConfId;
+	private long signatureConfId;
 
 	@Value("${esignsante.webservices.signature.secret}")
 	private String secret;
 
 	@Value("${esignsante.webservices.proof.confId}")
-	private int proofConfId;
+	private long proofConfId;
 	
 	@Value("${esignsante.webservices.checksignature}")
-	private int checkSignatureConfId;
+	private long checkSignatureConfId;
 	
-	@Value("${esignsante.webservices.basepath")
+	@Value("${esignsante.webservices.basepath}")
 	private String basePath;
 	
 	@Value("${esignsante.webservices.appliantId}")

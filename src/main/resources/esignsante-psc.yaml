@@ -2,12 +2,12 @@ openapi: 3.0.0
 info:
   title: esignsante-psc
   version: '1.0'
-  description: Cette API permet de signer des documents PDF or XML avec un certificat X509 de l'A.N.S
+  description: This API can be used to sign PDF or XML documents with an A.N.S X509 certificate
   contact:
     email: esignsante@esante.gouv.fr
 servers:
   - url: 'https://esignsante.psc.esante.gouv.fr/v1'
-    description: Bas à sable
+    description: Sandbox
 tags:
   - name: utils
   - name: signature
@@ -15,7 +15,7 @@ tags:
 paths:
   /:
     get:
-      summary: Liste des opérations disponibles.  
+      summary: Liste des opérations disponibles
       tags:
         - utils
       responses:
@@ -45,7 +45,7 @@ paths:
       description: 'Opération qui permet au client de lister les opérations offertes par le composant eSignSante-PSC.  '
   /ca:
     get:
-      summary: Liste des chaines de confiances supportées
+      summary: Liste des autorités de certification
       tags:
         - utils
       responses:
@@ -71,43 +71,46 @@ paths:
       operationId: post-asksignature-xades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Document'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '401':
-          description: Jeton non-valide.
+          description: erreur 401
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '415':
-          description: Le format de document n'est pas supporté par le serveur.
+          description: erreur 415
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Erreur interne du serveur
+          description: Internal Server Error
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
-                documenttosign:
-                  $ref: '#/components/schemas/RichDocument'
+                file:
+                  type: string
+                  format: binary
+                userinfo:
+                  $ref: '#/components/schemas/UserInfo'    
               required:
-                - documenttosign
+                - file  
         description: Le document à signer au format XML.
       parameters:
         - schema:
@@ -127,41 +130,46 @@ paths:
       operationId: post-askSignature-pades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/Document'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '401':
-          description: Jeton non-valide.
+          description: erreur 401
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '415':
-          description: Le format de document n'est pas supporté par le serveur.
+          description: erreur 415
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Erreur interne du serveur
+          description: Internal Server Error
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
-                documenttosign:
-                  $ref: '#/components/schemas/RichDocument'
+                file:
+                  type: string
+                  format: binary
+                userinfo:
+                  $ref: '#/components/schemas/UserInfo'
+              required:
+                - file  
         description: Le document à signer au format PDF.
       parameters:
         - schema:
@@ -181,13 +189,13 @@ paths:
       operationId: post-checksignature-xades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
           content:
             application/json:
               schema:
@@ -197,17 +205,12 @@ paths:
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  $ref: '#/components/schemas/Document'
-              required:
-                - file
+              $ref: '#/components/schemas/Document'
         description: 'Le document à vérifier, il doit impérativement être au format XML.'
       tags:
         - checksignature
@@ -218,13 +221,13 @@ paths:
       operationId: post-checksignature-pades
       responses:
         '200':
-          description: Requête en succès.
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
         '400':
-          description: Requête mal formée.
+          description: erreur 400
           content:
             application/json:
               schema:
@@ -234,17 +237,12 @@ paths:
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service indisponible
+          description: Service Unavailable
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  $ref: '#/components/schemas/Document'
-              required:
-                - file
+              $ref: '#/components/schemas/Document'
         description: Le document à vérifier au format PDF.
       tags:
         - checksignature
@@ -279,18 +277,8 @@ components:
         activities:
           type: array
           uniqueItems: true
-          minItems: 1
           items:
             $ref: '#/components/schemas/Activitie'
-      required:
-        - codeProfession
-        - codeCategorieProfessionnelle
-        - codeCiviliteDexercice
-        - nomDexercice
-        - prenomDexercice
-        - codeTypeSavoirFaire
-        - codeSavoirFaire
-        - activities
     Activitie:
       description: ''
       type: object
@@ -382,36 +370,6 @@ components:
         autoriteDenregistrement:
           type: string
           minLength: 1
-      required:
-        - codeModeExercice
-        - codeSecteurDactivite
-        - codeSectionPharmacien
-        - codeRole
-        - numeroSiretSite
-        - numeroSirenSite
-        - numeroFinessSite
-        - numeroFinessetablissementJuridique
-        - identifiantTechniqueDeLaStructure
-        - raisonSocialeSite
-        - enseigneCommercialeSite
-        - complementDestinataire
-        - complementPointGeographique
-        - numeroVoie
-        - indiceRepetitionVoie
-        - codeTypeDeVoie
-        - libelleVoie
-        - mentionDistribution
-        - bureauCedex
-        - codePostal
-        - codeCommune
-        - codePays
-        - telephone
-        - telephone2
-        - telecopie
-        - adresseEMail
-        - codeDepartement
-        - ancienIdentifiantDeLaStructure
-        - autoriteDenregistrement
       title: ''
     Operation:
       type: object
@@ -429,10 +387,13 @@ components:
       title: Document
       type: object
       description: Document to sign (XML or PDF)
+      x-examples: {}
       properties:
         file:
           type: string
           format: binary
+      required:
+        - file
     Error:
       title: Error
       type: object
@@ -453,17 +414,6 @@ components:
           items:
             $ref: '#/components/schemas/Error'
       description: Résultat d'une vérification de signature.
-    RichDocument:
-      title: RichDocument
-      type: object
-      properties:
-        document:
-          $ref: '#/components/schemas/Document'
-        userinfo:
-          $ref: '#/components/schemas/UserInfo'
-      required:
-        - document
-        - userinfo
     SubjectRefPro:
       description: ''
       type: object
@@ -474,12 +424,8 @@ components:
         exercices:
           type: array
           uniqueItems: true
-          minItems: 1
           items:
             $ref: '#/components/schemas/Exercice'
-      required:
-        - codeCivilite
-        - exercices
     UserInfo:
       description: ''
       type: object
@@ -530,21 +476,9 @@ components:
           type: string
           minLength: 1
       required:
-        - Secteur_Activite
-        - sub
-        - email_verified
         - SubjectOrganization
-        - Mode_Acces_Raison
         - preferred_username
         - given_name
-        - Acces_Regulation_Medicale
-        - UITVersion
-        - Palier_Authentification
-        - SubjectRefPro
-        - SubjectOrganizationID
-        - SubjectRole
-        - PSI_Locale
-        - SubjectNameID
         - family_name
     SubjectRole:
       title: SubjectRole
