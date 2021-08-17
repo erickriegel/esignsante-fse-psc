@@ -2,18 +2,15 @@ package fr.ans.api.sign.esignsante.psc.esignsantewebservices.call;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
-import fr.ans.api.sign.esignsante.psc.storage.repository.ProofMongoRepository;
 import fr.ans.esignsante.ApiClient;
+import fr.ans.esignsante.api.CaApi;
+import fr.ans.esignsante.api.PadesApi;
 import fr.ans.esignsante.api.XadesApi;
-import fr.ans.esignsante.model.ESignSanteSignatureReport;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
 import fr.ans.esignsante.model.ESignSanteValidationReport;
 import fr.ans.esignsante.model.OpenidToken;
@@ -33,19 +30,12 @@ public class EsignsanteCall {
 	EsignsanteConfigurationProperties esignConf;
 	
 	
-	//tmp à déplacer
-	 @Autowired
- 	MongoTemplate mongoTemplate;
-     
-     @Autowired
-     ProofMongoRepository repo; 
-	//fin tmp à déplacer
 	
 	public ApiClient confApiClient() {
 		esignWSApiClient = new ApiClient();
 		esignWSApiClient.setBasePath(esignConf.getBasePath());
 		
-		log.info("Appel esignante Webservices pour basePAth = " + esignConf.getBasePath());
+		log.info("Appel esignante Webservices pour basePath = " + esignConf.getBasePath());
 		return esignWSApiClient;
 	}
 	
@@ -53,9 +43,6 @@ public class EsignsanteCall {
 		
 		esignWSApiClient = confApiClient();
 		
-//		String basePath = "http://localhost:8081/esignsante/v1";
-//		esignWSApiClient = new ApiClient();
-//		esignWSApiClient.setBasePath(basePath);
 		
 	 List<String> signers = new ArrayList<String>();
 	 signers.add("medecin1");
@@ -65,9 +52,11 @@ public class EsignsanteCall {
 	 String secret = "password";
 		Long idSignConf = 1L;
 		
-	 log.debug("appel esignsanteWebservices pour une demande de signature en xades");
+	 log.debug("appel esignsanteWebservices pour une demande de signature en xades avec: ");
 		log.debug("paramètres: basePath: " + esignWSApiClient.getBasePath() + " idSignConf: " + idSignConf + " file: " + fileToSign.getName() );
-		log.debug("fileExist:" + fileToSign.exists() );
+//	    log.debug("basePath: " + esignWSApiClient.getBasePath() + " idSignConf: " + idSignConf + " file: " + fileToSign.getName(),
+//	    		//esignWSApiClient.getBasePath() , idSignConf);
+//		log.debug("fileExist:" + fileToSign.exists() );
 		
 		List<OpenidToken> openidTokens = new ArrayList<OpenidToken>();
 	
@@ -75,21 +64,8 @@ String requestId = "TODO";
 	 XadesApi api = new XadesApi(esignWSApiClient);
 	 
 	 
-	 
-	   Date now = new Date() ;
-	   ProofStorage prof1 = new ProofStorage(
-			   "CABINET M SPECIALISTE0021889", //SubjectOrganization
-			   "899700218896", //preferred_username
-			   "ROBERT", //given_name
-			   "SPECIALISTE0021889", //family name
-			   now, //timestamp
-			   null // TODO
-			   );
-
-	   mongoTemplate.save(prof1);
-
-	   String proofId = prof1.getId();
-	   log.info("ID de la preuve persistée: " + proofId );
+	  // String proofId = prof1.getId();
+	   
 		try {
 			
 //		OpenidToken tok;
@@ -121,37 +97,57 @@ String requestId = "TODO";
 	
 	}
 	
-	public ESignSanteValidationReport chekSignatureXades() {
+	public ESignSanteValidationReport chekSignatureXades(File fileToCheck) {
 		
-		esignWSApiClient = confApiClient();
-		
-//		String basePath = "http://localhost:8081/esignsante/v1";
-//		esignWSApiClient = new ApiClient();
-//		esignWSApiClient.setBasePath(basePath);
-		
+		esignWSApiClient = confApiClient(); //juste le BasePath
 	
 	 ESignSanteValidationReport report = null;
 	 List<String> signers = new ArrayList<String>();
-	 signers.add("medecin1");
-	 signers.add("patient1");
-	 //File fileToSign = new File("C:\\Users\\cjuillard\\eclipse-workspace\\esignsante-psc\\src\\main\\resources\\application.properties");
-	 File fileToCheck = new File("C:\\Users\\cjuillard\\eclipse-workspace\\esignsante-psc\\src\\test\\resources\\EsignSanteWS\\Xades\\pomSigne.txt");
-	 String secret = "password";
-		Long idSignConf = 1L;
-		
+
+//	 File fileToCheck = new File("C:\\Users\\cjuillard\\eclipse-workspace\\esignsante-psc\\src\\test\\resources\\EsignSanteWS\\Xades\\pomSigne.txt");
+	long idCheckSign = 	 esignConf.getCheckSignatureConfId();
 	 log.debug("appel esignsanteWebservices pour une VERIF de signature en xades");
-		log.debug("paramètres: basePath: " + esignWSApiClient.getBasePath() + " idSignConf: " + idSignConf + " file: " + fileToCheck.getName() );
+		log.debug("paramètres: basePath: " + esignWSApiClient.getBasePath() +
+				" id checkSign d esignsante: " + idCheckSign + " file: " + fileToCheck.getName() );
 		log.debug("fileExist:" + fileToCheck.exists() );
 		
 	
 	 XadesApi api = new XadesApi(esignWSApiClient);
 		try {
-	 report = api.verifSignatureXades(idSignConf, fileToCheck);
+	 report = api.verifSignatureXades(idCheckSign, fileToCheck);
 	 log.debug("sortie de fct");
 	 log.debug("report valid?: " + report.isValide());
 	 log.debug("nbError: " + report.getErreurs().size());
 		} catch (Exception e) {
-			log.debug("plantage appel esignsante");
+			log.debug("plantage appel esignsante checkXades");
+			log.debug(e.getMessage());
+			log.debug(e.toString());
+		
+		}
+	return report;
+	}
+	
+public ESignSanteValidationReport chekSignaturePades(File fileToCheck) {
+		
+		esignWSApiClient = confApiClient(); //juste le BasePath
+	
+	 ESignSanteValidationReport report = null;
+	
+	long idCheckSign = 	 esignConf.getCheckSignatureConfId();
+	
+	 log.debug("appel esignsanteWebservices pour une VERIF de signature en PADES");
+	 log.debug("paramètres: basePath: " + esignWSApiClient.getBasePath() +
+				" id checkSign d esignsante: " + idCheckSign + " file: " + fileToCheck.getName() );
+	 log.debug("fileExist:" + fileToCheck.exists() );
+		
+	
+	 PadesApi api = new PadesApi(esignWSApiClient);
+		try {
+	 report = api.verifSignaturePades(idCheckSign, fileToCheck);
+	 log.debug("report valid?: " + report.isValide());
+	 log.debug("nbError: " + report.getErreurs().size());
+		} catch (Exception e) {
+			log.debug("plantage appel esignsante checkPades");
 			log.debug(e.getMessage());
 			log.debug(e.toString());
 		
@@ -159,4 +155,11 @@ String requestId = "TODO";
 	return report;
 	}
 
+public List<String> getCA() {
+	List<String> results = null;
+	esignWSApiClient = confApiClient();
+	CaApi api = new CaApi(esignWSApiClient);
+	results = api.getCA();
+	return results;
+}
 }

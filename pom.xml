@@ -30,6 +30,7 @@
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
 		<dist>docker</dist>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<embededMongoDownloadUrl>http://fastdl.mongodb.org/</embededMongoDownloadUrl>
 
 	</properties>
@@ -299,6 +300,9 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<jvmArguments>
+
+                      <!--  <jvmArguments>-Dfile.encoding=UTF8</jvmArguments> -->
+          
 						<!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 -->
 						<!-- -add-opens java.base/java.lang=ALL-UNNAMED -illegal-access=permit -->
 					</jvmArguments>
@@ -511,7 +515,7 @@
 							<goal>start</goal>
 						</goals>
 						<configuration>
-							<port>27018</port>
+							<port>27017</port>
 							<!-- optional, default 27017 -->
 							<version>3.4.24</version> <!--2.2.1 par defaut -->
 							<logging>console</logging>

@@ -1,5 +1,6 @@
 package fr.ans.api.sign.esignsante.psc.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
@@ -9,6 +10,8 @@ import org.springframework.web.filter.CommonsRequestLoggingFilter;
  * associé à la propriété Logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter de applicationproperties*/
 
 public class RequestLoggingFilterConfig {
+	
+	@Bean
 	 public CommonsRequestLoggingFilter logFilter() {
 	        CommonsRequestLoggingFilter filter
 	          = new CommonsRequestLoggingFilter();

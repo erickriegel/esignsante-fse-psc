@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import fr.ans.api.sign.esignsante.psc.api.CaApiDelegate;
+import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,13 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDelegate{
 
-	
+	@Autowired
+	EsignsanteCall esignWS;
 	
 	@Override
 	public ResponseEntity<List<String>> getCa()  {
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<List<String>>  re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		log.trace(" 11111 Réception d'une demande des ca");
+		log.trace(" Réception d'une demande des CAs");
+		
+       //Controle du header 'accept'
 		/*
 		if (acceptHeader.isPresent() && acceptHeader.get().contains(HEADER_TYPE)) {
 		}
@@ -37,8 +41,8 @@ public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDeleg
 		}
 		*/
 	
-
-		log.trace(" FIN 11111 Réception d'une demande des ca");
-		return null;
+		List<String> results = esignWS.getCA();
+		re = new ResponseEntity<>(results, HttpStatus.OK);
+		return re;
 	}
 }

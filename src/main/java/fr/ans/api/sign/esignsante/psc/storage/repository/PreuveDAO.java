@@ -6,7 +6,9 @@ import fr.ans.esignsante.model.ESignSanteSignatureReport;
 
 public interface PreuveDAO {
 
-	public String archiveRequeteEntrantePreuve(ProofStorage proofIn);
+	//public String archiveRequeteEntrantePreuve(ProofStorage proofIn);
 	
-	public boolean archivePreuve(String idMongoDB,ProofStorage proof );
+	//public boolean archivePreuve(String idMongoDB,ProofStorage proof );
+	
+	public boolean archivePreuve(ProofStorage proof );
 }

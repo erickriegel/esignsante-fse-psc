@@ -6,7 +6,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -44,12 +46,10 @@ abstract public class AbstractApiDelegate {
 		return getRequest().map(r -> r.getHeader("Accept"));
 	}
 	
-	protected Path multipartFileToFile(
-		    MultipartFile multipart, 
-		    Path dir
-		) throws IOException {
-		    Path filepath = Paths.get(dir.toString(), multipart.getOriginalFilename());
+
+	protected File multipartFileToFile(MultipartFile multipart /*,  Path dir*/) throws IOException {
+		    Path filepath = Paths.get(FileSystems.getDefault().getPath(".").toString(), multipart.getOriginalFilename());
 		    multipart.transferTo(filepath);
-		    return filepath;
+		    return filepath.toFile();
 		}
 }

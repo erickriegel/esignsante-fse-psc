@@ -36,7 +36,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	public ResponseEntity<Document> postAskSignaturePades(@ApiParam(value = "" ,required=true) @RequestHeader(value="access_token", required=true) String accessToken,@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file,@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false)  UserInfo userinfo) {	
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		log.trace(" 3333 Réception d'une demande de signature Pades");
+		log.trace("Réception d'une demande de signature Pades");
 	
 		//return re;
 		return null;
@@ -46,33 +46,25 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	public ResponseEntity<Document> postAsksignatureXades(@ApiParam(value = "" ,required=true) @RequestHeader(value="access_token", required=true) String accessToken,@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file,@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false)  UserInfo userinfo) {
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		log.trace(" 4444 Réception d'une demande de signature Xades");
+		log.trace("Réception d'une demande de signature Xades");
 		log.debug("userINfo {}", userinfo.toString());
 		log.debug("file {}", userinfo.toString());
 		
-		Path filepath = null;
-		try {
-			filepath = multipartFileToFile(file, FileSystems.getDefault().getPath("."));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+//		Path filepath = null;
 //		try {
-//			fileToCheck = file.getResource().;
+//			filepath = multipartFileToFile(file, FileSystems.getDefault().getPath("."));
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
+//		
+//		try {
+//			log.debug("file: {} filepath {}", file.getResource().contentLength(), filepath.toString());
 //		} catch (IOException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
-//			log.debug("KOKO");
 //		}
-//		log.debug("file: " + file.getContentType());
-		
-		try {
-			log.debug("file: {} filepath {}", file.getResource().contentLength(), filepath.toString());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		
 		

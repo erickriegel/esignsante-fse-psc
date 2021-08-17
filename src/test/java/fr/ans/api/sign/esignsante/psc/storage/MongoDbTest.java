@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.bson.BsonDocument;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.ProofMongoRepository;
+import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
+import springfox.documentation.spring.web.json.Json;
 
 /*
  * Classe utilisée uniquement pour les tests
@@ -31,7 +36,7 @@ public class MongoDbTest {
 	   
     
 	
-        private final static String COLLECTION = "collectionxx";
+        private final static String COLLECTION = "preuves";
 
         @Autowired
     	MongoTemplate mongoTemplate;
@@ -48,37 +53,54 @@ public class MongoDbTest {
 	  @Test
 	   public void sauvegardeEmbeddeMongoDB() {
 		   log.info("*** Test d'écriture ProofStorage dans MongoDB");
-		   log.error("noms des base utilisée, collection=> " + mongoTemplate.getDb().getName() + " , " + COLLECTION);
-		   log.error("nom de la base utilisée=> " + mongoTemplate.getDb().getName());
+		   //log.error("noms des base utilisée, collection=> " + mongoTemplate.getDb().getName() + " , " + COLLECTION);
+		   log.error("noms des base utilisée => " + mongoTemplate.getDb().getName());
+		  
+		   //String sJson = "{\"active\":false}";
+		   String sJson = "{\"Secteur_Activite\":\"SA07^1.2.250.1.71.4.2.4\",\"email_verified\":false,\"SubjectOrganization\":\"CABINET M SPECIALISTE0021889\",\"preferred_username\":\"899700218896\",\"given_name\":\"ROBERT\",\"SubjectRefPro\":{\"codeCivilite\":\"M\",\"exercices\":[{\"codeProfession\":\"10\",\"nomDexercice\":\"SPECIALISTE0021889\",\"prenomDexercice\":\"ROBERT\",\"codeTypeSavoirFaire\":\"\"}]},\"SubjectRole\":[\"10^1.2.250.1.213.1.1.5.5\"],\"SubjectNameID\":\"899700218896\",\"family_name\":\"SPECIALISTE0021889\"}";
+		   
+			   org.bson.Document bson =  org.bson.Document.parse(sJson);
+			 //  BsonDocument bsonn= bson.toBsonDocument();
 		 			   
 		   //la collection doit être vide après le setup
 		   assertTrue(repo.findAll().isEmpty());
-		   
+		   log.info("ici");
+		   String requestId = Helper.generateRequestId();
 		   Date now = new Date() ;
 		   ProofStorage prof1 = new ProofStorage(
+				   requestId,
 				   "CABINET M SPECIALISTE0021889", //SubjectOrganization
 				   "899700218896", //preferred_username
 				   "ROBERT", //given_name
 				   "SPECIALISTE0021889", //family name
 				   now, //timestamp
-				   null // TODO
+				   bson 
 				   );
 	
 		   mongoTemplate.save(prof1);
 	
-		   
+		   log.info("la");
 		  Set<String> mongoCollections = mongoTemplate.getCollectionNames();
 		  assertTrue(mongoCollections.size() >= 1 , "il doit y avoir au moins une collection dans la base");
-		  assertTrue(mongoCollections.contains("archivesPreuves") , "la collection @Document(collection = \"archivesPreuves\" doit exister");
-		   
-		   List<ProofStorage> results = mongoTemplate.findAll(ProofStorage.class, COLLECTION);
+		  assertTrue(mongoCollections.contains("preuves") , "la collection @Document(collection = \"preuves\" doit exister");
+		  log.info("lalalala");
+		   List<ProofStorage> results = mongoTemplate.findAll(ProofStorage.class /*, COLLECTION*/);
 		   log.info("nb elements trouvés: " + results.size());
 
-		   
-		   
+		  
+		  ProofStorage result = repo.findOneById(prof1.get_id());
+		  		   assertEquals(result.getRequestId(), prof1.getRequestId());		
+		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
+		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
+		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
+		   assertEquals(result.getTimestamp().compareTo(prof1.getTimestamp()), 0);
+		   assertTrue(result.getTimestamp().compareTo(new Date()) < 0);
+
+
 		   results = repo.findBySubjectOrganizationWithOutBSON(prof1.getSubjectOrganization());
 		   log.info("nb elements trouvés: " + results.size());
-		   ProofStorage result = results.get(0);
+		   result = results.get(0);
+		   assertEquals(result.getRequestId(), prof1.getRequestId());		
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
@@ -87,20 +109,11 @@ public class MongoDbTest {
 
 		   
 		  //TEST retrouver une preuve à partir de l'id généré
-		   log.info("id_bdd: " + result.getId());
-		   ProofStorage tmp = repo.findOneById(result.getId());
+		   log.info("id_bdd: " + result.get_id());
+		   ProofStorage tmp = repo.findOneById(result.get_id());
 		   log.info("tpm1 :" + tmp.getFamily_name());
-		   tmp = repo.findOneById("llloo");
-		   if (tmp == null)
-		   {
-			   log.info("non trouvé");
-			   }
-		   else {
-			   log.info("tpm2 :" + tmp.getFamily_name());			   
-		   }
-
 		   //
-		   log.info("id_bdd: " + result.getId());
+		   log.info("id_bdd: " + result.get_id());
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	

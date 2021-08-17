@@ -5,9 +5,11 @@ import java.util.Date;
 import javax.validation.constraints.NotNull;
 
 import org.bson.BsonDocument;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+//import org.bson.Document;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,12 +23,15 @@ import lombok.ToString;
 /*
  * Classe ProofStorage: Modèle pour stokage de la preuve dans MongoDB
  */
-@Document(collection = "archivesPreuves")
+@Document(collection = "preuves")
 public class ProofStorage {
 	
-	public ProofStorage(String subjectOrganization, String preferred_username, String given_name, String family_name,
-			Date timestamp , BsonDocument bsonProof) {
+	public ProofStorage() {}; //findAll
+	
+	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name, String family_name,
+			Date timestamp , org.bson.Document bsonProof) {
 		super();
+		this.requestId = requestID;
 		this.subjectOrganization = subjectOrganization;
 		this.preferred_username = preferred_username;
 		this.given_name = given_name;
@@ -34,24 +39,58 @@ public class ProofStorage {
 		this.timestamp = timestamp;
 		this.bsonProof = bsonProof;
 	}
+	
+	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name, String family_name,
+			Date timestamp) {
+		super();
+		this.requestId = requestID;
+		this.subjectOrganization = subjectOrganization;
+		this.preferred_username = preferred_username;
+		this.given_name = given_name;
+		this.family_name = family_name;
+		this.timestamp = timestamp;
+	}
 
+	public ProofStorage(ObjectId id,
+			@NotNull(message = "Persistence: le champ  'requestId'ne doit pas être nul") String requestId,
+			String subjectOrganization, String preferred_username, String given_name, String family_name,
+			@NotNull(message = "Persistence: le 'timestamp' ne doit pas être nul") Date timestamp,
+			@NotNull(message = "Persistence: le 'bsonProof' ne doit pas être nul") org.bson.Document bsonProof) {
+		super();
+		this._id = id;
+		this.requestId = requestId;
+		this.subjectOrganization = subjectOrganization;
+		this.preferred_username = preferred_username;
+		this.given_name = given_name;
+		this.family_name = family_name;
+		this.timestamp = timestamp;
+		this.bsonProof = bsonProof;
+		
+	
+	}
 	@Id
-    private String id;
+    //private String id; 
+	private ObjectId _id;
+	
 	
 	@Setter
-	@NotNull(message = "Persistence: le champ 'subjectOrganization' ne doit pas être nul")
+	@NotNull(message = "Persistence: le champ  'requestId'ne doit pas être nul")
+    private String requestId;
+	
+	@Setter
+	//@NotNull(message = "Persistence: le champ 'subjectOrganization' ne doit pas être nul")
     private String subjectOrganization;
 	
 	@Setter
-	@NotNull(message = "Persistence: le champ 'preferred_username' ne doit pas être nul")
+	//@NotNull(message = "Persistence: le champ 'preferred_username' ne doit pas être nul")
     private String preferred_username;
 	
 	@Setter
-	@NotNull(message = "Persistence: le champ 'given_name' ne doit pas être nul")
+	//@NotNull(message = "Persistence: le champ 'given_name' ne doit pas être nul")
     private String given_name;
 	
 	@Setter
-	@NotNull(message = "Persistence: le champ 'family_name' ne doit pas être nul")
+	//@NotNull(message = "Persistence: le champ 'family_name' ne doit pas être nul")
     private String family_name;
 	
 	@Setter
@@ -60,7 +99,9 @@ public class ProofStorage {
 	
 	@Setter
 	@NotNull(message = "Persistence: le 'bsonProof' ne doit pas être nul")
-    private BsonDocument bsonProof;
+    private org.bson.Document bsonProof;
+
+
 	
 	
 }
