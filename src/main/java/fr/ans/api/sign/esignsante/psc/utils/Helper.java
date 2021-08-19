@@ -1,5 +1,6 @@
 package fr.ans.api.sign.esignsante.psc.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -48,14 +49,14 @@ public class Helper {
 		return requestID;
 	}
 
-	public static String encodeBase64(String stringToEncode) {
-		return Base64.getEncoder().encodeToString(stringToEncode.getBytes());
+	public static String encodeBase64(String stringToEncode) throws UnsupportedEncodingException {
+		return Base64.getEncoder().encodeToString(stringToEncode.getBytes("UTF-8") );
 	}
 
-	public static String decodeBase64(String stringToDecode) {
+	public static String decodeBase64(String stringToDecode) throws UnsupportedEncodingException {
 		byte[] decodedBytes = Base64.getDecoder().decode(stringToDecode);
-		return new String(decodedBytes);
-
+		//return new String(decodedBytes);
+			return new String(decodedBytes, "UTF-8");
 	}
 
 	public static List<Error> mapListErreurToListError(List<Erreur> erreurs) {

@@ -4,10 +4,12 @@ package fr.ans.api.sign.esignsante.psc.api.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.esignsante.model.Erreur;
@@ -15,25 +17,40 @@ import lombok.extern.slf4j.Slf4j;
 import fr.ans.api.sign.esignsante.psc.model.Error;
 
 @Slf4j
+@SpringBootTest // (properties = "file.encoding=UTF-8")
 public class HelperTest {
 
-	final public String STRING_TO_ENCODE ="Chaîne de caractère UTF8 &é\"(,;!";
+	final public String STRING_TO_ENCODE =new String("Chaîne de caractère UTF8 &é\"(,;!");
 	final public String STRING_TO_DECODE ="Q2hhw65uZSBkZSBjYXJhY3TDqHJlIFVURjggJsOpIigsOyE=";
 	
-//	@Test
+	@Test
 	public void encodeBase64() {
-	   String test = Helper.encodeBase64(STRING_TO_ENCODE);
-	   log.debug("encodebase64");
-	   log.debug(test);
-	   assertEquals(test.compareTo(STRING_TO_DECODE),0);
+	   String test;
+	try {
+		test = Helper.encodeBase64(STRING_TO_ENCODE);
+		 log.debug("encodebase64");
+		   log.debug(test);
+		   assertEquals(test.compareTo(STRING_TO_DECODE),0);
+	} catch (UnsupportedEncodingException e) {
+		assertTrue(false,"UnsupportedEncodingException durant le codage...");
+		e.printStackTrace();
+	}
+	  
 	}
 	
-//	@Test
-	public void decodeBase64() {
-	   String test = Helper.decodeBase64(STRING_TO_DECODE);
-	   log.debug("decodebase64");
-	   log.debug(test);
-	   assertEquals(test.compareTo(STRING_TO_ENCODE),0);
+	@Test
+	public void decodeBase64()  {
+	   String test;
+	try {
+		test = Helper.decodeBase64(STRING_TO_DECODE);
+		log.debug("decodebase64");
+		   log.debug(test);
+		   assertEquals(test.compareTo(STRING_TO_ENCODE),0);
+	} catch (UnsupportedEncodingException e) {
+		assertTrue(false,"UnsupportedEncodingException durant le decodage...");
+		e.printStackTrace();
+	}
+	   
 	}
 	
 	@Test

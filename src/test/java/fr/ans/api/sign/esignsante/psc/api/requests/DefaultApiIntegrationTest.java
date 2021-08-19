@@ -29,7 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
  * Test des EndPoints offerts par l'API esignsante-psc.
  */
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // pour restdocs
-@SpringBootTest
+@SpringBootTest //(properties = "file.encoding=UTF-8")
 @AutoConfigureMockMvc
 public class DefaultApiIntegrationTest {
 
@@ -58,7 +58,7 @@ public class DefaultApiIntegrationTest {
      *
      * @throws Exception the exception
      */
- //  @Test
+   @Test
     @DisplayName("Vérification de la liste des services disponibles.")
     public void rootGetTest() throws Exception {
    
