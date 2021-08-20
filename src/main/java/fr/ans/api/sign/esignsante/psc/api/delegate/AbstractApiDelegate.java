@@ -52,4 +52,6 @@ abstract public class AbstractApiDelegate {
 		    multipart.transferTo(filepath);
 		    return filepath.toFile();
 		}
+	
+	
 }

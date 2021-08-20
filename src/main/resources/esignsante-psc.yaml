@@ -102,15 +102,8 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                userinfo:
-                  $ref: '#/components/schemas/UserInfo'    
-              required:
-                - file  
+              $ref: '#/components/schemas/RichDocument' 
+        required: true
         description: Le document à signer au format XML.
       parameters:
         - schema:
@@ -160,16 +153,9 @@ paths:
       requestBody:
         content:
           multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                userinfo:
-                  $ref: '#/components/schemas/UserInfo'
-              required:
-                - file  
+              schema:
+                $ref: '#/components/schemas/RichDocument' 
+        required: true
         description: Le document à signer au format PDF.
       parameters:
         - schema:
@@ -485,6 +471,18 @@ components:
       type: array
       items:
         type: string
+    RichDocument:
+      title: RichDocument
+      type: object
+      properties:
+        file:
+          description: Objet contenant le fichier ) signer et le UserInfo 
+          type: string
+          format: binary
+        userinfo:
+          type: string
+      required:
+        - file
   responses: {}
   securitySchemes:
     PRO-SanteConnect:
@@ -494,4 +492,4 @@ components:
     Pro-SanteConnect_BAS:
       type: openIdConnect
       openIdConnectUrl: 'https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
-  parameters: {}
+  parameters: {}   

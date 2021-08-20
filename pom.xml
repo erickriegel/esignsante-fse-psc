@@ -183,6 +183,13 @@
 		</dependency>
 	<!-- FIN client esignsante -->
 			
+			<!--  parser un json JSONObject-->
+<!-- 			<dependency>
+    <groupId>com.googlecode.json-simple</groupId>
+    <artifactId>json-simple</artifactId>
+    <version>1.1</version>
+</dependency> -->
+			
 			<!--  validation avant sauvegarde MongoDB -->
 <!-- 		<dependency>
     <groupId>org.hibernate</groupId>

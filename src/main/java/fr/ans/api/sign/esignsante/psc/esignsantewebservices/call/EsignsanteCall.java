@@ -39,7 +39,7 @@ public class EsignsanteCall {
 		return esignWSApiClient;
 	}
 	
-	public void signatureXadesWithProof() {
+	public void signatureXadesWithProofDebug() {
 		
 		esignWSApiClient = confApiClient();
 		
@@ -96,6 +96,46 @@ String requestId = "TODO";
 		}
 	
 	}
+	
+	public ESignSanteSignatureReportWithProof signatureXades(File fileToSign, 
+			List<String> signers, String requestId, List<OpenidToken> openidTokens) {
+		
+		esignWSApiClient = confApiClient();
+		
+	 log.debug("appel esignsanteWebservices pour une demande de signature en xades avec: ");
+
+	
+	 XadesApi api = new XadesApi(esignWSApiClient);
+		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \","
+				+ esignWSApiClient.getBasePath(), esignConf.getSignatureConfId(), esignConf.getProofConfId());
+		ESignSanteSignatureReportWithProof report = null;
+		try {
+			report = api.signatureXadesWithProof(
+			esignConf.getSecret(),
+			esignConf.getSignatureConfId(),
+			fileToSign, 
+			signers,
+			esignConf.getProofConfId(),
+		    requestId,
+			esignConf.getProofTag(),
+			esignConf.getAppliantId(),
+			openidTokens);
+
+			
+			
+			log.debug("sortie de fct");
+	 log.debug(report.getDocSigne().toString());
+	 log.debug("nbError: " + report.getErreurs().size());
+		} catch (Exception e) {
+			log.debug("plantage appel esignsante");
+			log.debug(e.getMessage());
+			log.debug(e.toString());
+		
+		}
+	 return report;
+	}
+	
+	
 	
 	public ESignSanteValidationReport chekSignatureXades(File fileToCheck) {
 		

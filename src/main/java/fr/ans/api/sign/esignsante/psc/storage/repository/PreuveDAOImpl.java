@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
-import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.esignsante.model.ESignSanteSignatureReport;
 import lombok.extern.slf4j.Slf4j;
@@ -65,12 +64,12 @@ public class PreuveDAOImpl implements PreuveDAO {
 //	}  
 	 
  	public boolean archivePreuve(ProofStorage proof) {
-		log.debug("demande persistence de la preuve d'une demande de signature: \r\n "
-		    +" SubjectOrganization: {} \r\n  Preferred_username: {} \r\n Given_name: {} \r\n"
-		    + "Family_name:{}  \r\n Timestamp (acceptation de la reqête): {}  \r\n  BSON  {} ",
-		   proof.getSubjectOrganization(), proof.getPreferred_username() ,proof.getGiven_name(),
-		   proof.getFamily_name() , proof.getTimestamp(), proof.getBsonProof().toJson().toString());
-		mongoTemplate.save(proof);
+//		log.debug("demande persistence de la preuve d'une demande de signature: \r\n "
+//		    +" SubjectOrganization: {} \r\n  Preferred_username: {} \r\n Given_name: {} \r\n"
+//		    + "Family_name:{}  \r\n Timestamp (acceptation de la reqête): {}  \r\n  BSON  {} ",
+//		   proof.getSubjectOrganization(), proof.getPreferred_username() ,proof.getGiven_name(),
+//		   proof.getFamily_name() , proof.getTimestamp(), proof.getBsonProof().toJson().toString());
+//		mongoTemplate.save(proof);
 		
 		return true;
 	}  

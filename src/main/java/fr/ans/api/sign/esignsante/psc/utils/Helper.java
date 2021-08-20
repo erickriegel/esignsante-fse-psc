@@ -3,12 +3,25 @@ package fr.ans.api.sign.esignsante.psc.utils;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 //import org.bson.BsonDocument;
 import org.bson.Document;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+
 
 import fr.ans.api.sign.esignsante.psc.model.Error;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
@@ -19,6 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Helper {
 
+	public final static String GIVEN_NAME = "given_name";
+	public final static String PREFERRED_USERNAME= "preferred_username";
+	public final static String SUBJECT_ORGANIZATION = "SubjectOrganization";
+	public final static String FAMILY_NAME = "family_name";
+	
 	private Helper() {
 	}
 
@@ -27,17 +45,21 @@ public class Helper {
 	 * génération d'un requestID
 	 */
 	public static ProofStorage convertUserInfoToProofStorage(UserInfo userinfo) {
-		Date now = new Date();
-		ProofStorage proof = new ProofStorage(Helper.generateRequestId(), userinfo.getSubjectOrganization(),
-				userinfo.getPreferredUsername(), userinfo.getGivenName(), userinfo.getFamilyName(), now);
-		return proof;
+		// ICI à corriger !!!!!!!!!!!!!
+//		Date now = new Date();
+//		ProofStorage proof = new ProofStorage(Helper.generateRequestId(), userinfo.getSubjectOrganization(),
+//				userinfo.getPreferredUsername(), userinfo.getGivenName(), userinfo.getFamilyName(), now);
+//		return proof;
+		return null;
 	}
 
 	public static ProofStorage convertUserInfoToProofStorage(UserInfo userinfo, org.bson.Document bsonProof) {
-		Date now = new Date();
-		ProofStorage proof = new ProofStorage(Helper.generateRequestId(), userinfo.getSubjectOrganization(),
-				userinfo.getPreferredUsername(), userinfo.getGivenName(), userinfo.getFamilyName(), now, bsonProof);
-		return proof;
+		// ICI à correiger !!!!!!!!!!!!
+//		Date now = new Date();
+//		ProofStorage proof = new ProofStorage(Helper.generateRequestId(), userinfo.getSubjectOrganization(),
+//				userinfo.getPreferredUsername(), userinfo.getGivenName(), userinfo.getFamilyName(), now, bsonProof);
+//		return proof;
+		return null;
 	}
 
 	/*
@@ -72,6 +94,33 @@ public class Helper {
 		}).collect(Collectors.toList());
 
 		return errors;
+	}
+	
+	public static UserInfo jsonStringToUserInfo(String sUserInfo) throws JsonMappingException, JsonProcessingException {
+		return new ObjectMapper().readValue(sUserInfo, UserInfo.class);  	
+	}
+
+	public static Map<String,String> jsonStringToPartialMap(String sUserInfo) throws JsonMappingException, JsonProcessingException {
+		final ObjectNode node = new ObjectMapper().readValue(sUserInfo, ObjectNode.class);
+		
+		
+		Map<String, String> data = new HashMap<String, String>();
+		if (node.has(GIVEN_NAME)) {   
+			data.put(GIVEN_NAME, node.get(GIVEN_NAME).asText());
+		}
+
+		if (node.has(PREFERRED_USERNAME)) {
+			data.put(PREFERRED_USERNAME, node.get(PREFERRED_USERNAME).asText());
+		}
+
+		if (node.has(FAMILY_NAME)) {   
+			data.put(FAMILY_NAME, node.get(FAMILY_NAME).asText());
+		}
+
+		if (node.has(SUBJECT_ORGANIZATION)) {  
+			data.put(SUBJECT_ORGANIZATION, node.get(SUBJECT_ORGANIZATION).asText());
+		}
+		return data;  	
 	}
 
 }

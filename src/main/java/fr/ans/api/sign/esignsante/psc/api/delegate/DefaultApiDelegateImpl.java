@@ -74,7 +74,7 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 		
 		//tmp
 		//esignWS.signTest();
-		esignWS.signatureXadesWithProof();
+		esignWS.signatureXadesWithProofDebug();
 //		esignWS.chekSignatureXades();
 		
 		
