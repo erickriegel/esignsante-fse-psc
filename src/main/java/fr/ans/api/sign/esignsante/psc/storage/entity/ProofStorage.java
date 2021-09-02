@@ -23,13 +23,13 @@ import lombok.ToString;
 /*
  * Classe ProofStorage: Modèle pour stokage de la preuve dans MongoDB
  */
-@Document(collection = "preuves")
+@Document(collection = "preuvesNew")
 public class ProofStorage {
 	
 	public ProofStorage() {}; //findAll
 	
 	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name, String family_name,
-			Date timestamp , org.bson.Document bsonProof) {
+			Date timestamp , String proof) {
 		super();
 		this.requestId = requestID;
 		this.subjectOrganization = subjectOrganization;
@@ -37,7 +37,7 @@ public class ProofStorage {
 		this.given_name = given_name;
 		this.family_name = family_name;
 		this.timestamp = timestamp;
-		this.bsonProof = bsonProof;
+		this.proof = proof;
 	}
 	
 	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name, String family_name,
@@ -55,7 +55,7 @@ public class ProofStorage {
 			@NotNull(message = "Persistence: le champ  'requestId'ne doit pas être nul") String requestId,
 			String subjectOrganization, String preferred_username, String given_name, String family_name,
 			@NotNull(message = "Persistence: le 'timestamp' ne doit pas être nul") Date timestamp,
-			@NotNull(message = "Persistence: le 'bsonProof' ne doit pas être nul") org.bson.Document bsonProof) {
+			@NotNull(message = "Persistence: la 'proof' ne doit pas être nulle") String proof) {
 		super();
 		this._id = id;
 		this.requestId = requestId;
@@ -64,7 +64,7 @@ public class ProofStorage {
 		this.given_name = given_name;
 		this.family_name = family_name;
 		this.timestamp = timestamp;
-		this.bsonProof = bsonProof;
+		this.proof = proof;
 		
 	
 	}
@@ -98,8 +98,8 @@ public class ProofStorage {
     private Date timestamp;
 	
 	@Setter
-	@NotNull(message = "Persistence: le 'bsonProof' ne doit pas être nul")
-    private org.bson.Document bsonProof;
+	@NotNull(message = "Persistence: la 'proof' ne doit pas être nulle")
+    private String proof;
 
 
 	

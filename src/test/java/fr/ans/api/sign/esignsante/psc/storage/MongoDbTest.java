@@ -53,19 +53,16 @@ public class MongoDbTest {
 	  @Test
 	   public void sauvegardeEmbeddeMongoDB() {
 		   log.info("*** Test d'écriture ProofStorage dans MongoDB");
-		   //log.error("noms des base utilisée, collection=> " + mongoTemplate.getDb().getName() + " , " + COLLECTION);
-		   log.error("noms des base utilisée => " + mongoTemplate.getDb().getName());
+		   log.info("nom de base utilisée => " + mongoTemplate.getDb().getName());
 		  
 		   //String sJson = "{\"active\":false}";
 		   String sJson = "{\"Secteur_Activite\":\"SA07^1.2.250.1.71.4.2.4\",\"email_verified\":false,\"SubjectOrganization\":\"CABINET M SPECIALISTE0021889\",\"preferred_username\":\"899700218896\",\"given_name\":\"ROBERT\",\"SubjectRefPro\":{\"codeCivilite\":\"M\",\"exercices\":[{\"codeProfession\":\"10\",\"nomDexercice\":\"SPECIALISTE0021889\",\"prenomDexercice\":\"ROBERT\",\"codeTypeSavoirFaire\":\"\"}]},\"SubjectRole\":[\"10^1.2.250.1.213.1.1.5.5\"],\"SubjectNameID\":\"899700218896\",\"family_name\":\"SPECIALISTE0021889\"}";
-		   
-			   org.bson.Document bson =  org.bson.Document.parse(sJson);
-			 //  BsonDocument bsonn= bson.toBsonDocument();
-		 			   
+
+		   String preuve =  "preuveBase64";
+				 			   
 		   //la collection doit être vide après le setup
 		   assertTrue(repo.findAll().isEmpty());
-		   log.info("ici");
-		   String requestId = Helper.generateRequestId();
+				   String requestId = Helper.generateRequestId();
 		   Date now = new Date() ;
 		   ProofStorage prof1 = new ProofStorage(
 				   requestId,
@@ -74,20 +71,16 @@ public class MongoDbTest {
 				   "ROBERT", //given_name
 				   "SPECIALISTE0021889", //family name
 				   now, //timestamp
-				   bson 
+				   preuve 
 				   );
 	
 		   mongoTemplate.save(prof1);
 	
-		   log.info("la");
 		  Set<String> mongoCollections = mongoTemplate.getCollectionNames();
 		  assertTrue(mongoCollections.size() >= 1 , "il doit y avoir au moins une collection dans la base");
 		  assertTrue(mongoCollections.contains("preuves") , "la collection @Document(collection = \"preuves\" doit exister");
-		  log.info("lalalala");
-		   List<ProofStorage> results = mongoTemplate.findAll(ProofStorage.class /*, COLLECTION*/);
-		   log.info("nb elements trouvés: " + results.size());
-
-		  
+		  List<ProofStorage> results = mongoTemplate.findAll(ProofStorage.class /*, COLLECTION*/);
+				  
 		  ProofStorage result = repo.findOneById(prof1.get_id());
 		  		   assertEquals(result.getRequestId(), prof1.getRequestId());		
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
@@ -98,7 +91,6 @@ public class MongoDbTest {
 
 
 		   results = repo.findBySubjectOrganizationWithOutBSON(prof1.getSubjectOrganization());
-		   log.info("nb elements trouvés: " + results.size());
 		   result = results.get(0);
 		   assertEquals(result.getRequestId(), prof1.getRequestId());		
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
@@ -109,11 +101,8 @@ public class MongoDbTest {
 
 		   
 		  //TEST retrouver une preuve à partir de l'id généré
-		   log.info("id_bdd: " + result.get_id());
+		   log.info("Recherche de la preuve stokée id_bdd: " + result.get_id());
 		   ProofStorage tmp = repo.findOneById(result.get_id());
-		   log.info("tpm1 :" + tmp.getFamily_name());
-		   //
-		   log.info("id_bdd: " + result.get_id());
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
@@ -124,6 +113,7 @@ public class MongoDbTest {
 		   
 		   results = repo.findBySubjectOrganizationWithOutBSON("NotExisting");
 		   assertTrue(results.isEmpty());
+		   log.info("Test stokage recherche en BDD OK");
 	   }
 	    
 }

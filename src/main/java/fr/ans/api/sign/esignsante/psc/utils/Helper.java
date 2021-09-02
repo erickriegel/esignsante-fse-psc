@@ -103,7 +103,7 @@ public class Helper {
 	public static Map<String,String> jsonStringToPartialMap(String sUserInfo) throws JsonMappingException, JsonProcessingException {
 		final ObjectNode node = new ObjectMapper().readValue(sUserInfo, ObjectNode.class);
 		
-		
+		log.debug("jsonStringToPartialMap IN");
 		Map<String, String> data = new HashMap<String, String>();
 		if (node.has(GIVEN_NAME)) {   
 			data.put(GIVEN_NAME, node.get(GIVEN_NAME).asText());
@@ -120,6 +120,7 @@ public class Helper {
 		if (node.has(SUBJECT_ORGANIZATION)) {  
 			data.put(SUBJECT_ORGANIZATION, node.get(SUBJECT_ORGANIZATION).asText());
 		}
+		log.debug("jsonStringToPartialMap OUT: parse UserInfo OK");
 		return data;  	
 	}
 
