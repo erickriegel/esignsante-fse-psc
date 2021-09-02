@@ -528,7 +528,7 @@
 							<goal>start</goal>
 						</goals>
 						<configuration>
-							<port>27018</port>
+							<port>27017</port>
 							<version>3.4.24</version>
 							<logging>console</logging>
 							<downloadPath>${embededMongoDownloadUrl}</downloadPath>

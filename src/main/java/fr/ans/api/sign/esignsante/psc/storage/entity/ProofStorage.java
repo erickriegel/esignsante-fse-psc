@@ -23,7 +23,7 @@ import lombok.ToString;
 /*
  * Classe ProofStorage: Modèle pour stokage de la preuve dans MongoDB
  */
-@Document(collection = "preuvesNew")
+@Document(collection = "preuves")
 public class ProofStorage {
 	
 	public ProofStorage() {}; //findAll

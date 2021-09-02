@@ -276,9 +276,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		return retour;
 	}
 
-	private void testRetourXML() {
+	private void testRetourXML(String docSigne) {
 		MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-		bodyBuilder.part("file", new ByteArrayResource(new byte[] { 1, 2, 3, 4 }) {
+		bodyBuilder.part("file", new ByteArrayResource(docSigne.getBytes()) {
 
 			@Override
 			public String getFilename() {
@@ -287,5 +287,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		}, MediaType.APPLICATION_XML);
 		bodyBuilder.build();
+		//bodyBuilder.
 	}
 }
