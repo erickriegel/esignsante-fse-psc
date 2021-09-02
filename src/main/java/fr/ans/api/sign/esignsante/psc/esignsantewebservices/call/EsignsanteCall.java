@@ -102,21 +102,17 @@ public class EsignsanteCall {
 //	}
 	
 	public ESignSanteSignatureReportWithProof signatureXades(File fileToSign, 
-			List<String> signers, String requestId, List<OpenidToken> openidTokens) throws JsonProcessingException {
+			List<String> signers, String requestId, List<OpenidToken> openidTokens) {
 		
 		esignWSApiClient = confApiClient();
 		
-	 log.debug("appel esignsanteWebservices pour une demande de signature en xades avec: ");
+	 log.debug("appel esignsanteWebservices pour une demande de signature en xades ");
 
-	 ObjectMapper objectMapper = new ObjectMapper();
-	 String sOpenidTokens = objectMapper.writeValueAsString(openidTokens);
-	 log.debug("sOPenIdTOken {}", sOpenidTokens); 
-	
 	 XadesApi api = new XadesApi(esignWSApiClient);
 		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n",
 				esignWSApiClient.getBasePath(), esignConf.getSignatureConfId(), esignConf.getProofConfId());
 		ESignSanteSignatureReportWithProof report = null;
-		try {
+//		try {
 			report = api.signatureXadesWithProof(
 			esignConf.getSecret(),
 			esignConf.getSignatureConfId(),
@@ -126,23 +122,21 @@ public class EsignsanteCall {
 		    requestId,
 			esignConf.getProofTag(),
 			esignConf.getAppliantId(),
-			/*openidTokens*/ null );
+			openidTokens );
 
 			
-	//		String test = " sOPenIdTOken [{\"accessToken\":\"ceci_est_un_accessToken\",\"introspectionResponse\":\"{\\\"exp\\\":1628250495,\\\"iat\\\":1628250435,\\\"auth_time\\\":1628250434,\\\"jti\\\":\\\"0cc00f99-3f1b-4799-9222-a944ca82c310\\\",\\\"iss\\\":\\\"https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet\\\",\\\"sub\\\":\\\"f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700218896\\\",\\\"typ\\\":\\\"Bearer\\\",\\\"azp\\\":\\\"ans-poc-bas-psc\\\",\\\"nonce\\\":\\\"\\\",\\\"session_state\\\":\\\"e0e82435-fef5-430b-9b31-187fe3b0ffe6\\\",\\\"preferred_username\\\":\\\"899700218896\\\",\\\"email_verified\\\":false,\\\"acr\\\":\\\"eidas3\\\",\\\"scope\\\":\\\"openid profile email scope_all\\\",\\\"client_id\\\":\\\"ans-poc-bas-psc\\\",\\\"username\\\":\\\"899700218896\\\",\\\"active\\\":true}\",\"userInfo\":\"{\\\"Secteur_Activite\\\":\\\"SA07^1.2.250.1.71.4.2.4\\\",\\\"sub\\\":\\\"f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700218896\\\",\\\"email_verified\\\":false,\\\"SubjectOrganization\\\":\\\"CABINET M SPECIALISTE0021889\\\",\\\"Mode_Acces_Raison\\\":\\\"\\\",\\\"preferred_username\\\":\\\"899700218896\\\",\\\"given_name\\\":\\\"ROBERT\\\",\\\"Acces_Regulation_Medicale\\\":\\\"FAUX\\\",\\\"UITVersion\\\":\\\"1.0\\\",\\\"Palier_Authentification\\\":\\\"APPPRIP3^1.2.250.1.213.1.5.1.1.1\\\",\\\"SubjectRefPro\\\":{\\\"codeCivilite\\\":\\\"M\\\",\\\"exercices\\\":[{\\\"codeProfession\\\":\\\"10\\\",\\\"codeCategorieProfessionnelle\\\":\\\"C\\\",\\\"codeCiviliteDexercice\\\":\\\"M\\\",\\\"nomDexercice\\\":\\\"SPECIALISTE0021889\\\",\\\"prenomDexercice\\\":\\\"ROBERT\\\",\\\"codeTypeSavoirFaire\\\":\\\"\\\",\\\"codeSavoirFaire\\\":\\\"\\\",\\\"activities\\\":[{\\\"codeModeExercice\\\":\\\"L\\\",\\\"codeSecteurDactivite\\\":\\\"SA07\\\",\\\"codeSectionPharmacien\\\":\\\"\\\",\\\"codeRole\\\":\\\"\\\",\\\"numeroSiretSite\\\":\\\"\\\",\\\"numeroSirenSite\\\":\\\"\\\",\\\"numeroFinessSite\\\":\\\"\\\",\\\"numeroFinessetablissementJuridique\\\":\\\"\\\",\\\"identifiantTechniqueDeLaStructure\\\":\\\"\\\",\\\"raisonSocialeSite\\\":\\\"CABINET M SPECIALISTE0021889\\\",\\\"enseigneCommercialeSite\\\":\\\"\\\",\\\"complementDestinataire\\\":\\\"\\\",\\\"complementPointGeographique\\\":\\\"\\\",\\\"numeroVoie\\\":\\\"1\\\",\\\"indiceRepetitionVoie\\\":\\\"\\\",\\\"codeTypeDeVoie\\\":\\\"R\\\",\\\"libelleVoie\\\":\\\"PASTEUR\\\",\\\"mentionDistribution\\\":\\\"\\\",\\\"bureauCedex\\\":\\\"\\\",\\\"codePostal\\\":\\\"75009\\\",\\\"codeCommune\\\":\\\"75109\\\",\\\"codePays\\\":\\\"\\\",\\\"telephone\\\":\\\"\\\",\\\"telephone2\\\":\\\"\\\",\\\"telecopie\\\":\\\"\\\",\\\"adresseEMail\\\":\\\"\\\",\\\"codeDepartement\\\":\\\"75\\\",\\\"ancienIdentifiantDeLaStructure\\\":\\\"\\\",\\\"autoriteDenregistrement\\\":\\\"\\\"}]}]},\\\"SubjectOrganizationID\\\":\\\"\\\",\\\"SubjectRole\\\":[\\\"10^1.2.250.1.213.1.1.5.5\\\"],\\\"PSI_Locale\\\":\\\"1.2.250.1.213.1.3.1.1\\\",\\\"SubjectNameID\\\":\\\"899700218896\\\",\\\"family_name\\\":\\\"SPECIALISTE0021889\\\"}\"}]";
-			//String test = "{\"Secteur_Activite\":\"SA07^1.2.250.1.71.4.2.4\",\"sub\":\"f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700218896\",\"email_verified\":false,\"SubjectOrganization\":\"CABINET M SPECIALISTE0021889\",\"Mode_Acces_Raison\":\"\",\"preferred_username\":\"899700218896\",\"given_name\":\"ROBERT\",\"Acces_Regulation_Medicale\":\"FAUX\",\"UITVersion\":\"1.0\",\"Palier_Authentification\":\"APPPRIP3^1.2.250.1.213.1.5.1.1.1\",\"SubjectRefPro\":{\"codeCivilite\":\"M\",\"exercices\":[{\"codeProfession\":\"10\",\"codeCategorieProfessionnelle\":\"C\",\"codeCiviliteDexercice\":\"M\",\"nomDexercice\":\"SPECIALISTE0021889\",\"prenomDexercice\":\"ROBERT\",\"codeTypeSavoirFaire\":\"\",\"codeSavoirFaire\":\"\",\"activities\":[{\"codeModeExercice\":\"L\",\"codeSecteurDactivite\":\"SA07\",\"codeSectionPharmacien\":\"\",\"codeRole\":\"\",\"numeroSiretSite\":\"\",\"numeroSirenSite\":\"\",\"numeroFinessSite\":\"\",\"numeroFinessetablissementJuridique\":\"\",\"identifiantTechniqueDeLaStructure\":\"\",\"raisonSocialeSite\":\"CABINET M SPECIALISTE0021889\",\"enseigneCommercialeSite\":\"\",\"complementDestinataire\":\"\",\"complementPointGeographique\":\"\",\"numeroVoie\":\"1\",\"indiceRepetitionVoie\":\"\",\"codeTypeDeVoie\":\"R\",\"libelleVoie\":\"PASTEUR\",\"mentionDistribution\":\"\",\"bureauCedex\":\"\",\"codePostal\":\"75009\",\"codeCommune\":\"75109\",\"codePays\":\"\",\"telephone\":\"\",\"telephone2\":\"\",\"telecopie\":\"\",\"adresseEMail\":\"\",\"codeDepartement\":\"75\",\"ancienIdentifiantDeLaStructure\":\"\",\"autoriteDenregistrement\":\"\"}]}]},\"SubjectOrganizationID\":\"\",\"SubjectRole\":[\"10^1.2.250.1.213.1.1.5.5\"],\"PSI_Locale\":\"1.2.250.1.213.1.3.1.1\",\"SubjectNameID\":\"899700218896\",\"family_name\":\"SPECIALISTE0021889\"}";
 			
-			log.debug("sortie de fct");
-	// log.debug("doc signe: {}", report.getDocSigne().toString());
-			 log.debug("pruve: {}", report.getPreuve());
-	 log.debug("nbError: " + report.getErreurs().size());
-		} catch (Exception e) {
-			log.debug("plantage appel esignsante");
-			log.debug(e.getMessage());
-			log.debug(e.toString());
-			report = null;
-		
-		}
+	
+				
+			 log.debug("appel esignsate OK => preuve: {}", report.getPreuve());
+			 log.debug("nbError: " + report.getErreurs().size());
+//		} catch (Exception e) {
+//			log.debug("plantage appel esignsante");
+//			log.debug(e.getMessage());
+//			log.debug(e.toString());
+//			report = null;
+//		
+//		}
 	 return report;
 	}
 	

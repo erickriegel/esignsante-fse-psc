@@ -14,10 +14,13 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 //import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -31,6 +34,7 @@ import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
+import fr.ans.api.sign.esignsante.psc.utils.FileResource;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.api.sign.esignsante.psc.utils.PSCTokenStatus;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
@@ -76,6 +80,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
+		log.debug("Réception d'une demande de signature Xades");
+		
 		//TODO vérifier que les champs ne sont pas nuls => requête reçue invalide
 		if (accessToken.isEmpty())  {
 		re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -87,7 +93,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		//Vérification du Token
 		PSCTokenStatus status = isValidPSCToken(accessToken);
 		//TODO Gérer le status
-		log.error("!!!!!!!!!!!!!!! ATTENTION BYPASS gestion de l accessToken !!!!!!!!!!!!!!!! ");
+		log.error("!!!!!!!!!!!!!!! ATTENTION BYPASS gestion de l accessToken => Token tjrs VALID !!!!!!!!!!!!!!!! ");
 		// FIN TODO Gérer le status
 		
 		// génération d'un UUDI
@@ -105,7 +111,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		}
 		*/
 		openidToken.setAccessToken(accessToken);
-		log.error("TODO ICI: reponseINtorpection tmp en dur");
 		/*try {
 		openidToken.setIntrospectionResponse(
 				Helper.encodeBase64(
@@ -117,7 +122,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 */
 		List<String> signers = new ArrayList<String>();
 
-		log.trace("Réception d'une demande de signature Xades");
+		
 
 		////////////////////////////////////////////////
 		//                 BYPASS DONNEES EN DUR 
@@ -133,7 +138,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		openidTokens.add(openidToken);
 
 		
-		log.debug("user {}", userinfo.toString());
+		log.debug("userInfo {}", userinfo.toString());
 
 		
 		File fileToSign = null;
@@ -148,21 +153,15 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			java.util.Map<String, String> userToPersit = Helper.jsonStringToPartialMap(userinfo);
 			Date now = new Date();
 
-//			log.debug("appel persistence avant appel esignsante");
-//			org.bson.Document bsonBidon = org.bson.Document.parse("{}");
-//			// pour test stokage avant appel esignsante
-//			ProofStorage proofbefore = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
-//					userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
-//					userToPersit.get(Helper.FAMILY_NAME), now, bsonBidon);
-//			dao.archivePreuve(proofbefore);
-//			log.debug("fin 1er appel persistence");
-			
+		
 					log.debug("openidToken: {} \n {} \n {} \n", 
 					openidTokens.get(0).getUserInfo(),
 					openidTokens.get(0).getAccessToken(),
 					openidTokens.get(0).getIntrospectionResponse());
 
 					////////////////////////////////////////////////////////////////////////////////////////////////
+					log.error("!!!!! Appel sans openidToken à cause de  'Illegal character(s) in message header value:' ");
+					openidTokens = null;
 			ESignSanteSignatureReportWithProof report = esignWS.signatureXades(fileToSign, signers,
 					requestID, openidTokens);
 			///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,10 +230,19 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
  
 			//////////////////////////////////////////////
 			// test avec Input Stream
-		//	InputStream targetStream = new ByteArrayInputStream(signedString.getBytes());
+		/*
 			InputStream targetStream = new ByteArrayInputStream(signedString.getBytes());
 			Document returned = new Document();
 			returned.setFile(new InputStreamResource(targetStream));
+			*/
+			
+			////////////////////////////////////////////////
+			// test ....
+			Resource resource = new ByteArrayResource(signedString.getBytes());
+			Document returned = new Document();
+			returned.setFile(resource);
+			
+
 			
 			    re = new ResponseEntity<>(returned, HttpStatus.OK);
 		} catch (IOException e) {
@@ -268,4 +276,16 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		return retour;
 	}
 
+	private void testRetourXML() {
+		MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+		bodyBuilder.part("file", new ByteArrayResource(new byte[] { 1, 2, 3, 4 }) {
+
+			@Override
+			public String getFilename() {
+				return "docSigned.xml";
+			}
+
+		}, MediaType.APPLICATION_XML);
+		bodyBuilder.build();
+	}
 }
