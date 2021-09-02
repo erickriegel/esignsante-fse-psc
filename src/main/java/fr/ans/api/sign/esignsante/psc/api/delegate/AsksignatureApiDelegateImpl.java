@@ -15,7 +15,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.mongodb.util.BsonUtils;
 //import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +29,10 @@ import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
-import fr.ans.api.sign.esignsante.psc.storage.entity.ProofDTO;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
+import fr.ans.api.sign.esignsante.psc.utils.PSCTokenStatus;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
 import fr.ans.esignsante.model.OpenidToken;
 import io.swagger.annotations.ApiParam;
@@ -77,34 +76,20 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
-		//pour test connexion prosanteConnect
-		String token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJjaDNLZkFqOXZhX2tUZ2xGY01tTWlQVXZaSkNyU2l0NXZyeGVfZVgzbWpNIn0.eyJleHAiOjE2Mjg3ODE1NTUsImlhdCI6MTYyODc4MTQ5NSwiYXV0aF90aW1lIjoxNjI4NzgxNDk0LCJqdGkiOiI0MzkyNmNmMS0zZTExLTQ4MTItOWE2ZS1hNjMxYjk0ZjZhZDciLCJpc3MiOiJodHRwczovL2F1dGguYmFzLmVzdy5lc2FudGUuZ291di5mci9hdXRoL3JlYWxtcy9lc2FudGUtd2FsbGV0Iiwic3ViIjoiZjo1NTBkYzFjOC1kOTdiLTRiMWUtYWM4Yy04ZWI0NDcxY2Y5ZGQ6ODk5NzAwMjE4ODk2IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYW5zLXBvYy1iYXMtcHNjIiwibm9uY2UiOiIiLCJzZXNzaW9uX3N0YXRlIjoiMDdhOWRmMDYtNjAxMy00YWRhLWE2YWMtOTU0NDRmN2IwOWUxIiwiYWNyIjoiMSIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgc2NvcGVfYWxsIiwiYWNyIjoiZWlkYXMzIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiI4OTk3MDAyMTg4OTYifQ.Va0NR0lKcyZgRD3tUUb-BpzKYGUCh0gvOFbt-_c9w1ociNkG2hJTo6XxgAMEOvcpM4aVPedyhIYRyKAOaEsICH5VPVP0zvHvbtoatkFRPH_Zro05jkhvsW8X4XTuY06EJdHxUiMRZC_AqclQ1QIR5vc-0XBWFPW9vt5Q-qOqqTPLWrnDxqdVqBfwkVoKlh1Jnlv6vilSqBIsQbs_76dN8T0cChzmtk0kCJcpnXyTy__PLDLpgHITDGnLONwbaP0ofxEjTZ9OgISWQCd5GKWiv5iZrebka0Dvbjkooqt5DhIlGi30l2vLs7-eowrcxsfJGgwzJafppga0nIvBiQ83oA";
-		try {
-			String result = pscApi.isTokenActive(token);
-			log.info("resultat PSC aceesToken en dur: {}",result);
-			//TODO parser Active ou pas
-		} catch (JsonProcessingException e1) {
-			//log.error("INtrospection PSC erreur: JsonProcessingException);
-			e1.printStackTrace();
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		//TODO vérifier que les champs ne sont pas nuls => requête reçue invalide
+		if (accessToken.isEmpty())  {
+		re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		log.debug("Requete refusée car les paramètres reçus ne sont pas conformes");
+		//throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "postAsksignatureXades requête rejetée pour accessToken 'empty' ");
+		return re;
 		}
 		
+		//Vérification du Token
+		PSCTokenStatus status = isValidPSCToken(accessToken);
+		//TODO Gérer le status
+		log.error("!!!!!!!!!!!!!!! ATTENTION BYPASS gestion de l accessToken !!!!!!!!!!!!!!!! ");
+		// FIN TODO Gérer le status
 		
-		// controle des donnees
-		// POUR test
-//		if (userinfo == null) {
-//			re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			return re;
-////   if (secret == null) {
-////       throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'secret' when calling signatureXadesWithProof");
-////   }
-//		}
-
 		// génération d'un UUDI
 		String requestID = Helper.generateRequestId();
 
@@ -258,9 +243,29 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500 à confirmer
 		}
 
-		return re;
-		
-
+		return re;		
+	}
+	
+	private PSCTokenStatus isValidPSCToken (String token) {
+		PSCTokenStatus retour = PSCTokenStatus.NO_RESPONSE;
+		try {
+			String result = pscApi.isTokenActive(token);
+			retour = Helper.parsePSCresponse(result);
+			log.debug("Appel PSC intropesction: reponse = {}, \n PSCTokenStatus = {}" , result, retour.getPSCTokenStatus());
+		} catch (JsonProcessingException e1) {
+			log.error("Exception sur introspection PSC erreur: JsonProcessingException \n {}",
+					e1.getMessage());
+			e1.printStackTrace();
+		} catch (UnsupportedEncodingException e1) {
+			log.error("Exception sur introspection PSC erreur: UnsupportedEncodingException \n {}",
+					e1.getMessage());
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			log.error("Exception sur introspection PSC erreur: URISyntaxException \n {}",
+					e1.getMessage());
+			e1.printStackTrace();
+		}
+		return retour;
 	}
 
 }

@@ -108,7 +108,7 @@ public class MongoDbTest {
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
 		   assertEquals(result.getTimestamp().compareTo(prof1.getTimestamp()), 0);
 		   assertTrue(result.getTimestamp().compareTo(new Date()) < 0);
-		 //TODO BSON  assertEquals(result.getFamily_name(), prof1.getFamily_name());		
+		   assertEquals(result.getProof(), preuve);		
 		   
 		   
 		   results = repo.findBySubjectOrganizationWithOutBSON("NotExisting");

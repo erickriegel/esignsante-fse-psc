@@ -32,10 +32,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Helper {
 
+	// champs du UserInfo
 	public final static String GIVEN_NAME = "given_name";
 	public final static String PREFERRED_USERNAME= "preferred_username";
 	public final static String SUBJECT_ORGANIZATION = "SubjectOrganization";
 	public final static String FAMILY_NAME = "family_name";
+	
+	// champs reponse intropestion PSC
+	public final static String TOKEN_ACTIVE_FIELD = "active";
+	public final static String TOKEN_ACTIVE_FALSE = "false";
+	public final static String TOKEN_ACTIVE_TRUE = "true";
 	
 	private Helper() {
 	}
@@ -124,4 +130,31 @@ public class Helper {
 		return data;  	
 	}
 
+	public static PSCTokenStatus parsePSCresponse(String reponsePSC) {
+		PSCTokenStatus retour = PSCTokenStatus.INVALID;
+		log.debug("parsePSCresponse IN with {}" , reponsePSC);
+
+		ObjectNode node;
+		try {
+			node = new ObjectMapper().readValue(reponsePSC, ObjectNode.class);
+
+			if (node.has(TOKEN_ACTIVE_FIELD)) {   
+				if (node.get(TOKEN_ACTIVE_FIELD).asText().equalsIgnoreCase(TOKEN_ACTIVE_TRUE)) {
+					retour = PSCTokenStatus.VALID;
+				}
+			}
+			else {
+				retour = PSCTokenStatus.FIELD_NOT_FOUND;
+				log.error("Reponse invalide introspection PSC: champ {} non trouvé", Helper.TOKEN_ACTIVE_FIELD);
+			}
+
+		} catch (Exception e) {
+			log.error("Erreur technique durant le parse de la reponse d'intropection PSC: champ {} ", e.getMessage());
+			e.printStackTrace();
+			retour = PSCTokenStatus.TECH_ERROR;
+		} 
+		
+		log.debug("parsePSCresponse OUT status =  {}" , retour.getPSCTokenStatus());
+		return retour;
+	}
 }
