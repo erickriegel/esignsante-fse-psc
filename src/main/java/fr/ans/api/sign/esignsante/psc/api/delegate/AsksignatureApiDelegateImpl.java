@@ -1,9 +1,7 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -34,7 +32,6 @@ import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
-import fr.ans.api.sign.esignsante.psc.utils.FileResource;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.api.sign.esignsante.psc.utils.PSCTokenStatus;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
@@ -241,10 +238,12 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			Resource resource = new ByteArrayResource(signedString.getBytes());
 			Document returned = new Document();
 			returned.setFile(resource);
-			
+		//	HttpHeaders httpHeaders = new HttpHeaders();
+			//httpHeaders.setContentType(MediaType.APPLICATION_XML);
+			  re = new ResponseEntity<>(returned, HttpStatus.OK);
 
 			
-			    re = new ResponseEntity<>(returned, HttpStatus.OK);
+			    //re = new ResponseEntity<>(returned,httpHeaders, HttpStatus.OK);
 		} catch (IOException e) {
 			// Pb technique sur fichier reçu. => erreur 500
 			e.printStackTrace();
