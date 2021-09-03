@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 //import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -70,12 +71,13 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	}
 
 	@Override
-	public ResponseEntity<Document> postAsksignatureXades(
+	public ResponseEntity<String> /*ResponseEntity<Document>*/ postAsksignatureXades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo)  {
 		final Optional<String> acceptHeader = getAcceptHeader();
-		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+	//	ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		ResponseEntity<String> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
 		log.debug("Réception d'une demande de signature Xades");
 		
@@ -171,19 +173,14 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 //			log.debug("doc signé: {}", report.getDocSigne());
 			Document signedDoc = new Document();
 
-//			log.debug("essaie de conversion de la preuve extraite du rapprt esignsante en JSON/BSON");
-//			ObjectMapper mapper = new ObjectMapper();
-//			 String sJsonReport = mapper.writeValueAsString(report /*report.getPreuve()*/);
-//			org.bson.Document bson = org.bson.Document.parse(sJsonReport);
-//			
-			// vrai archivage
-			log.debug("essaie d'archivage de la preuve en BDD");
+			//report OK ou pas ???
+			log.debug("report ... \n \tValide {} \n \tErrors {} \n \tDocSigné {}" , report.isValide(), report.getErreurs(), Helper.decodeBase64(report.getDocSigne()));
+			
+			// vrai archivage de la pruve
+			log.debug(" START archivage de la preuve en BDD");
 			ProofStorage proof = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
 					userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
 					userToPersit.get(Helper.FAMILY_NAME), now, report.getPreuve());
-			
-			//org.bson.Document bson = BsonUtils.asBson(proof);
-			//Boolean isConvertEnable = BsonUtils.supportsBson(proof);
 		
 			dao.archivePreuve(proof);
 			log.debug("FIN archivage de la preuve en BDD");
@@ -238,12 +235,12 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			Resource resource = new ByteArrayResource(signedString.getBytes());
 			Document returned = new Document();
 			returned.setFile(resource);
-		//	HttpHeaders httpHeaders = new HttpHeaders();
-			//httpHeaders.setContentType(MediaType.APPLICATION_XML);
-			  re = new ResponseEntity<>(returned, HttpStatus.OK);
-
+	//		HttpHeaders httpHeaders = new HttpHeaders();
+	//		httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+			//re = new ResponseEntity<>(returned,httpHeaders, HttpStatus.OK);
+			re = new ResponseEntity<>(signedString, HttpStatus.OK);
 			
-			    //re = new ResponseEntity<>(returned,httpHeaders, HttpStatus.OK);
+					    
 		} catch (IOException e) {
 			// Pb technique sur fichier reçu. => erreur 500
 			e.printStackTrace();

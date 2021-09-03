@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -158,17 +159,15 @@ public class EsignsanteCall {
 		
 	
 	 XadesApi api = new XadesApi(esignWSApiClient);
-		try {
+	//	try {
 	 report = api.verifSignatureXades(idCheckSign, fileToCheck);
-	 log.debug("sortie de fct");
-	 log.debug("report valid?: " + report.isValide());
-	 log.debug("nbError: " + report.getErreurs().size());
-		} catch (Exception e) {
-			log.debug("plantage appel esignsante checkXades");
-			log.debug(e.getMessage());
-			log.debug(e.toString());
-		
-		}
+//	 log.debug("sortie de fct");
+//	 log.debug("report valid?: " + report.isValide());
+//	 log.debug("nbError: " + report.getErreurs().size());
+//					} catch (Exception e) {
+//						//relancer une exception 
+//						interceptErrorCheckSignature(e);
+//					}
 	return report;
 	}
 	
@@ -207,4 +206,25 @@ public List<String> getCA() {
 	results = api.getCA();
 	return results;
 }
+
+//private void interceptErrorCheckSignature (Exception e) {
+//	log.debug("message {} \n", e.getMessage());
+//	log.debug("toString {} \n", e.toString());					
+//	log.debug("class Name {} \n", e.getClass().getName());
+//	log.debug("class Canoicalname {} \n", e.getClass().getCanonicalName());
+//
+//	switch (e.getClass().getCanonicalName()) {
+//
+//	  case "org.springframework.web.client.HttpServerErrorException.NotImplemented":
+//		  log.debug("plantage appel esignsanteWS checkCheckSignature HttpServerErrorException.NotImplemented");
+//	    break;
+//	  
+//	  case "org.springframework.web.client.ResourceAccessException":
+//		  log.debug("plantage appel esignsanteWS ResourceAccessException (esignsante non dispo");
+//	    break;
+//	  
+//	  default:
+//		  log.debug("plantage appel esignsante checkXades Exception defaut non gérée");
+//	  }
+//}
 }

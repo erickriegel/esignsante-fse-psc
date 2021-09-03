@@ -72,10 +72,11 @@ paths:
       responses:
         '200':
           description: OK
+          headers: {}
           content:
             application/xml:
               schema:
-                $ref: '#/components/schemas/Document'
+                type: string
         '400':
           description: erreur 400
           content:
@@ -102,7 +103,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/RichDocument' 
+              $ref: '#/components/schemas/RichDocument'
         required: true
         description: Le document à signer au format XML.
       parameters:
@@ -153,8 +154,8 @@ paths:
       requestBody:
         content:
           multipart/form-data:
-              schema:
-                $ref: '#/components/schemas/RichDocument' 
+            schema:
+              $ref: '#/components/schemas/RichDocument'
         required: true
         description: Le document à signer au format PDF.
       parameters:
@@ -476,7 +477,7 @@ components:
       type: object
       properties:
         file:
-          description: Objet contenant le fichier ) signer et le UserInfo 
+          description: Objet contenant le fichier ) signer et le UserInfo
           type: string
           format: binary
         userinfo:
@@ -492,4 +493,4 @@ components:
     Pro-SanteConnect_BAS:
       type: openIdConnect
       openIdConnectUrl: 'https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet/.well-known/wallet-openid-configuration'
-  parameters: {}   
+  parameters: {}
