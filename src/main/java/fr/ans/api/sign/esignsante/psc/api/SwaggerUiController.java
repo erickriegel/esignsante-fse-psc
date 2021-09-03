@@ -20,7 +20,7 @@ public class SwaggerUiController {
      *
      * @param httpResponse the http response
      */
-    @RequestMapping(value = "swagger-ui", method = RequestMethod.GET)
+    @RequestMapping(value = "swagger-ui.html", method = RequestMethod.GET)
     public void getSwagger(final HttpServletResponse httpResponse) {
         httpResponse.setStatus(HttpStatus.NOT_FOUND.value());
     }
