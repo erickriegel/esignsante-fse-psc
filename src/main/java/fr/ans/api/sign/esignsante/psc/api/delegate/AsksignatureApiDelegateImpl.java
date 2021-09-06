@@ -7,12 +7,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,9 +30,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
+import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
+import fr.ans.api.sign.esignsante.psc.utils.FileResource;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.api.sign.esignsante.psc.utils.PSCTokenStatus;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
@@ -61,46 +66,67 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		final Optional<String> acceptHeader = getAcceptHeader();
 		ResponseEntity<org.springframework.core.io.Resource> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		log.debug("Réception d'une demande de signature Pades");
-		
-		//TODO...(à factoriser avec XADES) ...
+
+		// TODO...(à factoriser avec XADES) ...
 		log.debug("userInfo {}", userinfo.toString());
 		// génération d'un UUDI
-				String requestID = Helper.generateRequestId();
-				List<String> signers = new ArrayList<String>();
+		String requestID = Helper.generateRequestId();
+		List<String> signers = new ArrayList<String>();
 
-				File fileToSign = null;
-				try {
-					fileToSign = checkInputFile(file);
-				} catch (IOException e) {
-					log.error("!!! TODO gérer Exception plantage recup du fichier");
-							
-					e.printStackTrace();
-					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-				}		
+		File fileToSign = null;
+		try {
+			fileToSign = checkInputFile(file);
+		} catch (IOException e) {
+			log.error("!!! TODO gérer Exception plantage recup du fichier");
+
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		// extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
+		UserInfo userToPersit = null;
+		try {		
+			userToPersit = Helper.jsonBase64StringToUserInfo(userinfo);
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+			log.error("UserInfo:  JsonMappingException ");
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (JsonProcessingException e) {
+			log.error("UserInfo:  JsonProcessingException ");
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+	}catch(	UnsupportedEncodingException e)
+	{
+		e.printStackTrace();
+		log.error("UserInfo:  UnsupportedEncodingException ");
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+	Date now = new Date();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	log.error("!!!!! Appel sans openidToken à cause de  'Illegal character(s) in message header value:' ");
+	ESignSanteSignatureReportWithProof report = esignWS.signaturePades(fileToSign, signers, requestID, null);
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// archivage BDD
+	archivagePreuve(report, requestID, userToPersit, now );
 				
-				//extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
-				Map<String, String> userToPersit = null;
+				//Formatage retour
+				String signedStringBase64 = report.getDocSigne();
+				// log.debug("signedStringBase64 {}", signedStringBase64);
+				String signedString = null;
 				try {
-					userToPersit = Helper.jsonStringToPartialMap(userinfo);
-				} catch (JsonMappingException e) {
-					// TODO Auto-generated catch block
+					signedString = Helper.decodeBase64(signedStringBase64);
+				} catch (UnsupportedEncodingException e) {
+					log.error("PADES: pb decodage base 64 du fichier signeré");
 					e.printStackTrace();
-				} catch (JsonProcessingException e) {
-					log.error("!!! TODO gérer Exception erreur parse du USerINfo");
-					e.printStackTrace();
-					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 				}
-				Date now = new Date();
-
-
-				////////////////////////////////////////////////////////////////////////////////////////////////
-				log.error("!!!!! Appel sans openidToken à cause de  'Illegal character(s) in message header value:' ");
-				ESignSanteSignatureReportWithProof report = esignWS.signaturePades(fileToSign, signers, requestID,
-						null);
-				///////////////////////////////////////////////////////////////////////////////////////////////////////
+				log.debug("signedString {}", signedString);
 				
-		// return re;
-		return null;
+//				FileResource docRetourned = new FileResource(signedString.getBytes(),file.getOriginalFilename());
+				Resource resource = new ByteArrayResource(signedString.getBytes());
+				re = new ResponseEntity<>(resource, HttpStatus.OK);
+         		return re;
 	}
 
 	@Override
@@ -109,11 +135,13 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 		final Optional<String> acceptHeader = getAcceptHeader();
+		ResponseEntity<String> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		// TODO 415 si pas les 2application/JSON et application
 		// ResponseEntity<Document> re = new
 		// ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		ResponseEntity<String> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
+		
+		
+		
 		log.debug("Réception d'une demande de signature Xades");
 
 		// TODO vérifier que les champs ne sont pas nuls => requête reçue invalide
@@ -164,7 +192,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		openidTokens.add(openidToken);
 
-		log.debug("userInfo {}", userinfo.toString());
+	
 
 		File fileToSign = null;
 		try {
@@ -173,20 +201,50 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 //			log.debug("fileToCheck length" + fileToSign.length());
 //			log.debug("fileToCheck isFile" + fileToSign.isFile());
 
-			log.debug("appel esignsante pour un contrôle de siganture en xades");
+			log.debug("appel esignsante pour une demande de siganture en xades");
 
 			// extraction des champs à persister dans MongoDB
-			java.util.Map<String, String> userToPersit = Helper.jsonStringToPartialMap(userinfo);
+			java.util.Map<String, String> userToPersit = null;
+			if (userinfo == null || userinfo.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			log.debug("***************userInfo non null ou non vide");
+			try {
+			userToPersit = Helper.jsonStringBase64ToPartialMap(userinfo);
+			} catch (UnsupportedEncodingException |  JsonProcessingException | IllegalArgumentException e1) {		
+				e1.printStackTrace();
+				log.error("Echec de lecture du paramètre UserInfo");
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//				return new ResponseEntity<>(buildError(HttpStatus.BAD_REQUEST.toString(),
+//						"Echec de lecture du paramètre UserInfo => UnsupportedEncodingException |  JsonProcessingException | IllegalArgumentException")
+//						,HttpStatus.BAD_REQUEST);
+
+			}
+			
 			Date now = new Date();
 
+			log.debug("userInfo (received) {}", userinfo.toString());
+			try {
+				log.debug("userInfo (base64 decoded {}", Helper.decodeBase64(userinfo));
+			} catch (UnsupportedEncodingException e1) {		
+				e1.printStackTrace();
+				log.error(" Erreur sur decodebase64 du UserInfo")	; // normalement impossible ici		
+			}
 			log.debug("openidToken: {} \n {} \n {} \n", openidTokens.get(0).getUserInfo(),
 					openidTokens.get(0).getAccessToken(), openidTokens.get(0).getIntrospectionResponse());
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 			log.error("!!!!! Appel sans openidToken à cause de  'Illegal character(s) in message header value:' ");
 			openidTokens = null;
-			ESignSanteSignatureReportWithProof report = esignWS.signatureXades(fileToSign, signers, requestID,
+			ESignSanteSignatureReportWithProof report = null;
+			try {
+			report = esignWS.signatureXades(fileToSign, signers, requestID,
 					openidTokens);
+			}catch (RestClientException e) {
+				log.error("RestClientException  lors d'un appel à esignsante ");
+				e.printStackTrace();
+				return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+			}
 			///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			// if (report== null)
@@ -195,7 +253,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			// message header value:' ");
 			log.debug("retour appel esignsante xades - formatage de la réponse");
 //			log.debug("doc signé: {}", report.getDocSigne());
-	//		Document signedDoc = new Document();
+			// Document signedDoc = new Document();
 
 			// report OK ou pas ???
 			log.debug("report ... \n \tValide {} \n \tErrors {} \n \tDocSigné {}", report.isValide(),
@@ -313,9 +371,61 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("fileToCheck isFile" + fileToSign.isFile());
 		return fileToSign;
 	}
+
+	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID,
+			Map<String, String> userToPersit, Date now) {
+
+		// vrai archivage de la pruve
+		log.debug(" START archivage de la preuve en BDD");
+		ProofStorage proof = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
+				userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
+				userToPersit.get(Helper.FAMILY_NAME), now, report.getPreuve());
+
+		dao.archivePreuve(proof);
+		log.debug("FIN archivage de la preuve en BDD");
+
+	}
 	
-	private void archivagePreuve(ESignSanteSignatureReportWithProof report ){
-		
-		
+	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID,
+			UserInfo userToPersit, Date now) {
+
+		// vrai archivage de la pruve
+		log.debug(" START archivage de la preuve en BDD");
+		ProofStorage proof = new ProofStorage(requestID, userToPersit.getSubjectOrganization(),
+				userToPersit.getPreferredUsername(), userToPersit.getGivenName(),
+				userToPersit.getFamilyName(), now, report.getPreuve());
+		dao.archivePreuve(proof);
+		log.debug("FIN archivage de la preuve en BDD");
+
+	}
+	
+	private Map<String, String> extractUserToPersit(String jsonUserInfoBase64Encoded) {// extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
+	Map<String, String> userToPersit = null;
+	try {
+		userToPersit = Helper.jsonStringBase64ToPartialMap(jsonUserInfoBase64Encoded);
+
+	} catch (JsonMappingException e) {
+		e.printStackTrace();
+		log.error("UserInfo:  JsonMappingException ");
+
+	} catch (JsonProcessingException e) {
+		log.error("UserInfo:  JsonProcessingException ");
+		e.printStackTrace();
+
+}catch(	UnsupportedEncodingException e)
+{
+	e.printStackTrace();
+	log.error("UserInfo:  UnsupportedEncodingException ");
+}
+	return userToPersit; // si null -> return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+	}
+	
+	
+	private fr.ans.api.sign.esignsante.psc.model.Error buildError(String code, String msg) {
+		//if (!acceptHeader.isPresent()
+				fr.ans.api.sign.esignsante.psc.model.Error erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
+				erreur.setCode(code);
+				erreur.setMessage(msg);
+				return erreur;	
 	}
 }

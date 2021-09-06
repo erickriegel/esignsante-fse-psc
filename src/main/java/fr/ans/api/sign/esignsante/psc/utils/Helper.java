@@ -46,27 +46,6 @@ public class Helper {
 	private Helper() {
 	}
 
-	/*
-	 * Génération d'un objet ProofStorage avec les données extraites du UserInfo et
-	 * génération d'un requestID
-	 */
-	public static ProofStorage convertUserInfoToProofStorage(UserInfo userinfo) {
-		// ICI à corriger !!!!!!!!!!!!!
-//		Date now = new Date();
-//		ProofStorage proof = new ProofStorage(Helper.generateRequestId(), userinfo.getSubjectOrganization(),
-//				userinfo.getPreferredUsername(), userinfo.getGivenName(), userinfo.getFamilyName(), now);
-//		return proof;
-		return null;
-	}
-
-	public static ProofStorage convertUserInfoToProofStorage(UserInfo userinfo, org.bson.Document bsonProof) {
-		// ICI à correiger !!!!!!!!!!!!
-//		Date now = new Date();
-//		ProofStorage proof = new ProofStorage(Helper.generateRequestId(), userinfo.getSubjectOrganization(),
-//				userinfo.getPreferredUsername(), userinfo.getGivenName(), userinfo.getFamilyName(), now, bsonProof);
-//		return proof;
-		return null;
-	}
 
 	/*
 	 * génération d'un identifiant 'metier' unique transmis sur appel à esignsante
@@ -102,30 +81,54 @@ public class Helper {
 		return errors;
 	}
 	
-	public static UserInfo jsonStringToUserInfo(String sUserInfo) throws JsonMappingException, JsonProcessingException {
-		return new ObjectMapper().readValue(/*TODO +helper decode base64*/sUserInfo, UserInfo.class);  	
+	public static UserInfo jsonBase64StringToUserInfo(String sUserInfoEncodedBase64) throws JsonMappingException, JsonProcessingException, UnsupportedEncodingException  {
+		return new ObjectMapper().readValue(Helper.decodeBase64(sUserInfoEncodedBase64), UserInfo.class);  	
 	}
 
-	public static Map<String,String> jsonStringToPartialMap(String sUserInfo) throws JsonMappingException, JsonProcessingException {
-		final ObjectNode node = new ObjectMapper().readValue(sUserInfo, ObjectNode.class);
-		
+	public static Map<String,String> jsonStringBase64ToPartialMap(String sUserInfoBase64Json) throws JsonProcessingException, UnsupportedEncodingException, IllegalArgumentException {
+		final ObjectNode node = new ObjectMapper().readValue(Helper.decodeBase64(sUserInfoBase64Json), ObjectNode.class);
+		Boolean allFieldsExist = true;
 		log.debug("jsonStringToPartialMap IN");
 		Map<String, String> data = new HashMap<String, String>();
 		if (node.has(GIVEN_NAME)) {   
 			data.put(GIVEN_NAME, node.get(GIVEN_NAME).asText());
 		}
+		else {
+			allFieldsExist = false;
+			log.error("Champ: {} non trouvé dans le UserInfo transmis", GIVEN_NAME);
+		}
+			
 
 		if (node.has(PREFERRED_USERNAME)) {
 			data.put(PREFERRED_USERNAME, node.get(PREFERRED_USERNAME).asText());
+		}
+		else {
+			allFieldsExist = false;
+			log.error("Champ: {} non trouvé dans le UserInfo transmis", PREFERRED_USERNAME);
 		}
 
 		if (node.has(FAMILY_NAME)) {   
 			data.put(FAMILY_NAME, node.get(FAMILY_NAME).asText());
 		}
+		else {
+			allFieldsExist = false;
+			log.error("Champ: {} non trouvé dans le UserInfo transmis", FAMILY_NAME);
+		}
 
 		if (node.has(SUBJECT_ORGANIZATION)) {  
 			data.put(SUBJECT_ORGANIZATION, node.get(SUBJECT_ORGANIZATION).asText());
 		}
+		else {
+			allFieldsExist = false;
+			log.error("Champ: {} non trouvé dans le UserInfo transmis", SUBJECT_ORGANIZATION);
+		}
+		
+//		if (allFieldsExist == false) 
+//		{
+//			//throw new JsonMappingException("IL existe au moins un champ non trouvé dans le USerInfo transmis");
+//			throw new XXXException();
+//		}
+//		
 		log.debug("jsonStringToPartialMap OUT: parse UserInfo OK");
 		return data;  	
 	}

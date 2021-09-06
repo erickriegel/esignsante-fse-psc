@@ -50,7 +50,7 @@ public class MongoDbTest {
         }
     	  
         
-	  @Test
+//	  @Test
 	   public void sauvegardeEmbeddeMongoDB() {
 		   log.info("*** Test d'écriture ProofStorage dans MongoDB");
 		   log.info("nom de base utilisée => " + mongoTemplate.getDb().getName());
