@@ -129,6 +129,37 @@ public class EsignsanteCall {
 		return report;
 	}
 
+	
+	public ESignSanteSignatureReportWithProof signaturePades(File fileToSign, List<String> signers, String requestId,
+			List<OpenidToken> openidTokens) {
+
+		esignWSApiClient = confApiClient();
+
+		log.debug("appel esignsanteWebservices pour une demande de signature en PADES ");
+		log.debug("fileToSign: {}",fileToSign.getName() );
+
+		PadesApi api = new PadesApi(esignWSApiClient);
+		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n", esignWSApiClient.getBasePath(),
+				esignConf.getSignatureConfId(), esignConf.getProofConfId());
+		ESignSanteSignatureReportWithProof report = null;
+//		try {
+		report = api.signaturePadesWithProof(esignConf.getSecret(), esignConf.getSignatureConfId(), fileToSign, signers,
+				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
+				openidTokens);
+
+		log.debug("appel esignsate OK => preuve: {}", report.getPreuve());
+		log.debug("nbError: " + report.getErreurs().size());
+//		} catch (Exception e) {
+//			log.debug("plantage appel esignsante");
+//			log.debug(e.getMessage());
+//			log.debug(e.toString());
+//			report = null;
+//		
+//		}
+		return report;
+	}
+	
+	
 	public ESignSanteValidationReport chekSignatureXades(File fileToCheck) {
 
 		esignWSApiClient = confApiClient(); // juste le BasePath
