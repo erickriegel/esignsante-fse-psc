@@ -40,7 +40,8 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Classe DefaultApiDelegateImpl. Implementation des EndPoints /checksignature/*
+ * Classe DefaultApiDelegateImpl. Implementation des EndPoints /askksignature/*
+ * 
  */
 @Service
 @Slf4j
