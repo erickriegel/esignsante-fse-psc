@@ -5,10 +5,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileResource implements MultipartFile{
+public class FileResource implements Resource{
 	private final byte[] data;
 	private final String fileName;
 
@@ -18,43 +21,61 @@ public class FileResource implements MultipartFile{
 	}
 
 	@Override
-	public String getName() {
-		return fileName;
-	}
-
-	@Override
-	public String getOriginalFilename() {
-		return fileName;
-	}
-
-	@Override
-	public String getContentType() {
-		return "application/pdf";
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
-
-	@Override
-	public long getSize() {
-		return data.length;
-	}
-
-	@Override
-	public byte[] getBytes() throws IOException {
-		return data;
-	}
-
-	@Override
 	public InputStream getInputStream() throws IOException {
 		return new ByteArrayInputStream(data);
 	}
 
 	@Override
-	public void transferTo(File dest) throws IOException, IllegalStateException {
-		new FileOutputStream(dest).write(data);
+	public boolean exists() {	
+		return true;
 	}
+
+	@Override
+	public URL getURL() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public URI getURI() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public File getFile() throws IOException {
+		
+		return null;
+	}
+
+	@Override
+	public long contentLength() throws IOException {
+      
+		return data.length;
+	}
+
+	@Override
+	public long lastModified() throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Resource createRelative(String relativePath) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getFilename() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDescription() {	
+		return "Document PDF signé par esignsante";
+	}
+
 	
 }

@@ -79,8 +79,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				}		
 				
 				//extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
+				Map<String, String> userToPersit = null;
 				try {
-					java.util.Map<String, String> userToPersit = Helper.jsonStringToPartialMap(userinfo);
+					userToPersit = Helper.jsonStringToPartialMap(userinfo);
 				} catch (JsonMappingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
