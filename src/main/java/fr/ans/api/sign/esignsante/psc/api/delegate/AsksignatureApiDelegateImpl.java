@@ -13,7 +13,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
-import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
@@ -40,8 +38,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Classe DefaultApiDelegateImpl. Implementation des EndPoints /askksignature/*
- * 
+ * Classe DefaultApiDelegateImpl. Implementation des EndPoints /checksignature/*
  */
 @Service
 @Slf4j
@@ -81,7 +78,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 				}		
 				
-				//extraction des champs pour sauvegarde
+				//extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
 				try {
 					java.util.Map<String, String> userToPersit = Helper.jsonStringToPartialMap(userinfo);
 				} catch (JsonMappingException e) {
@@ -197,7 +194,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			// message header value:' ");
 			log.debug("retour appel esignsante xades - formatage de la réponse");
 //			log.debug("doc signé: {}", report.getDocSigne());
-			Document signedDoc = new Document();
+	//		Document signedDoc = new Document();
 
 			// report OK ou pas ???
 			log.debug("report ... \n \tValide {} \n \tErrors {} \n \tDocSigné {}", report.isValide(),
@@ -257,9 +254,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 			////////////////////////////////////////////////
 			// test ....
-			Resource resource = new ByteArrayResource(signedString.getBytes());
-			Document returned = new Document();
-			returned.setFile(resource);
+//			Resource resource = new ByteArrayResource(signedString.getBytes());
+//			Document returned = new Document();
+//			returned.setFile(resource);
 			// HttpHeaders httpHeaders = new HttpHeaders();
 			// httpHeaders.setContentType(MediaType.TEXT_PLAIN);
 			// re = new ResponseEntity<>(returned,httpHeaders, HttpStatus.OK);
