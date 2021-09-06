@@ -312,4 +312,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("fileToCheck isFile" + fileToSign.isFile());
 		return fileToSign;
 	}
+	
+	private void archivagePreuve(ESignSanteSignatureReportWithProof report ){
+		
+		
+	}
 }
