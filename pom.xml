@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>fr.ans.sign</groupId>
 	<artifactId>esignsante-psc</artifactId>
-	<version>0.0.28-SNAPSHOT</version>
+	<version>0.0.29-SNAPSHOT</version>
 	<!-- <version>${project-version}</version> -->
 	<name>esignsante-psc</name>
 
