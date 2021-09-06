@@ -31,6 +31,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 
 import fr.ans.api.sign.esignsante.psc.model.Error;
+
 /**
  * Classe DefaultApiDelegateImpl. Implementation des EndPoints /checksignature/*
  */
@@ -41,133 +42,121 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 
 	@Autowired
 	EsignsanteCall esignWS;
-	
-@Override
- 
-public ResponseEntity<Result> postChecksignaturePades(@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file) {
-	final Optional<String> acceptHeader = getAcceptHeader();
-	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-	log.trace("Réception d'une demande Checksignature Pades");
-	
-	//TODO factorisation avec postChecksignatureXades
-	File fileToCheck = null;
-	try {
-		fileToCheck = multipartFileToFile(file);
-		log.debug("fileToCheck length" + fileToCheck.length());
-		log.debug("fileToCheck isFile" + fileToCheck.isFile());
 
-		log.debug("appel esignsante pour un contrôle de siganture en PADES");
-		ESignSanteValidationReport report = esignWS.chekSignaturePades(fileToCheck);
-		log.debug("retour appel esignsante pour un contrôle de siganture en PADES - formatage de la réponse");
-		log.debug("vreport {}", report.isValide());
+	@Override
 
-		List<Erreur> erreurs = report.getErreurs();
-		
-		List<Error> errors = Helper.mapListErreurToListError(erreurs);
-		
-		Result result = new Result();
-		result.setValid(report.isValide());
-		result.setErrors(errors);
-		
-		re = new ResponseEntity<>(result,HttpStatus.OK);
-	} catch (IOException e) {
-		// Pb technique sur fichier reçu. => erreur 500 
-		e.printStackTrace();
-		re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); //500 à confirmer
+	public ResponseEntity<Result> postChecksignaturePades(
+			@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file) {
+		final Optional<String> acceptHeader = getAcceptHeader();
+		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		log.trace("Réception d'une demande Checksignature Pades");
+
+		// TODO factorisation avec postChecksignatureXades
+		File fileToCheck = null;
+		try {
+			fileToCheck = multipartFileToFile(file);
+			log.debug("fileToCheck length" + fileToCheck.length());
+			log.debug("fileToCheck isFile" + fileToCheck.isFile());
+
+			log.debug("appel esignsante pour un contrôle de siganture en PADES");
+			ESignSanteValidationReport report = esignWS.chekSignaturePades(fileToCheck);
+			log.debug("retour appel esignsante pour un contrôle de siganture en PADES - formatage de la réponse");
+			log.debug("vreport {}", report.isValide());
+
+			List<Erreur> erreurs = report.getErreurs();
+
+			List<Error> errors = Helper.mapListErreurToListError(erreurs);
+
+			Result result = new Result();
+			result.setValid(report.isValide());
+			result.setErrors(errors);
+
+			re = new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (IOException e) {
+			// Pb technique sur fichier reçu. => erreur 500
+			e.printStackTrace();
+			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500 à confirmer
+		}
+		return re;
 	}
-	return re;
-}
 
-@Override
-public ResponseEntity<Result> postChecksignatureXades(@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {
-	final Optional<String> acceptHeader = getAcceptHeader();
-	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-	log.trace("Réception d'une demande Checksignature Xades."  );
+	@Override
+	public ResponseEntity<Result> postChecksignatureXades(
+			@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {
+		final Optional<String> acceptHeader = getAcceptHeader();
+		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		log.debug("Réception d'une demande Checksignature Xades.");
 
-	
-	assert file!=null;
-	
-	File fileToCheck = null;
-	try {
-		fileToCheck = multipartFileToFile(file);
-		log.debug("fileToCheck length" + fileToCheck.length());
-		log.debug("fileToCheck isFile" + fileToCheck.isFile());
-	} catch (IOException e) {
-		// Pb technique sur fichier reçu. => erreur 500 
-		e.printStackTrace();
-		re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); //500 à confirmer
-	}
+		assert file != null;
+
+		File fileToCheck = null;
+		try {
+			fileToCheck = multipartFileToFile(file);
+			log.debug("fileToCheck length" + fileToCheck.length());
+			log.debug("fileToCheck isFile" + fileToCheck.isFile());
+		} catch (IOException e) {
+			// Pb technique sur fichier reçu. => erreur 500
+			e.printStackTrace();
+			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500 à confirmer
+		}
 
 		log.debug("appel esignsante pour un contrôle de siganture en xades");
 		ESignSanteValidationReport report = null;
 		HttpStatus returnedStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		try {
-		report = esignWS.chekSignatureXades(fileToCheck);
-		log.debug("retour appel esignsante OIK pour un contrôle de siganture en xades - formatage de la réponse");
-		log.debug("vreport {}", report.isValide());
+			report = esignWS.chekSignatureXades(fileToCheck);
+			log.debug("retour appel esignsante OIK pour un contrôle de siganture en xades - formatage de la réponse");
+			log.debug("vreport {}", report.isValide());
 
-		List<Erreur> erreurs = report.getErreurs();
-		
-		List<Error> errors = Helper.mapListErreurToListError(erreurs);
-		
-		Result result = new Result();
-		result.setValid(report.isValide());
-		result.setErrors(errors);
-		
-		re = new ResponseEntity<>(result,HttpStatus.OK);
+			List<Erreur> erreurs = report.getErreurs();
+
+			List<Error> errors = Helper.mapListErreurToListError(erreurs);
+
+			Result result = new Result();
+			result.setValid(report.isValide());
+			result.setErrors(errors);
+
+			re = new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			re = interceptErrorCheckSignature(e);
 		}
-		
-	
+		return re;
+	}
 
-	
-	
-   
-	return re;
+	private ResponseEntity interceptErrorCheckSignature(Exception e) {
+		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		log.debug("message {} \n", e.getMessage());
+		log.debug("toString {} \n", e.toString());
+		log.debug("class Name {} \n", e.getClass().getName());
+		log.debug("class Canoicalname {} \n", e.getClass().getCanonicalName());
 
-}
+		switch (e.getClass().getCanonicalName()) {
 
-//private static List<Error> mapListErreurToListError (List<Erreur> erreurs) {
-//	CollectionTransformer transformer = new CollectionTransformer<Integer, String>() {
-//        @Override  
-//        String transform(Integer e) {
-//            return e.toString();
-//        }
-//    };
-//	return transformer.transform(erreurs);
-//	
-//
-//	}
-private ResponseEntity interceptErrorCheckSignature (Exception e) {
-	ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	log.debug("message {} \n", e.getMessage());
-	log.debug("toString {} \n", e.toString());					
-	log.debug("class Name {} \n", e.getClass().getName());
-	log.debug("class Canoicalname {} \n", e.getClass().getCanonicalName());
+		case "org.springframework.web.client.HttpServerErrorException.NotImplemented":
+			// 501: fichier non xm par exemple
+			log.error("Echec de l'appel à esignsanteWS => HttpServerErrorException.NotImplemented");
+			log.error("\t 501: cause possible: erreur sur le type de fichier fourni (par exemple non xml pour Xades)");
+			re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+			break;
 
-	switch (e.getClass().getCanonicalName()) {
+		case "org.springframework.web.client.ResourceAccessException":
+			// esignWS OFF par exemple
+			log.error("Echec de l'appel à esignsanteWS => ResourceAccessException (esignsante non dispo");
+			re = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+			break;
 
-	  case "org.springframework.web.client.HttpServerErrorException.NotImplemented":
-		  //501 fichier non xm par exemple
-		  log.debug("plantage appel esignsanteWS checkCheckSignature HttpServerErrorException.NotImplemented");
-		  re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-	    break;
-	  
-	  case "org.springframework.web.client.ResourceAccessException":
-		  //esignWS OFF par exemple
-		  log.debug("plantage appel esignsanteWS ResourceAccessException (esignsante non dispo");
-		  re = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
-	    break;
+		case "org.springframework.web.client.HttpClientErrorException.NotFound":
+			// 404: erreur sur l'id de la conf d'esignsWS
+			log.error("Echec de l'appel à esignsanteWS => HttpClientErrorException.NotFound");
+			log.error("\t cause possible: identifiant de configuration esignWS invalid.");
+			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			break;
 
-    
-	  default:
-		  //comprend erreur 400: requête mal formée, 404 id conf introuvable.	  
-		  log.debug("plantage appel esignsante checkXades Exception defaut non gérée");
-		  
-	  }
-	return re;
-}
+		default:
+			// comprend erreur 400: requête mal formée, 404 id conf introuvable.
+			log.error("Echec de l'appel à esignsanteWS: Exception non gérée");
+		}
+		return re;
+	}
 
- 
 }

@@ -14,8 +14,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-//import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,12 +56,12 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	ProsanteConnectCalls pscApi;
 	
 	@Override
-	public ResponseEntity<Document> postAskSignaturePades(
+	public ResponseEntity<org.springframework.core.io.Resource> postAskSignaturePades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 		final Optional<String> acceptHeader = getAcceptHeader();
-		ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		ResponseEntity<org.springframework.core.io.Resource> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		log.trace("Réception d'une demande de signature Pades");
 
 		// return re;
@@ -76,6 +74,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo)  {
 		final Optional<String> acceptHeader = getAcceptHeader();
+		//TODO 415 si pas les 2application/JSON et application 
 	//	ResponseEntity<Document> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		ResponseEntity<String> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

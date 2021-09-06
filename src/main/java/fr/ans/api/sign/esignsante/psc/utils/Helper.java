@@ -103,7 +103,7 @@ public class Helper {
 	}
 	
 	public static UserInfo jsonStringToUserInfo(String sUserInfo) throws JsonMappingException, JsonProcessingException {
-		return new ObjectMapper().readValue(sUserInfo, UserInfo.class);  	
+		return new ObjectMapper().readValue(/*TODO +helper decode base64*/sUserInfo, UserInfo.class);  	
 	}
 
 	public static Map<String,String> jsonStringToPartialMap(String sUserInfo) throws JsonMappingException, JsonProcessingException {

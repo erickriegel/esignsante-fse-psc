@@ -77,6 +77,10 @@ paths:
             application/xml:
               schema:
                 type: string
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '400':
           description: erreur 400
           content:
@@ -128,7 +132,8 @@ paths:
           content:
             application/pdf:
               schema:
-                $ref: '#/components/schemas/Document'
+                type: string
+                format: binary
         '400':
           description: erreur 400
           content:
