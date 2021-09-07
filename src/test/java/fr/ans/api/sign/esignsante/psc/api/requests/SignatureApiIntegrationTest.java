@@ -3,7 +3,11 @@ package fr.ans.api.sign.esignsante.psc.api.requests;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -33,6 +38,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.stream.Collectors;
+
+import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
+import lombok.extern.slf4j.Slf4j;
+
 //import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 //import fr.ans.api.sign.esignsante.psc.model.RequeteSignatureRecue;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
@@ -55,8 +65,10 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 //import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 
@@ -67,9 +79,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ContextConfiguration
 @SpringBootTest
 @AutoConfigureMockMvc
-@ComponentScan("fr.ans.api.sign.esignsante.psc.api")
-
+//@ComponentScan("fr.ans.api.sign.esignsante.psc.api")
+@Slf4j
 public class SignatureApiIntegrationTest {
+	
+     
 
 	/*
 	 * setUp pour restdocs
@@ -85,19 +99,11 @@ public class SignatureApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 	
-  //  private RequeteSignatureRecue requeteBody = new RequeteSignatureRecue();
-    
-    private final static String titreDocument = "signature";
-    
-    private final static String endPoint = "/signature/test";
-    
-    private String requestJson;
-//    private RequeteSignatureRecue reponseRecue;
     
     private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
     /**
-     * Vérification de la liste des services disponibles.
+     * Demande de signature cas passant
      *
      * @throws Exception the exception
      */
@@ -105,6 +111,7 @@ public class SignatureApiIntegrationTest {
     @DisplayName("Demande de signature Cas passant.")
     public void appelDemandeDeSignature_CasPassant_Test() throws Exception {
 
+    	
 //    	requeteBody.setToken("Ceci est Token valide");
 //    	requeteBody.setDocumentASigner("Ceci est le document à signer");
 //    	
@@ -120,22 +127,19 @@ public class SignatureApiIntegrationTest {
     }
     
     
-      //    @Test
-    	  @DisplayName("Demande de signature KO: header accept non application/json.")
-    	    public void appelDemandeDeSignature_HeaderKO_Test() throws Exception {
-  	    	    	    	
-//        	  requeteBody.setToken("tokenPSCvalide");
-//          	requeteBody.setDocumentASigner("Document transmis à signer");
-//          	
-//              formatRequeteJson (requeteBody);
-//      	            
-//             
-//        	  ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.post(endPoint).accept(MediaType.APPLICATION_OCTET_STREAM)
-//        			  .contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotAcceptable());
-//        	  
-//                    
-//    	    	  returned.andDo(print()); //pour debug console: a supprimer
-//    	    	  returned.andDo(document(titreDocument+"/HeaderKO"));  
+          @Test
+    	  @DisplayName("Demande de signature KO: userINfo non en base 64")
+    	    public void demandeDeSignature_UserInfoNonbase64Test() throws Exception {
+  	    
+
+       		MockMultipartFile filemXml = new MockMultipartFile("file", "pom.xml", null,
+        	             Thread.currentThread().getContextClassLoader().getResourceAsStream("pomxx.xml"));
+       		InputStream data = Thread.currentThread().getContextClassLoader().getResourceAsStream("EsignSanteWS/Xades/pom.xml");
+
+//       		log.error("ici : " + new BufferedReader(new InputStreamReader(data))
+//       			    .lines().parallel().collect(Collectors.joining("\n")));
+
+        	 
     	    	  
 
     }
