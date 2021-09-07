@@ -43,6 +43,11 @@ public class Helper {
 	public final static String TOKEN_ACTIVE_FALSE = "false";
 	public final static String TOKEN_ACTIVE_TRUE = "true";
 	
+	//type de Header
+	public final static String APPLICATION_JSON = "application/json";
+	public final static String APPLICATION_XML = "application/xml";
+	public final static String APPLICATION_PDF = "application/pdf";
+	
 	private Helper() {
 	}
 

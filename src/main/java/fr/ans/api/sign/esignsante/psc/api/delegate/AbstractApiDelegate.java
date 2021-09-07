@@ -15,6 +15,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -47,10 +50,22 @@ abstract public class AbstractApiDelegate {
 	 *
 	 * @return the accept header
 	 */
+	//renvoie le premier header 'accept'
 	public Optional<String> getAcceptHeader() {
 		return getRequest().map(r -> r.getHeader("Accept"));
 	}
 	
+	//renvoie une liste de tous les headers 'accept' de la requête
+	public List<String> getAcceptHeaders() {
+		List<String> acceptes = new ArrayList<String>();
+		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
+				.currentRequestAttributes();
+		Enumeration<String> acceptheaders = attrs.getRequest().getHeaders("accept");
+		while (acceptheaders.hasMoreElements()) {		
+			acceptes.add(acceptheaders.nextElement());
+		}
+		return acceptes;
+	}
 
 	protected File multipartFileToFile(MultipartFile multipart /*,  Path dir*/) throws IOException {
 		    
@@ -74,6 +89,19 @@ abstract public class AbstractApiDelegate {
 		    multipart.transferTo(tempFile);
 		    return tempFile.toFile();
 		}
+	
+	
+	protected Boolean isExpectedAcceptHeader (Optional<String> header, String expectedAcceptHeader) {
+		Boolean retour = false;
+		 if (header.isPresent() && header.get().contains(expectedAcceptHeader)) {		
+			 retour = true;
+		 }
+		return retour;
+	}
+	
+	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders,String expectedAcceptHeader ) {
+		return acceptheaders.contains(expectedAcceptHeader);
+	}
 	
 //	public static File convert(MultipartFile file) throws IOException {
 //		File convFile = new File(file.getOriginalFilename());

@@ -25,6 +25,7 @@ import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Document;
 import fr.ans.api.sign.esignsante.psc.model.Result;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
+import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
 import fr.ans.esignsante.model.ESignSanteValidationReport;
 import fr.ans.esignsante.model.Erreur;
 import io.swagger.annotations.ApiParam;
@@ -48,83 +49,21 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 	public ResponseEntity<Result> postChecksignaturePades(
 			@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file) {
 		final Optional<String> acceptHeader = getAcceptHeader();
-		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		log.trace("Réception d'une demande Checksignature Pades");
-
-		// TODO factorisation avec postChecksignatureXades
-		File fileToCheck = null;
-		try {
-			fileToCheck = multipartFileToFile(file);
-			log.debug("fileToCheck length" + fileToCheck.length());
-			log.debug("fileToCheck isFile" + fileToCheck.isFile());
-
-			log.debug("appel esignsante pour un contrôle de siganture en PADES");
-			ESignSanteValidationReport report = esignWS.chekSignaturePades(fileToCheck);
-			log.debug("retour appel esignsante pour un contrôle de siganture en PADES - formatage de la réponse");
-			log.debug("vreport {}", report.isValide());
-
-			List<Erreur> erreurs = report.getErreurs();
-
-			List<Error> errors = Helper.mapListErreurToListError(erreurs);
-
-			Result result = new Result();
-			result.setValid(report.isValide());
-			result.setErrors(errors);
-
-			re = new ResponseEntity<>(result, HttpStatus.OK);
-		} catch (IOException e) {
-			// Pb technique sur fichier reçu. => erreur 500
-			e.printStackTrace();
-			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500 à confirmer
-		}
-		return re;
+		log.debug("Demande Checksignature Pades reçue");
+	
+		return execute(TYPE_SIGNATURE.PADES, file);
 	}
 
 	@Override
 	public ResponseEntity<Result> postChecksignatureXades(
 			@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {
-		final Optional<String> acceptHeader = getAcceptHeader();
-		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
 		log.debug("Réception d'une demande Checksignature Xades.");
-
-		assert file != null;
-
-		File fileToCheck = null;
-		try {
-			fileToCheck = multipartFileToFile(file);
-			log.debug("fileToCheck length" + fileToCheck.length());
-			log.debug("fileToCheck isFile" + fileToCheck.isFile());
-		} catch (IOException e) {
-			// Pb technique sur fichier reçu. => erreur 500
-			e.printStackTrace();
-			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500 à confirmer
-		}
-
-		log.debug("appel esignsante pour un contrôle de siganture en xades");
-		ESignSanteValidationReport report = null;
-		HttpStatus returnedStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-		try {
-			report = esignWS.chekSignatureXades(fileToCheck);
-			log.debug("retour appel esignsante OIK pour un contrôle de siganture en xades - formatage de la réponse");
-			log.debug("vreport {}", report.isValide());
-
-			List<Erreur> erreurs = report.getErreurs();
-
-			List<Error> errors = Helper.mapListErreurToListError(erreurs);
-
-			Result result = new Result();
-			result.setValid(report.isValide());
-			result.setErrors(errors);
-
-			re = new ResponseEntity<>(result, HttpStatus.OK);
-		} catch (Exception e) {
-			re = interceptErrorCheckSignature(e);
-		}
-		return re;
+		return execute(TYPE_SIGNATURE.XADES, file);
 	}
 
-	private ResponseEntity interceptErrorCheckSignature(Exception e) {
-		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	private HttpStatus interceptErrorCheckSignature(Exception e) {
+		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		log.debug("message {} \n", e.getMessage());
 		log.debug("toString {} \n", e.toString());
 		log.debug("class Name {} \n", e.getClass().getName());
@@ -136,27 +75,85 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			// 501: fichier non xm par exemple
 			log.error("Echec de l'appel à esignsanteWS => HttpServerErrorException.NotImplemented");
 			log.error("\t 501: cause possible: erreur sur le type de fichier fourni (par exemple non xml pour Xades)");
-			re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+			status = HttpStatus.NOT_IMPLEMENTED;
 			break;
 
 		case "org.springframework.web.client.ResourceAccessException":
 			// esignWS OFF par exemple
 			log.error("Echec de l'appel à esignsanteWS => ResourceAccessException (esignsante non dispo");
-			re = new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+			status = HttpStatus.SERVICE_UNAVAILABLE;
 			break;
 
 		case "org.springframework.web.client.HttpClientErrorException.NotFound":
 			// 404: erreur sur l'id de la conf d'esignsWS
 			log.error("Echec de l'appel à esignsanteWS => HttpClientErrorException.NotFound");
 			log.error("\t cause possible: identifiant de configuration esignWS invalid.");
-			re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			break;
 
 		default:
 			// comprend erreur 400: requête mal formée, 404 id conf introuvable.
 			log.error("Echec de l'appel à esignsanteWS: Exception non gérée");
 		}
-		return re;
+		return status;
 	}
 
+	private Result esignsanteReportToResult(ESignSanteValidationReport report) {
+		log.debug("retour appel esignsante OK pour un contrôle de signature - formatage de la réponse");
+		log.debug("report {}", report.isValide());
+
+		List<Erreur> erreurs = report.getErreurs();
+		List<Error> errors = Helper.mapListErreurToListError(erreurs);
+
+		Result result = new Result();
+		result.setValid(report.isValide());
+		result.setErrors(errors);
+		
+		return result;
+	}
+	
+	private File getMultiParrtFile(MultipartFile file) {
+		File fileToCheck = null;
+		try {
+			fileToCheck = multipartFileToFile(file);
+			log.debug("fileToCheck isFile: {} \t name: {} \t length {}", fileToCheck.getName(), fileToCheck.isFile(), fileToCheck.length());
+		} catch (IOException e) {
+			e.printStackTrace();			
+		}
+		return fileToCheck;
+	}
+	private ResponseEntity<Result> execute(TYPE_SIGNATURE typeSignature, MultipartFile file ) {
+		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		
+		//controle du acceptheader
+		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+			log.debug("Demande CheckSignature rejetée (NOT_IMPLEMENTED) Accept Head = APPLICATION/JSON non présent");
+			return re;
+		}		
+        
+		//assert file != null; => sinon MultipartException en amont de cette méthode
+		
+
+		File fileToCheck = getMultiParrtFile(file);
+		if (fileToCheck == null) {
+			return re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+
+		ESignSanteValidationReport report = null;
+
+		try {
+			if (typeSignature.equals(TYPE_SIGNATURE.XADES)) {
+			report = esignWS.chekSignatureXades(fileToCheck);
+			}
+			else {
+				report = esignWS.chekSignaturePades(fileToCheck);
+			}
+		} catch (Exception e) {		
+			return new ResponseEntity<>(interceptErrorCheckSignature(e)); 
+		}
+		Result result = esignsanteReportToResult(report); 
+		re = new ResponseEntity<>(result, HttpStatus.OK);
+
+		return re;
+	}
 }

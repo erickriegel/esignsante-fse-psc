@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import fr.ans.api.sign.esignsante.psc.api.DefaultApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Operation;
+import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -45,14 +46,15 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 	@Override
 	public ResponseEntity<Set<Operation>> getOperations() {
 		final Optional<String> acceptHeader = getAcceptHeader();
-		ResponseEntity<Set<Operation>> re = new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-		log.trace(" OOOOO Réception d'une demande des opérations disponibles");
+		ResponseEntity<Set<Operation>> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		log.trace("Réception d'une demande des opérations disponibles");
 		
-		//tmp: test pour écriture MongoDB Online
-	//	 todelete();
-		 //fin tmp: test pour écriture MongoDB Online
-		 
-		if (acceptHeader.isPresent() && acceptHeader.get().contains(HEADER_TYPE)) {
+		//vérification du Headers accept
+		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+			log.debug("Demande getOperation rejetée (NOT_IMPLEMENTED) Accept Head = APPLICATION/JSON non présent");
+			return re;
+		}
+
 			final Set<Operation> setOperations = new HashSet<Operation>();
 			setOperations.add(setOperation("/", "Liste des opérations disponibles", "", ""));
 
@@ -66,11 +68,6 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 
 			re = new ResponseEntity<>(setOperations, HttpStatus.OK);
 
-		} else {
-			log.warn(" 777777777777777777777777777777777777");
-			log.warn("ObjectMapper or HttpServletRequest not configured in default DefaultApi interface,"
-					+ " so no example is generated");
-		}
 		
 	
 		return re;

@@ -167,7 +167,7 @@ public class EsignsanteCall {
 		ESignSanteValidationReport report = null;
 		List<String> signers = new ArrayList<String>();
 
-//	 File fileToCheck = new File("C:\\Users\\cjuillard\\eclipse-workspace\\esignsante-psc\\src\\test\\resources\\EsignSanteWS\\Xades\\pomSigne.txt");
+
 		long idCheckSign = esignConf.getCheckSignatureConfId();
 		log.debug("appel esignsanteWebservices pour une VERIF de signature en xades");
 		log.debug("paramètres: basePath: " + esignWSApiClient.getBasePath() + " id checkSign d esignsante: "
@@ -175,15 +175,7 @@ public class EsignsanteCall {
 		log.debug("fileExist:" + fileToCheck.exists());
 
 		XadesApi api = new XadesApi(esignWSApiClient);
-		// try {
 		report = api.verifSignatureXades(idCheckSign, fileToCheck);
-//	 log.debug("sortie de fct");
-//	 log.debug("report valid?: " + report.isValide());
-//	 log.debug("nbError: " + report.getErreurs().size());
-//					} catch (Exception e) {
-//						//relancer une exception 
-//						interceptErrorCheckSignature(e);
-//					}
 		return report;
 	}
 
@@ -201,16 +193,7 @@ public class EsignsanteCall {
 		log.debug("fileExist:" + fileToCheck.exists());
 
 		PadesApi api = new PadesApi(esignWSApiClient);
-		try {
 			report = api.verifSignaturePades(idCheckSign, fileToCheck);
-			log.debug("report valid?: " + report.isValide());
-			log.debug("nbError: " + report.getErreurs().size());
-		} catch (Exception e) {
-			log.debug("plantage appel esignsante checkPades");
-			log.debug(e.getMessage());
-			log.debug(e.toString());
-
-		}
 		return report;
 	}
 
@@ -222,24 +205,4 @@ public class EsignsanteCall {
 		return results;
 	}
 
-//private void interceptErrorCheckSignature (Exception e) {
-//	log.debug("message {} \n", e.getMessage());
-//	log.debug("toString {} \n", e.toString());					
-//	log.debug("class Name {} \n", e.getClass().getName());
-//	log.debug("class Canoicalname {} \n", e.getClass().getCanonicalName());
-//
-//	switch (e.getClass().getCanonicalName()) {
-//
-//	  case "org.springframework.web.client.HttpServerErrorException.NotImplemented":
-//		  log.debug("plantage appel esignsanteWS checkCheckSignature HttpServerErrorException.NotImplemented");
-//	    break;
-//	  
-//	  case "org.springframework.web.client.ResourceAccessException":
-//		  log.debug("plantage appel esignsanteWS ResourceAccessException (esignsante non dispo");
-//	    break;
-//	  
-//	  default:
-//		  log.debug("plantage appel esignsante checkXades Exception defaut non gérée");
-//	  }
-//}
 }

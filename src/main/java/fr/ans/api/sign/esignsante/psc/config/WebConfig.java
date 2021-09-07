@@ -30,9 +30,9 @@ import springfox.documentation.builders.PathSelectors;
  * WebConfig
  */
 @Configuration
-//@Import(SwaggerConfiguration.class)
+@Import(SwaggerConfiguration.class)
 @EnableSwagger2 // CJU
-
+//https://stackoverflow.com/questions/61778286/swagger-is-adding-context-root-twice
 public class WebConfig {// {implements WebMvcConfigurer {
 
 //@Value("${application.version}")
@@ -50,7 +50,7 @@ public class WebConfig {// {implements WebMvcConfigurer {
 	 * List<HttpMessageConverter<?>> converters) { converters.add(new
 	 * MappingJackson2HttpMessageConverter()); }
 	 */
-	// CJU
+
 	@Bean
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2)
@@ -61,29 +61,18 @@ public class WebConfig {// {implements WebMvcConfigurer {
 				.paths(PathSelectors.any())
 				.build();
 	}
+	
+// pour => extends WebMvcConfigurationSupport
+//@Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+//        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+//    }
 
 //    private ApiInfo apiInfo() {
 //        return new ApiInfo("Langton ant app", "rest api for langton ant app", version, null,
 //                new Contact(), null, null, Collections.EMPTY_LIST);
 //    }
 //    
-	// FIN CJU
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
-	 * #addResourceHandlers(org.springframework.web.servlet.config.annotation.
-	 * ResourceHandlerRegistry)
-	 */
-	/*
-	 * @Override public void addResourceHandlers(final ResourceHandlerRegistry
-	 * registry) {
-	 * registry.addResourceHandler("swagger-ui.html").addResourceLocations(
-	 * "classpath:/META-INF/resources/");
-	 * 
-	 * registry.addResourceHandler("/webjars/**").addResourceLocations(
-	 * "classpath:/META-INF/resources/webjars/"); }
-	 */
 }

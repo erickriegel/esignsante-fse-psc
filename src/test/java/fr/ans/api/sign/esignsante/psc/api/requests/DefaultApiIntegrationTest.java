@@ -1,5 +1,6 @@
 package fr.ans.api.sign.esignsante.psc.api.requests;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -73,5 +74,26 @@ public class DefaultApiIntegrationTest {
         // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
     	  returned.andDo(print()); //pour debug console: a supprimer
     	  returned.andDo(document("Liste_des_services/OK"));
-    }       
+    }   
+   
+ //  @Test
+   @DisplayName("Lecture des Headers 'accept'")
+   public void rootGetTestBadAcceptHeader() throws Exception {
+      	      	
+   	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml")
+   			.contentType(MediaType.APPLICATION_JSON))
+       	    .andExpect(status().isNotImplemented()); //501 dans le code mais 406 en fait (NOT_ACCEPTABLE)...
+   	
+   }
+   
+   
+   @Test
+   @DisplayName("Multiple Headers 'accept'")
+   public void rootGetTestMultipledAcceptHeader() throws Exception {
+      	      	
+   	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml").accept("application/json")
+   			.contentType(MediaType.APPLICATION_JSON))
+       	    .andExpect(status().isOk()); 
+   } 
+
 }
