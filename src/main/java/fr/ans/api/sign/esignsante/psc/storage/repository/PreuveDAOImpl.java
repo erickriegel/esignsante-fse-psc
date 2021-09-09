@@ -65,11 +65,16 @@ public class PreuveDAOImpl implements PreuveDAO {
 	}  
 	 
  	public boolean archivePreuve(ProofStorage proof) {
-		log.debug("demande persistence de la preuve d'une demande de signature: \r\n "
-		    +" SubjectOrganization: {} \r\n  Preferred_username: {} \r\n Given_name: {} \r\n"
-		    + "Family_name:{}  \r\n Timestamp (acceptation de la reqête): {}  \r\n  preuve  {} ",
-		   proof.getSubjectOrganization(), proof.getPreferred_username() ,proof.getGiven_name(),
-		   proof.getFamily_name() , proof.getTimestamp(), proof.getProof());
+//		log.debug("demande persistence de la preuve d'une demande de signature: \r\n "
+//		    +" SubjectOrganization: {} \r\n  Preferred_username: {} \r\n Given_name: {} \r\n"
+//		    + "Family_name:{}  \r\n Timestamp (acceptation de la reqête): {}  \r\n  preuve  {} ",
+//		   proof.getSubjectOrganization(), proof.getPreferred_username() ,proof.getGiven_name(),
+//		   proof.getFamily_name() , proof.getTimestamp(), proof.getProof());
+		log.debug("demande persistence de la preuve d'une demande de signature pour: \r\n "
+			    +" SubjectOrganization: {} \r\n  Preferred_username: {} \r\n Given_name: {} \r\n"
+			    + "Family_name:{}  \r\n Timestamp (acceptation de la reqête): {}   ",
+			   proof.getSubjectOrganization(), proof.getPreferred_username() ,proof.getGiven_name(),
+			   proof.getFamily_name() , proof.getTimestamp());
 		mongoTemplate.save(proof);
 		
 		return true;

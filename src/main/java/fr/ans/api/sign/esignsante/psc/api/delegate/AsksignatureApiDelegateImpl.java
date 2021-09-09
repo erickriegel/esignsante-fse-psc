@@ -69,54 +69,76 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
-//		log.debug("Réception d'une demande de signature Pades");
-//		// ResponseEntity<Resource> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//
-//		// TODO verif accept application/JSON et application /xml
-//		// modif methode => isAcceptHeaderPresent(getAcceptHeaders(),
-//		// Helper.APPLICATION_JSON))
-//
-//		File fileToSign = getMultiPartFile(file);
-//		if (fileToSign == null) {
-//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		log.debug("Réception d'une demande de signature Pades");
+		// ResponseEntity<Resource> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+		log.error("!!bypass du controle Accpet HEader sur une demande de signature XADES");
+//		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
+//				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
+//			msgError = "Le header doit contenir s application/json et application/pdf";
+//			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}", getAcceptHeaders());
+//			return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 //		}
-//
-//		// extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
-//		UserInfo userToPersit = extractUserInfoFromRequest(userinfo);
-//		if (userToPersit == null) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//
-//		Date now = new Date();
-//
-//		// génération d'un UUDI
-//		String requestID = Helper.generateRequestId();
-//
+
+		 ParametresSign params = prepareAppelEsignWS(accessToken, file, userinfo);
+		 if (! params.getStatus().equals(HttpStatus.OK)) {
+			 return new ResponseEntity<>(params.getStatus());
+			}
+		 
+
+		 
+		 log.debug("Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
+				 params.getPscReponse().getPscResponse(), params.getFileToSign().getName(), params.getUserinfo().getSubjectOrganization());
+			// construction du OpenIDToken
+   		    UserInfo user = params.getUserinfo();
+			List<OpenidToken> openidTokens = new ArrayList<OpenidToken>();
+			OpenidToken openidToken = new OpenidToken();
+			openidToken.setAccessToken(accessToken);
+			openidToken.setIntrospectionResponse(params.getPscReponse().getPscResponse());
+			openidToken.setUserInfo(userinfo);
+			openidTokens.add(openidToken);
+			
+			List<String> signers = new ArrayList<String>();
+			
+			   log.debug("openidtoken[0] transmis à esignWS:");
+			    log.debug("\t userinfo (base64): {} ",openidTokens.get(0).getUserInfo());
+			    log.debug("\t accessToken: {} ",openidTokens.get(0).getAccessToken());
+			    log.debug("\t PSCResponse: {} ",openidTokens.get(0).getIntrospectionResponse());
+
 //		////////////////////////////////////////////////////////////////////////////////////////////////
-//		log.error("!!!!! Appel sans openidToken à cause de  'Illegal character(s) in message header value:' ");
-//		ESignSanteSignatureReportWithProof report = esignWS.signaturePades(fileToSign, signers, requestID, null);
+		log.debug("Appel esignWS pour une signature PADES");
+		ESignSanteSignatureReportWithProof report = null;
+		try {
+		report = esignWS.signaturePades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
+		} catch (RestClientException e) {
+			log.error("RestClientException  lors d'un appel à esignsante ");
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+		}
 //		///////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//		// archivage BDD
-//		archivagePreuve(report, requestID, userToPersit, now);
-//
+
+		// archivage BDD
+		archivagePreuve(report, params.getRequestID(),user, params.getDate());
+		
 //		// Formatage retour
-//		String signedStringBase64 = report.getDocSigne();
-//		// log.debug("signedStringBase64 {}", signedStringBase64);
-//		String signedString = null;
-//		try {
-//			signedString = Helper.decodeBase64(signedStringBase64);
-//		} catch (UnsupportedEncodingException e) {
-//			log.error("PADES: pb decodage base 64 du fichier signeré");
-//			e.printStackTrace();
-//		}
-//		log.debug("signedString {}", signedString);
-//
-////				FileResource docRetourned = new FileResource(signedString.getBytes(),file.getOriginalFilename());
+		String signedStringBase64 = report.getDocSigne();
+		// log.debug("signedStringBase64 {}", signedStringBase64);
+		String signedString = null;
+		try {
+			signedString = Helper.decodeBase64(signedStringBase64);
+		} catch (UnsupportedEncodingException e) {
+			log.error("PADES: pb decodage base 64 du fichier signeré");
+			e.printStackTrace();
+		}
+		log.debug("signedString {}", signedString);
+
+		FileResource docRetourned = new FileResource(signedString.getBytes(),"SIGNED"+file.getOriginalFilename());
 //		Resource resource = new ByteArrayResource(signedString.getBytes());
-////		re = new ResponseEntity<>(resource, HttpStatus.OK);
-////		return re;
-		return null;
+		//	return new ResponseEntity<>(resource, HttpStatus.OK);
+		
+		 HttpHeaders httpHeaders = new HttpHeaders();
+		 httpHeaders.setContentType(MediaType.APPLICATION_PDF);
+		return  new ResponseEntity<Resource>(docRetourned,httpHeaders, HttpStatus.OK);	
 	}
 
 	@Override
@@ -177,8 +199,11 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 	
 			////////////////////////////////////////////////////////////////////////////////////////////////
-			log.error("!!!!! Appel sans openidToken à cause de  'Illegal character(s) in message header value:' ");
-			openidTokens = null;
+		    log.debug("openidtoken[0] transmis à esignsanteWS:");
+		    log.debug("\t userinfo (base64): {} ",openidTokens.get(0).getUserInfo());
+		    log.debug("\t accessToken: {} ",openidTokens.get(0).getAccessToken());
+		    log.debug("\t PSCResponse: {} ",openidTokens.get(0).getIntrospectionResponse());
+		
 			ESignSanteSignatureReportWithProof report = null;
 			try {
 				report = esignWS.signatureXades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
@@ -198,7 +223,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			// Document signedDoc = new Document();
 
 			// report OK ou pas ???
-			log.debug("report ... \n \tValide {} \n \tErrors {} \n \tDocSigné {}", report.isValide(),
+			log.debug("report ... \n \tValide {} \n \tErrors {} ", report.isValide(),
 					report.getErreurs());
 
 
@@ -283,7 +308,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		try {
 			String result = pscApi.isTokenActive(token);
 			retour.setStatus(Helper.parsePSCresponse(result));
-			log.debug("Appel PSC intropesction: token= {}  reponse = {}  PSCTokenStatus = {}", token, result,
+			retour.setPscResponse(result);
+			log.debug("Appel PSC intropesction: token= {}  reponse = {}  PSCTokenStatus = {}", token, retour.getPscResponse(),
 					retour.getStatus());
 			log.error("!!!!!!!!!!  ICI BYPASS => ON force le status du Token à valid ...");
 			/////////////////////////////////////////////////////////////////////////
