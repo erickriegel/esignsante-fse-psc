@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import fr.ans.api.sign.esignsante.psc.api.CaApiDelegate;
+import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDeleg
 	EsignsanteCall esignWS;
 	
 	@Override
-	public ResponseEntity<List<String>> getCa()  {
+	public ResponseEntity<List<String>> getCa()   {
 		log.trace(" Réception d'une demande des CAs");
 		ResponseEntity<List<String>>  re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -39,7 +40,11 @@ public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDeleg
 		 results = esignWS.getCA();
 		} catch (ResourceAccessException e) {		
 			log.error("Exception sur demande de CA (appel esignWS) {}" , e.getMessage());
-			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+			// return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+			fr.ans.api.sign.esignsante.psc.model.Error erreur =new fr.ans.api.sign.esignsante.psc.model.Error();
+			erreur.setCode(HttpStatus.SERVICE_UNAVAILABLE.toString());
+			erreur.setMessage("Problème lors de l'appel à esignWebservices \n " + e.getMessage() );
+			throw new EsignPSCRequestException(erreur, HttpStatus.SERVICE_UNAVAILABLE);
 		}
 		
 		re = new ResponseEntity<>(results, HttpStatus.OK);
