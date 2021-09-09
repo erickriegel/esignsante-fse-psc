@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -85,7 +86,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			 return new ResponseEntity<>(params.getStatus());
 			}
 		 
-
+		 //verification du type de fichier
+			if (!(checkTypeFile(params.getFileToSign()).equals(Helper.APPLICATION_PDF))) {
+				return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+			}
 		 
 		 log.debug("Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
 				 params.getPscReponse().getPscResponse(), params.getFileToSign().getName(), params.getUserinfo().getSubjectOrganization());
@@ -118,7 +122,15 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 //		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// archivage BDD
+		try {
 		archivagePreuve(report, params.getRequestID(),user, params.getDate());
+		} catch (Exception e) {
+			log.error("Exception lors de l'archivage en BDD ");
+//			log.error("e.msg {} \t classe: {}", e.getMessage(), e.getClass());
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+		}
+
 		
 //		// Formatage retour
 		String signedStringBase64 = report.getDocSigne();
@@ -164,6 +176,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			 return new ResponseEntity<>(params.getStatus());
 			}
 
+		 //jusrte pour trace du type de fichier en debug
+		 checkTypeFile(params.getFileToSign());
+		 
 	 log.debug("Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
 			 params.getPscReponse().getPscResponse(), params.getFileToSign().getName(), params.getUserinfo().getSubjectOrganization());
 		// construction du OpenIDToken
@@ -175,28 +190,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		openidToken.setUserInfo(userinfo);
 		openidTokens.add(openidToken);
 
-		//openidToken.setAccessToken(accessToken);
-		/*
-		 * try { openidToken.setIntrospectionResponse( Helper.encodeBase64(
-		 * "{\"exp\":1628250495,\"iat\":1628250435,\"auth_time\":1628250434,\"jti\":\"0cc00f99-3f1b-4799-9222-a944ca82c310\",\"iss\":\"https://auth.bas.esw.esante.gouv.fr/auth/realms/esante-wallet\",\"sub\":\"f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700218896\",\"typ\":\"Bearer\",\"azp\":\"ans-poc-bas-psc\",\"nonce\":\"\",\"session_state\":\"e0e82435-fef5-430b-9b31-187fe3b0ffe6\",\"preferred_username\":\"899700218896\",\"email_verified\":false,\"acr\":\"eidas3\",\"scope\":\"openid profile email scope_all\",\"client_id\":\"ans-poc-bas-psc\",\"username\":\"899700218896\",\"active\":true}"
-		 * )); } catch (UnsupportedEncodingException e1) { // TODO Auto-generated catch
-		 * block e1.printStackTrace(); }
-		 */
 		List<String> signers = new ArrayList<String>();
-		
-		////////////////////////////////////////////////
-		// BYPASS DONNEES EN DUR
-//		openidToken.setIntrospectionResponse("aaa");
-//		openidToken.setAccessToken("bbb");
-//		openidToken.setUserInfo("ccc");
-//		signers.add("signataire1");
-//		signers.add("signataire2");
-
-		// FIN BYPASS DONNEES EN DUR
-		////////////////////////////////////////////////
-
-
-
 	
 			////////////////////////////////////////////////////////////////////////////////////////////////
 		    log.debug("openidtoken[0] transmis à esignsanteWS:");
@@ -214,29 +208,21 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			}
 			///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			// if (report== null)
-
-			// log.error("!!!!! Appel sans openidToken à cause de 'Illegal character(s) in
-			// message header value:' ");
 			log.debug("retour appel esignsante xades - formatage de la réponse");
 //			log.debug("doc signé: {}", report.getDocSigne());
-			// Document signedDoc = new Document();
-
-			// report OK ou pas ???
 			log.debug("report ... \n \tValide {} \n \tErrors {} ", report.isValide(),
 					report.getErreurs());
 
 
-//          Archivage dans MOngoDB			
-//			ProofStorage proof = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
-//					userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
-//					userToPersit.get(Helper.FAMILY_NAME), now, report.getPreuve());
-			
-			ProofStorage proof = new ProofStorage(params.getRequestID(),user.getSubjectOrganization(),
-					user.getPreferredUsername(), user.getGivenName(),
-					user.getFamilyName(), params.getDate(), report.getPreuve());
-		
-			dao.archivePreuve(proof);
+			// archivage BDD
+			try {
+			archivagePreuve(report, params.getRequestID(),user, params.getDate());
+			} catch (Exception e) {
+				log.error("Exception lors de l'archivage en BDD ");
+//				log.error("e.msg {} \t classe: {}", e.getMessage(), e.getClass());
+				e.printStackTrace();
+				return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+			}
 
 
 			String signedStringBase64 = report.getDocSigne();
@@ -350,22 +336,24 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		fileToSign = multipartFileToFile(file);
 		log.debug("fileToCheck length" + fileToSign.length());
 		log.debug("fileToCheck isFile" + fileToSign.isFile());
+		//test verification du type de fichier
 		return fileToSign;
 	}
 
-	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID,
-			Map<String, String> userToPersit, Date now) {
 
-		// vrai archivage de la pruve
-		log.debug(" START archivage de la preuve en BDD");
-		ProofStorage proof = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
-				userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
-				userToPersit.get(Helper.FAMILY_NAME), now, report.getPreuve());
-
-		dao.archivePreuve(proof);
-		log.debug("FIN archivage de la preuve en BDD");
-
-	}
+//	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID,
+//			Map<String, String> userToPersit, Date now) {
+//
+//		// vrai archivage de la pruve
+//		log.debug(" START archivage de la preuve en BDD");
+//		ProofStorage proof = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
+//				userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
+//				userToPersit.get(Helper.FAMILY_NAME), now, report.getPreuve());
+//
+//		dao.archivePreuve(proof);
+//		log.debug("FIN archivage de la preuve en BDD");
+//
+//	}
 
 	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID, UserInfo userToPersit,
 			Date now) {
@@ -491,4 +479,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		return resultat;
 
 	}
+	
+	
+	
 }

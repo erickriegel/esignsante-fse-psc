@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.tika.Tika;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -55,45 +57,41 @@ abstract public class AbstractApiDelegate {
 	
 	//renvoie une liste de tous les headers 'accept' de la requête
 	public List<String> getAcceptHeaders() {
-		List<String> acceptes = new ArrayList<String>();
-		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
-				.currentRequestAttributes();
-		Enumeration<String> acceptheaders = attrs.getRequest().getHeaders("accept");
-		while (acceptheaders.hasMoreElements()) {		
-			acceptes.add(acceptheaders.nextElement());
+		
+		Optional<String[]> accpetHeaders =  getRequest().map(r -> r.getHeaderValues("accept"));
+		if (accpetHeaders.isPresent() && !accpetHeaders.isEmpty()) {
+			return Arrays.asList(accpetHeaders.get());			
 		}
-		return acceptes;
+		return new ArrayList<String>();
+		
+//		List<String> acceptes = new ArrayList<String>();
+//		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
+//				.currentRequestAttributes();
+//		
+//		String[] accpetHeaders =  getRequest().map(r -> r.getHeaderValues("accept"));
+//		
+//		Enumeration<String> acceptheaders = attrs.getRequest()//attrs.getRequest().getHeaders("accept");
+//		while (acceptheaders.hasMoreElements()) {		
+//			acceptes.add(acceptheaders.nextElement());
+//		}
+//		return acceptes;
 	}
 
 	protected File multipartFileToFile(MultipartFile multipart /*,  Path dir*/) throws IOException {
 		    
 		    log.debug(" multipart.getOriginalFilename: {}", multipart.getOriginalFilename());
-//		    //!!!!!!! OK WINdows mais KO sous Linux AccessDenied
-//		    log.debug(" FileSystem.getDefault: {}", FileSystems.getDefault().getPath(".").toString());
-//		    Path filepath = Paths.get(FileSystems.getDefault().getPath(".").toString(), multipart.getOriginalFilename());
-//		    multipart.transferTo(filepath);
-//		    return filepath.toFile();
-		    
-		    
-		    
-		    //KO -> FileNotFoundException  [C:\Users\cjuillard\eclipse-workspace\esignsante-psc\target\ipsfra.xml] cannot be resolved in the file system for checking its content length
-//			File fileToSign = new File(multipart.getOriginalFilename());
-//			multipart.transferTo(fileToSign);
-//			return fileToSign;
-		    
-		    
+	    
 		    Path tempFile = Files.createTempFile(null, null);
 		    log.debug("tempFile {}" , tempFile.getFileName().toString() );
 		    multipart.transferTo(tempFile);
 		    return tempFile.toFile();
 		}
 	
-	//Methode OK CheckSignature sous Windows (OK CheckSignature Linux 10.3.9.234 08/09)
 	protected File getMultiPartFile(MultipartFile file) {
 		File fileToCheck = null;
 		try {
 			fileToCheck = multipartFileToFile(file);
-			log.debug("fileToCheck isFile: {} \t name: {} \t length {}", fileToCheck.getName(), fileToCheck.isFile(), fileToCheck.length());
+			log.debug("fileToCheck isFile: {} \t name: {} \t length {}",  fileToCheck.isFile(), fileToCheck.getName(), fileToCheck.length());
 		} catch (IOException e) {
 			e.printStackTrace();			
 			msgError = e.getMessage();
@@ -113,6 +111,18 @@ abstract public class AbstractApiDelegate {
 		return acceptheaders.contains(expectedAcceptHeader);
 	}
 	
+	protected String checkTypeFile(File fichierAtester) {
+		Tika tika = new Tika();
+		String detectedType = "";
+		 try {
+			detectedType = tika.detect(fichierAtester);
+			log.debug("Verification du fichier {} type detecté: {}", fichierAtester.getName(),detectedType);
+		} catch (IOException e) {
+			log.debug("Execption sur vérification du type de fichier transmis");			
+			e.printStackTrace();
+		}
+		 return detectedType;
+	}
 //	public static File convert(MultipartFile file) throws IOException {
 //		File convFile = new File(file.getOriginalFilename());
 //		convFile.createNewFile();

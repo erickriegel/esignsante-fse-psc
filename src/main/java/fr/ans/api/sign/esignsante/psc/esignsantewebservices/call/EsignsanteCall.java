@@ -147,7 +147,7 @@ public class EsignsanteCall {
 				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
 				openidTokens);
 
-		log.debug("appel esignsate OK => preuve: {}", report.getPreuve());
+		//log.debug("appel esignsante OK => preuve: {}", report.getPreuve());
 		log.debug("nbError: " + report.getErreurs().size());
 //		} catch (Exception e) {
 //			log.debug("plantage appel esignsante");
