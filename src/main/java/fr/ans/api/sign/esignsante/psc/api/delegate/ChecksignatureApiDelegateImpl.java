@@ -112,16 +112,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		return result;
 	}
 	
-	private File getMultiParrtFile(MultipartFile file) {
-		File fileToCheck = null;
-		try {
-			fileToCheck = multipartFileToFile(file);
-			log.debug("fileToCheck isFile: {} \t name: {} \t length {}", fileToCheck.getName(), fileToCheck.isFile(), fileToCheck.length());
-		} catch (IOException e) {
-			e.printStackTrace();			
-		}
-		return fileToCheck;
-	}
+	
 	private ResponseEntity<Result> execute(TYPE_SIGNATURE typeSignature, MultipartFile file ) {
 		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		
@@ -134,7 +125,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		//assert file != null; => sinon MultipartException en amont de cette méthode
 		
 
-		File fileToCheck = getMultiParrtFile(file);
+		File fileToCheck = getMultiPartFile(file);
 		if (fileToCheck == null) {
 			return re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
 		}

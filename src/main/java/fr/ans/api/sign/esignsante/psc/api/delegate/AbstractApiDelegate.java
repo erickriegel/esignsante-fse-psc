@@ -1,5 +1,14 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -7,18 +16,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * The Class ApiDelegate. Classe mère de tous les delegates. Traitement
@@ -28,6 +25,7 @@ import java.util.Optional;
 abstract public class AbstractApiDelegate {
 	
 	final protected String HEADER_TYPE = "application/json";
+	protected String msgError = "";
 
 	/**
 	 * Gets the request
@@ -90,6 +88,18 @@ abstract public class AbstractApiDelegate {
 		    return tempFile.toFile();
 		}
 	
+	//Methode OK CheckSignature sous Windows (OK CheckSignature Linux 10.3.9.234 08/09)
+	protected File getMultiPartFile(MultipartFile file) {
+		File fileToCheck = null;
+		try {
+			fileToCheck = multipartFileToFile(file);
+			log.debug("fileToCheck isFile: {} \t name: {} \t length {}", fileToCheck.getName(), fileToCheck.isFile(), fileToCheck.length());
+		} catch (IOException e) {
+			e.printStackTrace();			
+			msgError = e.getMessage();
+		}
+		return fileToCheck;
+	}
 	
 	protected Boolean isExpectedAcceptHeader (Optional<String> header, String expectedAcceptHeader) {
 		Boolean retour = false;
