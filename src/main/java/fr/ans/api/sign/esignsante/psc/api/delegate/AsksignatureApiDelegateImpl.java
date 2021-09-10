@@ -1,18 +1,15 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -29,20 +26,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
-import com.mongodb.MongoSocketOpenException;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
-import fr.ans.api.sign.esignsante.psc.model.Result;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
 import fr.ans.api.sign.esignsante.psc.utils.FileResource;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
-import fr.ans.api.sign.esignsante.psc.utils.PSCTokenResult;
-import fr.ans.api.sign.esignsante.psc.utils.PSCTokenStatus;
 import fr.ans.api.sign.esignsante.psc.utils.ParametresSign;
 import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
@@ -57,12 +49,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements AsksignatureApiDelegate {
 
+	/*
+	 * Appel esignSanteWebservices 
+	 * liste Cas, contrôles et demandes de signatures
+	 */
 	@Autowired
 	EsignsanteCall esignWS;
 
+	/*
+	 * Acces à MOngoDB 
+	 * Archivage de la preuve sur une demande de signature
+	 */
 	@Autowired
 	PreuveDAO dao;
 
+	/*
+	 * Appel ProSanteConnect pour vérifiacation
+	 * de la validité de l'accessToken
+	 * (Introspection)
+	 */
 	@Autowired
 	ProsanteConnectCalls pscApi;
 
@@ -73,223 +78,29 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Pades");
-		// ResponseEntity<Resource> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		log.error("!!bypass du controle Accpet Haader sur une demande de signature PADES");
 
-		log.error("!!bypass du controle Accpet HEader sur une demande de signature XADES");
-//		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-//				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
-//			msgError = "Le header doit contenir s application/json et application/pdf";
-//			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}", getAcceptHeaders());
-//			return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-//		}
+		ESignSanteSignatureReportWithProof report = executeAskSignature(
+				TYPE_SIGNATURE.PADES, accessToken, file, userinfo);
 
-		ParametresSign params = prepareAppelEsignWS(accessToken, file, userinfo);
-//		 if (! params.getStatus().equals(HttpStatus.OK)) {
-//			 return new ResponseEntity<>(params.getStatus());
-//			}
-
-		// verification du type de fichier
-		if (!(checkTypeFile(params.getFileToSign()).equals(Helper.APPLICATION_PDF))) {
-			return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-		}
-
-		log.debug(
-				"Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
-				params.getPscReponse(), params.getFileToSign().getName(),
-				params.getUserinfo().getSubjectOrganization());
-		// construction du OpenIDToken
-		UserInfo user = params.getUserinfo();
-		List<OpenidToken> openidTokens = new ArrayList<OpenidToken>();
-		OpenidToken openidToken = new OpenidToken();
-		openidToken.setAccessToken(accessToken);
-		openidToken.setIntrospectionResponse(params.getPscReponse());
-		openidToken.setUserInfo(userinfo);
-		openidTokens.add(openidToken);
-
-		List<String> signers = new ArrayList<String>();
-
-		log.debug("openidtoken[0] transmis à esignWS:");
-		log.debug("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
-		log.debug("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
-		log.debug("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
-
-//		////////////////////////////////////////////////////////////////////////////////////////////////
-		log.debug("Appel esignWS pour une signature PADES");
-		ESignSanteSignatureReportWithProof report = null;
-		try {
-			report = esignWS.signaturePades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
-		} catch (RestClientException e) {
-			log.error("RestClientException  lors d'un appel à esignsante ");
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
-		}
-//		///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// archivage BDD
-		try {
-			archivagePreuve(report, params.getRequestID(), user, params.getDate());
-		} catch (Exception e) {
-			log.error("Exception lors de l'archivage en BDD ");
-//			log.error("e.msg {} \t classe: {}", e.getMessage(), e.getClass());
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
-		}
-
-//		// Formatage retour
 		String signedStringBase64 = report.getDocSigne();
-		// log.debug("signedStringBase64 {}", signedStringBase64);
-		String signedString = null;
+		byte[] signedDoc = null;
+		
 		try {
-			signedString = Helper.decodeBase64(signedStringBase64);
+			signedDoc = Helper.decodeBase64toByteArray(signedStringBase64);
 		} catch (UnsupportedEncodingException e) {
-			log.error("PADES: pb decodage base 64 du fichier signeré");
 			e.printStackTrace();
+			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		log.debug("signedString {}", signedString);
-
-		FileResource docRetourned = new FileResource(signedString.getBytes(), "SIGNED" + file.getOriginalFilename());
-//		Resource resource = new ByteArrayResource(signedString.getBytes());
-		// return new ResponseEntity<>(resource, HttpStatus.OK);
-
+		Resource resource = new FileResource(signedDoc, "TODO");
+		
+		// reponse avec type en retour
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_PDF);
-		return new ResponseEntity<Resource>(docRetourned, httpHeaders, HttpStatus.OK);
+		return new ResponseEntity<org.springframework.core.io.Resource>(resource, httpHeaders, HttpStatus.OK);
+
 	}
 
-	@Override
-//	public ResponseEntity<String> /* ResponseEntity<Document> */ postAsksignatureXades(
-//			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
-//			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
-//			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
-//
-//		log.debug("Réception d'une demande de signature Xades");
-//		// SI pas interception de Spring -> TODO créer nouvelle methode au lieu de 2
-//		// appels ...
-//		log.error("!!bypass du controle Accpet HEader sur une demande de signature XADES");
-////		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-////				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)) == false) {
-////			msgError = "Le header doit contenir s application/json et application/xml";
-////			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}", getAcceptHeaders());
-////			return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-////		}
-//
-//		// Vérification des paramètres, appel PSC, formatge des paramètres pour esignWS
-//		 ParametresSign params = prepareAppelEsignWS(accessToken, file, userinfo);
-////		 if (! params.getStatus().equals(HttpStatus.OK)) {
-////			 return new ResponseEntity<>(params.getStatus());
-////			}
-//
-//		 //jusrte pour trace du type de fichier en debug
-//		 checkTypeFile(params.getFileToSign());
-//		 
-//	 log.debug("Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
-//			 params.getPscReponse(), params.getFileToSign().getName(), params.getUserinfo().getSubjectOrganization());
-//		// construction du OpenIDToken
-//		 UserInfo user = params.getUserinfo();
-//		List<OpenidToken> openidTokens = new ArrayList<OpenidToken>();
-//		OpenidToken openidToken = new OpenidToken();
-//		openidToken.setAccessToken(accessToken);
-//		openidToken.setIntrospectionResponse(params.getPscReponse());
-//		openidToken.setUserInfo(userinfo);
-//		openidTokens.add(openidToken);
-//
-//		List<String> signers = new ArrayList<String>();
-//	
-//			////////////////////////////////////////////////////////////////////////////////////////////////
-//		    log.debug("openidtoken[0] transmis à esignsanteWS:");
-//		    log.debug("\t userinfo (base64): {} ",openidTokens.get(0).getUserInfo());
-//		    log.debug("\t accessToken: {} ",openidTokens.get(0).getAccessToken());
-//		    log.debug("\t PSCResponse: {} ",openidTokens.get(0).getIntrospectionResponse());
-//		
-//			ESignSanteSignatureReportWithProof report = null;
-//			try {
-//				report = esignWS.signatureXades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
-//			} catch (RestClientException e) {
-//				throwExceptionRequestError(e,
-//						"Exception sur appel esignWS. Service inaccessible",
-//						HttpStatus.SERVICE_UNAVAILABLE);			}
-//			///////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//			log.debug("retour appel esignsante xades - formatage de la réponse");
-//			log.debug("report ... \n \tValide {} \n \tErrors {} ", report.isValide(),
-//					report.getErreurs());
-//
-//
-//			// archivage BDD
-//			try {
-//			archivagePreuve(report, params.getRequestID(),user, params.getDate());
-//			} catch (Exception e) {
-//				throwExceptionRequestError(e,
-//						"Requête abandonnée pour problème d'archivage de la preuve en base de données. Base inaccessible",
-//						HttpStatus.SERVICE_UNAVAILABLE);
-//			}
-//
-//
-//			String signedStringBase64 = report.getDocSigne();
-//
-//			String signedString = null;
-//			try {
-//				signedString = Helper.decodeBase64(signedStringBase64);
-//			} catch (UnsupportedEncodingException e) {			
-//				e.printStackTrace();
-//				throwExceptionRequestError(e,
-//						"Exception Serveur",
-//						HttpStatus.INTERNAL_SERVER_ERROR);
-//	
-//			}
-//			log.debug("signedString {}", signedString);
-//
-////			File fileOut  = new File();
-////			Path pathOut = new Pat
-////					
-////			pathOut = Files.writeString(Path.of("my", "path"), signedString, StandardCharset.UTF_8);
-////			
-////			signedDoc.setFile(resource);
-////			Resource resource = fileOut;
-////			FileWriter writer = new FileWriter(fileOut);
-////			writer.write(signedString);
-////			writer.close();
-//
-//			///////////////////////////////////////////////
-//			// test avec FIle
-////			 File tmpFile = File.createTempFile("response", ".xml");
-////			    FileWriter writer = new FileWriter(tmpFile);
-////			    writer.write(signedString);
-////			    writer.close();
-////			 log.debug("écriture du fichier tmp");
-////			 log.debug("File name {} exist {} path {} length {} " ,tmpFile.getName(), tmpFile.exists(), tmpFile.getAbsolutePath(),
-////					 tmpFile.length());
-////			 
-////			 Resource resourceOut = new FileSystemResource(tmpFile);
-////			    signedDoc.setFile(resourceOut);
-////			    log.debug("ICI");
-//			// re = new ResponseEntity<>(signedDoc, HttpStatus.OK);
-//			// FIN test avec FIle
-//			///////////////////////////////////////////////
-//
-//			//////////////////////////////////////////////
-//			// test avec Input Stream
-//			/*
-//			 * InputStream targetStream = new ByteArrayInputStream(signedString.getBytes());
-//			 * Document returned = new Document(); returned.setFile(new
-//			 * InputStreamResource(targetStream));
-//			 */
-//
-//			////////////////////////////////////////////////
-//			// test ....
-////			Resource resource = new ByteArrayResource(signedString.getBytes());
-////			Document returned = new Document();
-////			returned.setFile(resource);
-//			
-//			//reponse 'simple'
-//			//return new ResponseEntity<>(signedString, HttpStatus.OK);
-//			//reponse avec type en retour
-//			 HttpHeaders httpHeaders = new HttpHeaders();
-//			 httpHeaders.setContentType(MediaType.APPLICATION_XML);
-//			return  new ResponseEntity<>(signedString,httpHeaders, HttpStatus.OK);	
-//
-//	}
-//	
 
 	public ResponseEntity<String> /* ResponseEntity<Document> */ postAsksignatureXades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
@@ -314,7 +125,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		String signedString = null;
 		try {
-			signedString = Helper.decodeBase64(signedStringBase64);
+			signedString = Helper.decodeBase64toString(signedStringBase64);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -327,81 +138,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		httpHeaders.setContentType(MediaType.APPLICATION_XML);
 		return new ResponseEntity<>(signedString, httpHeaders, HttpStatus.OK);
 
-//			File fileOut  = new File();
-//			Path pathOut = new Pat
-//					
-//			pathOut = Files.writeString(Path.of("my", "path"), signedString, StandardCharset.UTF_8);
-//			
-//			signedDoc.setFile(resource);
-//			Resource resource = fileOut;
-//			FileWriter writer = new FileWriter(fileOut);
-//			writer.write(signedString);
-//			writer.close();
-
-		///////////////////////////////////////////////
-		// test avec FIle
-//			 File tmpFile = File.createTempFile("response", ".xml");
-//			    FileWriter writer = new FileWriter(tmpFile);
-//			    writer.write(signedString);
-//			    writer.close();
-//			 log.debug("écriture du fichier tmp");
-//			 log.debug("File name {} exist {} path {} length {} " ,tmpFile.getName(), tmpFile.exists(), tmpFile.getAbsolutePath(),
-//					 tmpFile.length());
-//			 
-//			 Resource resourceOut = new FileSystemResource(tmpFile);
-//			    signedDoc.setFile(resourceOut);
-//			    log.debug("ICI");
-		// re = new ResponseEntity<>(signedDoc, HttpStatus.OK);
-		// FIN test avec FIle
-		///////////////////////////////////////////////
-
-		//////////////////////////////////////////////
-		// test avec Input Stream
-		/*
-		 * InputStream targetStream = new ByteArrayInputStream(signedString.getBytes());
-		 * Document returned = new Document(); returned.setFile(new
-		 * InputStreamResource(targetStream));
-		 */
-
-		////////////////////////////////////////////////
-		// test ....
-//			Resource resource = new ByteArrayResource(signedString.getBytes());
-//			Document returned = new Document();
-//			returned.setFile(resource);
-
-		// reponse 'simple'
-		// return new ResponseEntity<>(signedString, HttpStatus.OK);
-
 	}
-
-//	private PSCTokenResult checkPSCToken(String token) {
-//		PSCTokenResult retour = new PSCTokenResult(PSCTokenStatus.TECH_ERROR, "Reponse non connue");
-//		try {
-//			String result = pscApi.isTokenActive(token);
-//			retour.setStatus(Helper.parsePSCresponse(result));
-//			retour.setPscResponse(result);
-//			log.debug("Appel PSC intropesction: token= {}  reponse = {}  PSCTokenStatus = {}", token, retour.getPscResponse(),
-//					retour.getStatus());
-//			log.error("!!!!!!!!!!  ICI BYPASS => ON force le status du Token à valid ...");
-//			/////////////////////////////////////////////////////////////////////////
-//			       retour.setStatus(PSCTokenStatus.VALID);
-//			/////////////////////////////////////////////////////////////////////////
-//		} catch (JsonProcessingException e1) {
-//			log.error("Exception sur introspection PSC token= {}  erreur: JsonProcessingException \n {}", token, e1.getMessage());
-//			e1.printStackTrace();
-//			retour.setStatus(PSCTokenStatus.TECH_ERROR);
-//		} catch (UnsupportedEncodingException e1) {
-//			log.error("Exception sur introspection PSC token= {}  erreur: UnsupportedEncodingException \n {}",token,  e1.getMessage());
-//			e1.printStackTrace();
-//			retour.setStatus(PSCTokenStatus.TECH_ERROR);
-//		} catch (URISyntaxException e1) {
-//			log.error("Exception sur introspection PSC token= {} erreur: URISyntaxException \n {}", token, e1.getMessage());
-//			e1.printStackTrace();
-//			retour.setStatus(PSCTokenStatus.TECH_ERROR);
-//		}
-//		return retour;
-//	}
-//	
 
 	private String checkPSCToken(String token) {
 		// PSCTokenResult retour = new PSCTokenResult(PSCTokenStatus.TECH_ERROR,

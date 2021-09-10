@@ -43,7 +43,8 @@ public class HelperTest {
 	}
 	  
 	}
-	
+
+	/*
 	@Test
 	public void decodeBase64()  {
 	   String test;
@@ -58,7 +59,7 @@ public class HelperTest {
 	}
 	   
 	}
-	
+	*/
 	@Test
 	public void converterErrorErreurTest() {
 		log.debug("test conversion Erreur(esignsante) en Error (esigsante-psc");

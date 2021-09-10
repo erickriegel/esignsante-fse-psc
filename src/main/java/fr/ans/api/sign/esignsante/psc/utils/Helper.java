@@ -66,12 +66,15 @@ public class Helper {
 		return Base64.getEncoder().encodeToString(stringToEncode.getBytes("UTF-8") );
 	}
 
-	public static String decodeBase64(String stringToDecode) throws UnsupportedEncodingException {
+	public static String decodeBase64toString(String stringToDecode) throws UnsupportedEncodingException {
 		byte[] decodedBytes = Base64.getDecoder().decode(stringToDecode);
-		//return new String(decodedBytes);
-			return new String(decodedBytes, "UTF-8");
+		return new String(decodedBytes, "UTF-8"); //new String(decodedBytes);
 	}
 
+	public static byte[] decodeBase64toByteArray(String stringToDecode) throws UnsupportedEncodingException {
+		return Base64.getDecoder().decode(stringToDecode);	
+	}
+	
 	public static List<Error> mapListErreurToListError(List<Erreur> erreurs) {
 
 		// List<Error> errors = new ArrayList<Error>();
@@ -88,11 +91,11 @@ public class Helper {
 	}
 	
 	public static UserInfo jsonBase64StringToUserInfo(String sUserInfoEncodedBase64) throws JsonMappingException, JsonProcessingException, UnsupportedEncodingException  {
-		return new ObjectMapper().readValue(Helper.decodeBase64(sUserInfoEncodedBase64), UserInfo.class);  	
+		return new ObjectMapper().readValue(Helper.decodeBase64toString(sUserInfoEncodedBase64), UserInfo.class);  	
 	}
 
 	public static Map<String,String> jsonStringBase64ToPartialMap(String sUserInfoBase64Json) throws JsonProcessingException, UnsupportedEncodingException, IllegalArgumentException {
-		final ObjectNode node = new ObjectMapper().readValue(Helper.decodeBase64(sUserInfoBase64Json), ObjectNode.class);
+		final ObjectNode node = new ObjectMapper().readValue(Helper.decodeBase64toString(sUserInfoBase64Json), ObjectNode.class);
 		Boolean allFieldsExist = true;
 		log.debug("jsonStringToPartialMap IN");
 		Map<String, String> data = new HashMap<String, String>();
