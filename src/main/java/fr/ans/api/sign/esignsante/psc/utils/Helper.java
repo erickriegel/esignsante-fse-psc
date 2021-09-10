@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 //import org.bson.BsonDocument;
 import org.bson.Document;
+import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -138,8 +139,8 @@ public class Helper {
 		return data;  	
 	}
 
-	public static PSCTokenStatus parsePSCresponse(String reponsePSC) {
-		PSCTokenStatus retour = PSCTokenStatus.INVALID;
+	public static HttpStatus parsePSCresponse(String reponsePSC) {
+		HttpStatus retour = HttpStatus.INTERNAL_SERVER_ERROR;
 		log.debug("parsePSCresponse IN with {}" , reponsePSC);
 
 		ObjectNode node;
@@ -147,22 +148,27 @@ public class Helper {
 			node = new ObjectMapper().readValue(reponsePSC, ObjectNode.class);
 
 			if (node.has(TOKEN_ACTIVE_FIELD)) {   
-				if (node.get(TOKEN_ACTIVE_FIELD).asText().equalsIgnoreCase(TOKEN_ACTIVE_TRUE)) {
-					retour = PSCTokenStatus.VALID;
+                 String token_active_field = node.get(TOKEN_ACTIVE_FIELD).asText();
+				if (token_active_field.equalsIgnoreCase(TOKEN_ACTIVE_TRUE)) {
+					retour = HttpStatus.OK;
+				}
+				else 
+                {
+					retour = HttpStatus.BAD_REQUEST;	
 				}
 			}
-			else {
-				retour = PSCTokenStatus.FIELD_NOT_FOUND;
+			else { 
+				retour = HttpStatus.INTERNAL_SERVER_ERROR;
 				log.error("Reponse invalide introspection PSC: champ {} non trouvé", Helper.TOKEN_ACTIVE_FIELD);
 			}
 
 		} catch (Exception e) {
 			log.error("Erreur technique durant le parse de la reponse d'intropection PSC: champ {} ", e.getMessage());
 			e.printStackTrace();
-			retour = PSCTokenStatus.TECH_ERROR;
+			retour = HttpStatus.INTERNAL_SERVER_ERROR;
 		} 
 		
-		log.debug("parsePSCresponse OUT status =  {}" , retour.getPSCTokenStatus());
+		log.debug("parsePSCresponse OUT status =  {}" , retour);
 		return retour;
 	}
 }

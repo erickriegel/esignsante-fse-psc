@@ -13,13 +13,13 @@ import lombok.Setter;
 @Setter
 public class ParametresSign {
 
-	private HttpStatus status = HttpStatus.OK;
+	//private HttpStatus status = HttpStatus.OK;
 	
-	private String msg = "";
+	//private String msg = "";
 	
 	private UserInfo userinfo = null;
 	
-	private PSCTokenResult pscReponse = null;
+	private String pscReponse = "reponse intropesction non connue";
 		
 	private String requestID = "";
 	

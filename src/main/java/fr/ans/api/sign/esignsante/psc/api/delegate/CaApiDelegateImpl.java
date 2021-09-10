@@ -26,28 +26,24 @@ public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDeleg
 	
 	@Override
 	public ResponseEntity<List<String>> getCa()   {
-		log.trace(" Réception d'une demande des CAs");
-		ResponseEntity<List<String>>  re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-		
-		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
-			log.debug("Demande getCa rejetée (NOT_IMPLEMENTED) Accept Head = APPLICATION/JSON non présent");			
-			return re;
-		}
+		log.debug(" Réception d'une demande des CAs");
+  
+		//le contrôle des headers 'accept' est géré par Spring			
+//		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+//			throwExceptionRequestError(
+//					"Header 'accept' non conforme: attendu application/json",
+//					HttpStatus.NOT_ACCEPTABLE);
+//		}
      
 		List<String> results = null;
 		try {
 		 results = esignWS.getCA();
 		} catch (ResourceAccessException e) {		
-			log.error("Exception sur demande de CA (appel esignWS) {}" , e.getMessage());
-			// return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
-			fr.ans.api.sign.esignsante.psc.model.Error erreur =new fr.ans.api.sign.esignsante.psc.model.Error();
-			erreur.setCode(HttpStatus.SERVICE_UNAVAILABLE.toString());
-			erreur.setMessage("Problème lors de l'appel à esignWebservices \n " + e.getMessage() );
-			throw new EsignPSCRequestException(erreur, HttpStatus.SERVICE_UNAVAILABLE);
+			throwExceptionRequestError(e,
+					"Exception sur appel esignWS. Service inaccessible",
+					HttpStatus.SERVICE_UNAVAILABLE);
 		}
-		
-		re = new ResponseEntity<>(results, HttpStatus.OK);
-		return re;
+		log.debug(" Demande des CAs traitée avec succès");
+		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 }

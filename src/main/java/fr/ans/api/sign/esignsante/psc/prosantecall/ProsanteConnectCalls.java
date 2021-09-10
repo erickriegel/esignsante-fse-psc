@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,6 @@ import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 
 
-@Configuration
 @Slf4j
 @Service
 public class ProsanteConnectCalls {
@@ -36,7 +36,11 @@ public class ProsanteConnectCalls {
 	public String pscClientID;
 
 	@Value("${psc.clientSecret}")
-	public String pscSecret;
+	public  String pscSecret;
+	
+	@Value("#{new Boolean('${psc.bypass}')}")
+	public Boolean pscBypass = false;
+	
 	
 	private /*public*/ HttpHeaders getHeaders () throws UnsupportedEncodingException
     {
@@ -63,8 +67,9 @@ public class ProsanteConnectCalls {
 
 	public String isTokenActive(String accessToken) throws URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
 		RestTemplate restTemplate = new RestTemplate();
-		log.trace("uri connection à ProSanteConnect: {}", pscUrl);
-		log.trace("ClientID pour proSanteConnect: {}", pscClientID);
+		log.debug("uri connection à ProSanteConnect: {}", pscUrl);
+		log.debug("ClientID pour proSanteConnect: {}", pscClientID);
+		log.debug("Bypass resultat Introspection: {}", pscBypass);
 		URI uri = new URI(pscUrl);      		
 
 		//payload
@@ -76,8 +81,10 @@ public class ProsanteConnectCalls {
 
 	log.trace("Appel ProSanteConnect REsponse: StatusCode {} \n body: {}",
 			 result.getStatusCode(), result.getBody() );
-
-		return result.getBody();
-		
+		return result.getBody();	
+	}
+	public Boolean bypassResultatPSC() {
+		log.debug(" Bypass resultat de PSC: {}", pscBypass);
+		return pscBypass;
 	}
 }

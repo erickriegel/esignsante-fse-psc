@@ -11,12 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.tika.Tika;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -93,8 +95,10 @@ abstract public class AbstractApiDelegate {
 			fileToCheck = multipartFileToFile(file);
 			log.debug("fileToCheck isFile: {} \t name: {} \t length {}",  fileToCheck.isFile(), fileToCheck.getName(), fileToCheck.length());
 		} catch (IOException e) {
-			e.printStackTrace();			
-			msgError = e.getMessage();
+			e.printStackTrace();
+			throwExceptionRequestError(e,
+					"Erreur dans la lecture du fichier reçu",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return fileToCheck;
 	}
@@ -117,9 +121,11 @@ abstract public class AbstractApiDelegate {
 		 try {
 			detectedType = tika.detect(fichierAtester);
 			log.debug("Verification du fichier {} type detecté: {}", fichierAtester.getName(),detectedType);
-		} catch (IOException e) {
-			log.debug("Execption sur vérification du type de fichier transmis");			
+		} catch (IOException e) {		
 			e.printStackTrace();
+			throwExceptionRequestError(e,
+					"Execption sur vérification du type de fichier transmis",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		 return detectedType;
 	}
@@ -132,5 +138,20 @@ abstract public class AbstractApiDelegate {
 //		return convFile;
 //	}
 	
+	protected void throwExceptionRequestError(Exception e, String msg, HttpStatus status) {
+		log.error("Requête en echec. Message retourné à l'utilisateur: {}", msg );
+		log.error("classe Exception: {}" , e.getClass().getName());
+		log.error("cause de l'eException: {}" , e.getCause());
+		log.error("message de l'exception {}" , e.getMessage()); 
+		throwExceptionRequestError(msg, status);
+	}
+	
+	protected void throwExceptionRequestError(String msg, HttpStatus status) {
+		fr.ans.api.sign.esignsante.psc.model.Error erreur =new fr.ans.api.sign.esignsante.psc.model.Error();
+		erreur.setCode(status.toString());
+		erreur.setMessage(msg);
+		throw new EsignPSCRequestException(erreur, status);
+
+	}
 	
 }
