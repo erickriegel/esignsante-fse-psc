@@ -30,12 +30,16 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.nimbusds.common.contenttype.ContentType;
 
+// pour COnfigWireMock -> https://stackoverflow.com/questions/46403420/import-static-com-github-tomakehurst-wiremock-core-wiremockconfiguration-wiremoc
+//import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+
 /**
  * Test des EndPoints offerts par l'API esignsante-psc.
  */
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // pour restdocs
 @SpringBootTest //(properties = "file.encoding=UTF-8")
 @AutoConfigureMockMvc
+
 public class CAApiIntegrationTest {
 
 	 private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
@@ -62,18 +66,31 @@ public class CAApiIntegrationTest {
      * Demande de la liste des CAs.
      *
      * @throws Exception the exception
-     */
-   @Test
+     */ 
+ //  @Test
     @DisplayName("Demande de la liste des CAs.")
     public void caGetTest() throws Exception {
    
+	   final String body = "";
      	      	    
-    	ResultActions returned = mockMvc.perform(get("/v1/ca").accept("application/json"));    			
-   //     	    .andExpect(status().isOk());
+    	ResultActions returned = mockMvc.perform(get("/v1/ca").accept("application/json"))   			
+     	    .andExpect(status().isOk()).andExpect(content().json(body)) ;
     	
        	  returned.andDo(print()); //pour debug console: a supprimer
     	  returned.andDo(document("CA/OK")); //RestDcos
     }   
    
+   @Test
+   @DisplayName("Demande de la liste des CAs. Cas non passant esignWS OFF")
+   public void caGet_esignWS_OFFTest() throws Exception {
   
+    	      	    
+   	ResultActions returned = mockMvc.perform(get("/v1/ca").accept("application/json"))    			
+      	    .andExpect(status().isServiceUnavailable());
+   	
+      	  returned.andDo(print()); //pour debug console: a supprimer
+   	  returned.andDo(document("CA/esginWS_OFF")); //RestDcos
+   }   
+   
+   
 }

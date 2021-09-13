@@ -42,6 +42,7 @@ public class MongoDBConfig {
 	public MongoTemplate mongoTemplate() throws IOException {
 		MongoClient mongoClient = MongoClients.create( "mongodb://"+ mongoHost + ":" + mongoPort );
 		log.info("création d'une connexion à MongoDB avec   mongodb://"+ mongoHost + ":" + mongoPort + " mongoDatabase: " + mongoDatabase);
+		
 		return new MongoTemplate(mongoClient, mongoDatabase);
 	}
 	

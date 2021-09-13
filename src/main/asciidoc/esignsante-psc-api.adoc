@@ -39,24 +39,6 @@ include::{snippets}/Liste_des_services/OK/http-response.adoc[]
 Payload:
 include::{snippets}/Liste_des_services/OK/response-body.adoc[]
 
-=== cas passant 2 header 'accept'
-
-http:
-include::{snippets}/Liste_des_services/OK_BIS/http-request.adoc[]
-
-httpIE:
-include::{snippets}/Liste_des_services/OK_BIS/httpie-request.adoc[]
-
-Requête avec curl
-include::{snippets}/Liste_des_services/OK_BIS/curl-request.adoc[]
-
-.response
-include::{snippets}/Liste_des_services/OK_BIS/http-response.adoc[]
-
-Payload:
-include::{snippets}/Liste_des_services/OK_BIS/response-body.adoc[]
-
-
 === cas non passant mauvais header accept
 
 http:
@@ -91,37 +73,74 @@ include::{snippets}/CA/OK/http-response.adoc[]
 payload:
 include::{snippets}/CA/OK/response-body.adoc[]
 
+=== cas non passant mauvais header accept
+
+http:
+include::{snippets}/CA/KO_NotAcceptable/http-request.adoc[]
+
+httpIE:
+include::{snippets}/CA/KO_NotAcceptable/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/CA/KO_NotAcceptable/curl-request.adoc[]
+
+.response
+include::{snippets}/CA/KO_NotAcceptable/http-response.adoc[]
+
+Payload:
+include::{snippets}/CA/Liste_des_services/KO_NotAcceptable/response-body.adoc[]
+
+=== cas non passant esignsanteWebservices non disponible
+
+http:
+include::{snippets}/CA/esginWS_OFF/http-request.adoc[]
+
+httpIE:
+include::{snippets}/CA/esginWS_OFF/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/CA/esginWS_OFF/curl-request.adoc[]
+
+.response
+include::{snippets}/CA/esginWS_OFF/http-response.adoc[]
+
+Payload:
+include::{snippets}/CA/esginWS_OFFresponse-body.adoc[]
+
+
+
+== Demande de signature XADES
 
 === Cas Token Invalid
 .request
-include::{snippets}/signature/TokenKo/http-request.adoc[]
+include::{snippets}/signature/XADES/TokenKo/http-request.adoc[]
 
 payload:
-include::{snippets}/signature/TokenKo/request-body.adoc[]
+include::{snippets}/signature/XADES/TokenKo/request-body.adoc[]
 
 
 .response
-include::{snippets}/signature/TokenKo/http-response.adoc[]
+include::{snippets}/signature/XADES/TokenKo/http-response.adoc[]
 
 === Cas Header Accept non Json
 .request
-include::{snippets}/signature/HeaderKO/http-request.adoc[]
+include::{snippets}/signature/XADES/HeaderKO/http-request.adoc[]
 
 payload:
-include::{snippets}/signature/HeaderKO/request-body.adoc[]
+include::{snippets}/signature/XADES/HeaderKO/request-body.adoc[]
 
 
 .response
-include::{snippets}/signature/HeaderKO/http-response.adoc[]
+include::{snippets}/signature/XADES/HeaderKO/http-response.adoc[]
 
 
 === Cas Stream In KO
 .request
-include::{snippets}/signature/StreamKo/http-request.adoc[]
+include::{snippets}/signature/XADES/StreamKo/http-request.adoc[]
 
 
 .response
-include::{snippets}/signature/StreamKo/http-response.adoc[]
+include::{snippets}/signature/XADES/StreamKo/http-response.adoc[]
 
 
 
