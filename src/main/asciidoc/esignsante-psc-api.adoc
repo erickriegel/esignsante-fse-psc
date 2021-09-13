@@ -22,6 +22,7 @@ start class (from POM properties)=>:: {start-class}
 == Interrogation de l'API
 Liste des services exposés
 
+=== cas passant simple
 .request
 http:
 include::{snippets}/Liste_des_services/OK/http-request.adoc[]
@@ -32,45 +33,63 @@ include::{snippets}/Liste_des_services/OK/httpie-request.adoc[]
 Requête avec curl:
 include::{snippets}/Liste_des_services/OK/curl-request.adoc[]
 
-
-
 .response
 include::{snippets}/Liste_des_services/OK/http-response.adoc[]
 
 Payload:
 include::{snippets}/Liste_des_services/OK/response-body.adoc[]
 
+=== cas passant 2 header 'accept'
+
+http:
+include::{snippets}/Liste_des_services/OK_BIS/http-request.adoc[]
+
+httpIE:
+include::{snippets}/Liste_des_services/OK_BIS/httpie-request.adoc[]
+
+Requête avec curl
+include::{snippets}/Liste_des_services/OK_BIS/curl-request.adoc[]
+
+.response
+include::{snippets}/Liste_des_services/OK_BIS/http-response.adoc[]
+
+Payload:
+include::{snippets}/Liste_des_services/OK_BIS/response-body.adoc[]
 
 
-== Demande de signature (mock pour test rest docs)
+=== cas non passant mauvais header accept
+
+http:
+include::{snippets}/Liste_des_services/KO_NotAcceptable/http-request.adoc[]
+
+httpIE:
+include::{snippets}/Liste_des_services/KO_NotAcceptable/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/Liste_des_services/KO_NotAcceptable/curl-request.adoc[]
+
+.response
+include::{snippets}/Liste_des_services/KO_NotAcceptable/http-response.adoc[]
+
+Payload:
+include::{snippets}/Liste_des_services/KO_NotAcceptable/response-body.adoc[]
+
+
+== Demande de la liste des Cas
 
 === Cas passant
 .request
-include::{snippets}/signature/OK/http-request.adoc[]
+include::{snippets}/CA/OK/http-request.adoc[]
 
 payload:
-include::{snippets}/signature/OK/request-body.adoc[]
+include::{snippets}/CA/OK/request-body.adoc[]
 
 
 .response
-include::{snippets}/signature/OK/http-response.adoc[]
+include::{snippets}/CA/OK/http-response.adoc[]
 
 payload:
-include::{snippets}/signature/OK/response-body.adoc[]
-
-=== Cas passant 2
-.request
-include::{snippets}/signature/OK2/http-request.adoc[]
-
-payload:
-include::{snippets}/signature/OK2/request-body.adoc[]
-
-
-.response
-include::{snippets}/signature/OK2/http-response.adoc[]
-
-payload:
-include::{snippets}/signature/OK2/response-body.adoc[]
+include::{snippets}/CA/OK/response-body.adoc[]
 
 
 === Cas Token Invalid

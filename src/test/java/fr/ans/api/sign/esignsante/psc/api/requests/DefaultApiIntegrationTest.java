@@ -1,6 +1,7 @@
 package fr.ans.api.sign.esignsante.psc.api.requests;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,9 +23,12 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.nimbusds.common.contenttype.ContentType;
 
 /**
  * Test des EndPoints offerts par l'API esignsante-psc.
@@ -67,23 +71,37 @@ public class DefaultApiIntegrationTest {
     	
        	    
     	
-    	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/json")
-    			.contentType(MediaType.APPLICATION_JSON))
+    	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/json"))    			
         	    .andExpect(status().isOk()).andExpect(content().json(body));
     	
         // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
     	  returned.andDo(print()); //pour debug console: a supprimer
-    	  returned.andDo(document("Liste_des_services/OK"));
+    	  returned.andDo(document("Liste_des_services/OK")); //RestDcos
     }   
    
- //  @Test
+   @Test
    @DisplayName("Lecture des Headers 'accept'")
    public void rootGetTestBadAcceptHeader() throws Exception {
       	      	
-   	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml")
-   			.contentType(MediaType.APPLICATION_JSON))
-       	    .andExpect(status().isNotImplemented()); //501 dans le code mais 406 en fait (NOT_ACCEPTABLE)...
+   	ResultActions returned = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML)).andExpect(status().isNotAcceptable());
    	
+   	returned.andDo(print()); //pour debug console: a supprimer
+	  returned.andDo(document("Liste_des_services/KO_NotAcceptable")); 
+	  
+	  
+   	//ResultActions toto = mockMvc.perform(get("/v1/"));
+   	MvcResult titi = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_JSON)).andReturn();
+   	assertTrue(titi.getResponse().getHeaderValues("Content-Type").size()==1);
+   	System.out.println("MediaType.APPLICATION_JSON.getType(): " + MediaType.APPLICATION_JSON.getType());
+   	System.out.println("getResponse().getHeaderValues" + titi.getResponse().getHeaderValues("Content-Type").get(0));
+   	assertTrue(titi.getResponse().getHeaderValues("Content-Type").get(0).equals("application/json"));
+   	
+//   	returned  = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML))
+//		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//		.andExpect()
+//		returned.andDo(print()); //pour debug console: a supprimer
+//  	     returned.andDo(document("Liste_des_services/KO")); //RestDcos
+	
    }
    
    
@@ -91,9 +109,10 @@ public class DefaultApiIntegrationTest {
    @DisplayName("Multiple Headers 'accept'")
    public void rootGetTestMultipledAcceptHeader() throws Exception {
       	      	
-   	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml").accept("application/json")
-   			.contentType(MediaType.APPLICATION_JSON))
-       	    .andExpect(status().isOk()); 
+   	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml").accept("application/json"))
+   			     	    .andExpect(status().isOk());
+   	returned.andDo(print()); //pour debug console: a supprimer
+	  returned.andDo(document("Liste_des_services/OK_BIS"));  	    
    } 
 
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -191,6 +193,17 @@
 			<version>2.1.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.github.tomakehurst/wiremock -->
+		<!-- mock des appels WS esignWS et ProSanteConnect -->
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>2.27.2</version>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 
 
@@ -233,8 +246,8 @@
 						</goals>
 
 						<configuration>
-
-							<sourceDocumentName>esignsante-psc-api.adoc</sourceDocumentName> <!-- CJU doit être dans src/main/asciidoc et contenir les snippets à intégrer -->
+							<!-- ce fichier doit être dans src/main/asciidoc qui doit contenir les snippets à intégrer -->
+							<sourceDocumentName>esignsante-psc-api.adoc</sourceDocumentName> 
 
 							<backend>html</backend>
 							<doctype>book</doctype>
@@ -246,9 +259,7 @@
 								<sectanchors>true</sectanchors>
 								<!-- set the idprefix to blank -->
 								<idprefix />
-
-
-								<snippets>${project.build.directory}/generated-snippets</snippets> <!-- CJU -->
+								<snippets>${project.build.directory}/generated-snippets</snippets> 
 							</attributes>
 
 							<!-- CJU TODO ASCIIDOC -->
@@ -434,13 +445,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- assembly -->
-			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
-				<descriptors> <descriptor>src/main/assembly/install.xml</descriptor> <descriptor>src/main/assembly/directories.xml</descriptor> 
-				</descriptors> </configuration> </plugin> -->
-			<!-- FIN assembly -->
-
-			<!-- license pour Hook SVN -->
+						<!-- license pour Hook SVN -->
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -463,37 +468,7 @@
 			</plugin>
 			<!-- FIN license pour Hook SVN -->
 
-			<!-- pour executer les tests dans la phase d'intégration et non la phase 
-				de test (plugin de démarrage de Embeded MongoDB) -->
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<!-- <version>2.22.0</version> -->
-				<configuration>
-					<skipTests>true</skipTests>
-
-				</configuration>
-				<executions>
-					<execution>
-
-						<phase>integration-test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<skipTests>false</skipTests>
-
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>>maven-failsafe-plugin</artifactId> 
-				<configuration> <includes> <include>**/*Test.java</include> </includes> </configuration> 
-				<executions> <execution> <goals> <goal>integration-test</goal> <goal>verify</goal> 
-				</goals> </execution> </executions> </plugin> -->
-
-			<!-- FIN pour executer les tests dans la phase d'intégration et non la 
-				phase de test (plugin de démarrage de Embeded MongoDB) -->
-
+			
 			<!-- demarrage- arret EmbeddedMongoDB pour les tests -->
 			<!-- exemple de conf ICI: https://github.com/joelittlejohn/embedmongo-maven-plugin -->
 			<plugin>
@@ -503,11 +478,13 @@
 				<executions>
 					<execution>
 						<id>start</id>
+						 <phase>process-test-classes</phase> 
 						<goals>
-							<goal>start</goal>
+							<goal>start</goal>						
 						</goals>
 						<configuration>
 							<port>27017</port>
+							
 							<version>3.4.24</version>
 							<logging>console</logging>
 							<downloadPath>${embededMongoDownloadUrl}</downloadPath>
@@ -515,6 +492,7 @@
 					</execution>
 					<execution>
 						<id>stop</id>
+						<phase>post-integration-test</phase>
 						<goals>
 							<goal>stop</goal>
 						</goals>
