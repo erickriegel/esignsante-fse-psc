@@ -1,17 +1,9 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.ChecksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
-import fr.ans.api.sign.esignsante.psc.model.Document;
+import fr.ans.api.sign.esignsante.psc.model.Error;
 import fr.ans.api.sign.esignsante.psc.model.Result;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
@@ -30,8 +22,6 @@ import fr.ans.esignsante.model.ESignSanteValidationReport;
 import fr.ans.esignsante.model.Erreur;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-
-import fr.ans.api.sign.esignsante.psc.model.Error;
 
 /**
  * Classe DefaultApiDelegateImpl. Implementation des EndPoints /checksignature/*
@@ -48,9 +38,9 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 
 	public ResponseEntity<Result> postChecksignaturePades(
 			@ApiParam(value = "") @Valid @RequestPart(value = "file", required = true) MultipartFile file) {
-		final Optional<String> acceptHeader = getAcceptHeader();
+
 		log.debug("Demande Checksignature Pades reçue");
-	
+
 		return execute(TYPE_SIGNATURE.PADES, file);
 	}
 
@@ -58,7 +48,8 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 	public ResponseEntity<Result> postChecksignatureXades(
 			@ApiParam(value = "") @Valid @RequestPart(value = "file", required = false) MultipartFile file) {
 
-		log.debug("Réception d'une demande Checksignature Xades.");
+		log.debug("Réception d'une demande Checksignature Pades.");
+
 		return execute(TYPE_SIGNATURE.XADES, file);
 	}
 
@@ -74,14 +65,17 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		case "org.springframework.web.client.HttpServerErrorException.NotImplemented":
 			// 501: fichier non xm par exemple
 			log.error("Echec de l'appel à esignsanteWS => HttpServerErrorException.NotImplemented");
-			log.error("\t 501: cause possible: erreur sur le type de fichier fourni (par exemple non xml pour Xades)");
-			status = HttpStatus.NOT_IMPLEMENTED;
+			throwExceptionRequestError(
+					"Echec de l'appel à esignsanteWS. Cause possible: erreur sur le type de fichier fourni (par exemple non xml pour Xades, non PDF pour PADES) ",
+					HttpStatus.NOT_IMPLEMENTED);
 			break;
 
 		case "org.springframework.web.client.ResourceAccessException":
 			// esignWS OFF par exemple
-			log.error("Echec de l'appel à esignsanteWS => ResourceAccessException (esignsante non dispo");
-			status = HttpStatus.SERVICE_UNAVAILABLE;
+			log.error("Exception sur appel esignWS. Service inaccessible");
+			throwExceptionRequestError("Exception sur appel esignWS. Service inaccessible",
+					HttpStatus.SERVICE_UNAVAILABLE);
+
 			break;
 
 		case "org.springframework.web.client.HttpClientErrorException.NotFound":
@@ -89,11 +83,15 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			log.error("Echec de l'appel à esignsanteWS => HttpClientErrorException.NotFound");
 			log.error("\t cause possible: identifiant de configuration esignWS invalid.");
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			throwExceptionRequestError(
+					"Echec de l'appel à esignsanteWS. Cause possible: identifiant de configuration esignWS invalid.) ",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 			break;
 
 		default:
 			// comprend erreur 400: requête mal formée, 404 id conf introuvable.
-			log.error("Echec de l'appel à esignsanteWS: Exception non gérée");
+			throwExceptionRequestError("Echec de l'appel à esignsanteWS: Exception non gérée",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return status;
 	}
@@ -108,41 +106,39 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		Result result = new Result();
 		result.setValid(report.isValide());
 		result.setErrors(errors);
-		
+
 		return result;
 	}
-	
-	
-	private ResponseEntity<Result> execute(TYPE_SIGNATURE typeSignature, MultipartFile file ) {
+
+	private ResponseEntity<Result> execute(TYPE_SIGNATURE typeSignature, MultipartFile file) {
 		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		
-		//controle du acceptheader
+
+		// controle du acceptheader
 		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
-			log.debug("Demande CheckSignature rejetée (NOT_IMPLEMENTED) Accept Head = APPLICATION/JSON non présent");
-			return re;
-		}		
-        
-		//assert file != null; => sinon MultipartException en amont de cette méthode
-		
+			log.debug("Demande CheckSignature rejetée car le header Accept = APPLICATION/JSON non présent");
+			throwExceptionRequestError(
+					"Requête rejetée car le header e fichier transmis semble ne pas être un PDF, type détecté  ",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
 
 		File fileToCheck = getMultiPartFile(file);
 		if (fileToCheck == null) {
-			return re = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+			throwExceptionRequestError("Le fichier signé à contrôler n'a pas pu être lu",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		ESignSanteValidationReport report = null;
 
 		try {
 			if (typeSignature.equals(TYPE_SIGNATURE.XADES)) {
-			report = esignWS.chekSignatureXades(fileToCheck);
-			}
-			else {
+				report = esignWS.chekSignatureXades(fileToCheck);
+			} else {
 				report = esignWS.chekSignaturePades(fileToCheck);
 			}
-		} catch (Exception e) {		
-			return new ResponseEntity<>(interceptErrorCheckSignature(e)); 
+		} catch (Exception e) {
+			interceptErrorCheckSignature(e);
 		}
-		Result result = esignsanteReportToResult(report); 
+		Result result = esignsanteReportToResult(report);
 		re = new ResponseEntity<>(result, HttpStatus.OK);
 
 		return re;

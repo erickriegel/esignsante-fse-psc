@@ -32,43 +32,36 @@ public class FileResource implements Resource{
 
 	@Override
 	public URL getURL() throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public URI getURI() throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public File getFile() throws IOException {
-		
+	public File getFile() throws IOException {	
 		return null;
 	}
 
 	@Override
-	public long contentLength() throws IOException {
-      
+	public long contentLength() throws IOException {     
 		return data.length;
 	}
 
 	@Override
 	public long lastModified() throws IOException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public Resource createRelative(String relativePath) throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getFilename() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

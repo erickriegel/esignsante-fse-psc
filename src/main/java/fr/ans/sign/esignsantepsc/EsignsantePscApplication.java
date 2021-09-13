@@ -10,11 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @EnableWebSecurity
 @SpringBootApplication 
-//@ComponentScan(basePackages = {"fr.ans.api.sign.esignsante.psc.api", "fr.ans.api.sign.esignsante.psc.config",
-//		"fr.ans.api.sign.esignsante.psc.prosanteconnect",
-//		"fr.ans.api.sign.esignsante.psc.storage.repository",
-//		"fr.ans.api.sign.esignsante.psc.esignsantewebservices"})
-
 @ComponentScan(basePackages = {"fr.ans.api.sign.esignsante.psc"})
 
 public class EsignsantePscApplication {

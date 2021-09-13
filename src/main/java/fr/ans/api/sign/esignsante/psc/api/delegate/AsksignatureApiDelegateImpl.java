@@ -6,18 +6,15 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -25,7 +22,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
@@ -50,22 +46,19 @@ import lombok.extern.slf4j.Slf4j;
 public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements AsksignatureApiDelegate {
 
 	/*
-	 * Appel esignSanteWebservices 
-	 * liste Cas, contrôles et demandes de signatures
+	 * Appel esignSanteWebservices liste Cas, contrôles et demandes de signatures
 	 */
 	@Autowired
 	EsignsanteCall esignWS;
 
 	/*
-	 * Acces à MOngoDB 
-	 * Archivage de la preuve sur une demande de signature
+	 * Acces à MOngoDB Archivage de la preuve sur une demande de signature
 	 */
 	@Autowired
 	PreuveDAO dao;
 
 	/*
-	 * Appel ProSanteConnect pour vérifiacation
-	 * de la validité de l'accessToken
+	 * Appel ProSanteConnect pour vérifiacation de la validité de l'accessToken
 	 * (Introspection)
 	 */
 	@Autowired
@@ -78,45 +71,49 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Pades");
-		log.error("!!bypass du controle Accpet Haader sur une demande de signature PADES");
 
-		ESignSanteSignatureReportWithProof report = executeAskSignature(
-				TYPE_SIGNATURE.PADES, accessToken, file, userinfo);
+		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
+				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
+			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}",
+					getAcceptHeaders());
+			throwExceptionRequestError("Le header doit contenir s application/json et application/pdf",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
+		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES, accessToken, file,
+				userinfo);
 
 		String signedStringBase64 = report.getDocSigne();
 		byte[] signedDoc = null;
-		
+
 		try {
 			signedDoc = Helper.decodeBase64toByteArray(signedStringBase64);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		Resource resource = new FileResource(signedDoc, "TODO");
-		
-		// reponse avec type en retour
+		Resource resource = new FileResource(signedDoc, "SIGNED_" + file.getOriginalFilename());
+
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_PDF);
 		return new ResponseEntity<org.springframework.core.io.Resource>(resource, httpHeaders, HttpStatus.OK);
 
 	}
 
-
-	public ResponseEntity<String> /* ResponseEntity<Document> */ postAsksignatureXades(
+	public ResponseEntity<String> postAsksignatureXades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Xades");
-		// SI pas interception de Spring -> TODO créer nouvelle methode au lieu de 2
-		// appels ...
-		log.error("!!bypass du controle Accpet HEader sur une demande de signature XADES");
-//		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-//				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)) == false) {
-//			msgError = "Le header doit contenir s application/json et application/xml";
-//			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}", getAcceptHeaders());
-//			return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-//		}
+
+		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
+				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)) == false) {
+			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}",
+					getAcceptHeaders());
+			throwExceptionRequestError("Le header doit contenir s application/json et application/xml",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
 
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.XADES, accessToken, file,
 				userinfo);
@@ -131,9 +128,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
-		log.debug("signedString {}", signedString);
 
-		// reponse avec type en retour
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_XML);
 		return new ResponseEntity<>(signedString, httpHeaders, HttpStatus.OK);
@@ -141,8 +136,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	}
 
 	private String checkPSCToken(String token) {
-		// PSCTokenResult retour = new PSCTokenResult(PSCTokenStatus.TECH_ERROR,
-		// "Reponse non connue");
 		HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		String msgError = "Exception sur vérfication de la validté du token PSC: " + token;
 		String result = "Reponse ProSanteConnect inconnue";
@@ -155,7 +148,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			if (httpStatus == HttpStatus.BAD_REQUEST) {
 				msgError = "L'accessToken fourni dans la requête n'est pas reconnu comme un token actif par ProSanteConnect token: "
 						+ token + " response PSC: " + result;
-				
+
 			}
 		} catch (JsonProcessingException | UnsupportedEncodingException | URISyntaxException e1) {
 			msgError.concat(" , JsonProcessingException");
@@ -168,105 +161,29 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				throwExceptionRequestError(msgError, httpStatus);
 			}
 		} else {
-			log.error("!!!!!!!!!!!!!!!!!!!");
-			log.error("!!!!!!!!!!!!!!! ATTENTION BYPASS du resultat de l'introspection ProsanteConnect");
-			log.error("!!!!!!!!!!!!!!!!!!!");
+			log.error("!!!!!!!!! ATTENTION BYPASS du resultat de l'introspection ProsanteConnect !!!!!!!!!");
 		}
 
 		return result;
 	}
 
-	private void testRetourXML(String docSigne) {
-		MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-		bodyBuilder.part("file", new ByteArrayResource(docSigne.getBytes()) {
-
-			@Override
-			public String getFilename() {
-				return "docSigned.xml";
-			}
-
-		}, MediaType.APPLICATION_XML);
-		bodyBuilder.build();
-		// bodyBuilder.
-	}
-
-//	private File checkInputFile(MultipartFile file)  {
-//		File fileToSign = null;
-//		try {
-//			fileToSign = multipartFileToFile(file);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			
-//		}
-//		log.debug("fileToCheck length" + fileToSign.length());
-//		log.debug("fileToCheck isFile" + fileToSign.isFile());
-//		//test verification du type de fichier
-//		return fileToSign;
-//	}
-
-//	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID,
-//			Map<String, String> userToPersit, Date now) {
-//
-//		// vrai archivage de la pruve
-//		log.debug(" START archivage de la preuve en BDD");
-//		ProofStorage proof = new ProofStorage(requestID, userToPersit.get(Helper.SUBJECT_ORGANIZATION),
-//				userToPersit.get(Helper.PREFERRED_USERNAME), userToPersit.get(Helper.GIVEN_NAME),
-//				userToPersit.get(Helper.FAMILY_NAME), now, report.getPreuve());
-//
-//		dao.archivePreuve(proof);
-//		log.debug("FIN archivage de la preuve en BDD");
-//
-//	}
-
 	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID, UserInfo userToPersit,
 			Date now) {
 
-		// vrai archivage de la preuve
 		log.debug(" START archivage de la preuve en BDD pour request id: {}", requestID);
 		ProofStorage proof = new ProofStorage(requestID, userToPersit.getSubjectOrganization(),
 				userToPersit.getPreferredUsername(), userToPersit.getGivenName(), userToPersit.getFamilyName(), now,
 				report.getPreuve());
-		// archivage BDD
 		try {
 			dao.archivePreuve(proof);
-		} catch (Exception e ) { 
+		} catch (Exception e) {
 			e.printStackTrace();
-				throwExceptionRequestError(e,
-						"Requête abandonnée pour problème d'archivage de la preuve en base de données. ",
-						HttpStatus.SERVICE_UNAVAILABLE);
+			throwExceptionRequestError(e,
+					"Requête abandonnée pour problème d'archivage de la preuve en base de données. ",
+					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
 		log.debug("Fin archivage de la preuve en BDD pour request id: {}\", requestID");
-	}
-
-	private Map<String, String> extracMaptUserToPersit(String jsonUserInfoBase64Encoded) {// extraction des champs du
-																							// userInfo pour sauvegarde
-																							// dans la preuve MongoDB
-		Map<String, String> userToPersit = null;
-		try {
-			userToPersit = Helper.jsonStringBase64ToPartialMap(jsonUserInfoBase64Encoded);
-
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-			log.error("UserInfo:  JsonMappingException ");
-
-		} catch (JsonProcessingException e) {
-			log.error("UserInfo:  JsonProcessingException ");
-			e.printStackTrace();
-
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			log.error("UserInfo:  UnsupportedEncodingException ");
-		}
-		return userToPersit; // si null -> return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	private fr.ans.api.sign.esignsante.psc.model.Error buildError(String code, String msg) {
-		// if (!acceptHeader.isPresent()
-		fr.ans.api.sign.esignsante.psc.model.Error erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
-		erreur.setCode(code);
-		erreur.setMessage(msg);
-		return erreur;
 	}
 
 	private UserInfo extractUserInfoFromRequest(String jsonUserInfoBase64) {
@@ -288,7 +205,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	private ParametresSign prepareAppelEsignWS(String accessToken, MultipartFile file, String userinfo) {
 		ParametresSign resultat = new ParametresSign();
 
-		//
 		resultat.setDate(new Date());
 
 		// verification de l'accessToken
@@ -299,7 +215,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		File fileToSign = getMultiPartFile(file);
 		resultat.setFileToSign(fileToSign);
 
-		// extraction des champs du userInfo pour sauvegarde dans la preuve MongoDB
+		// extraction du userInfo
 		UserInfo userToPersit = extractUserInfoFromRequest(userinfo);
 		resultat.setUserinfo(userToPersit);
 
@@ -328,10 +244,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		log.debug(
 				"Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
-
-				// Construction des l'OpneIdToken
 				params.getPscReponse(), params.getFileToSign().getName(),
 				params.getUserinfo().getSubjectOrganization());
+
 		// construction du OpenIDToken
 		UserInfo user = params.getUserinfo();
 		List<OpenidToken> openidTokens = new ArrayList<OpenidToken>();
@@ -363,26 +278,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		}
 
 		archivagePreuve(report, params.getRequestID(), user, params.getDate());
-//		// archivage BDD
-//		try {
-//			archivagePreuve(report, params.getRequestID(), user, params.getDate());
-////		} catch (MongoSocketOpenException | RestClientException e) { 
-////			throwExceptionRequestError(e,
-////					"Requête abandonnée pour problème d'archivage de la preuve en base de données. Base inaccessible",
-////					HttpStatus.SERVICE_UNAVAILABLE);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			if (e instanceof MongoSocketOpenException) {
-//				throwExceptionRequestError(e,
-//						"Requête abandonnée pour problème d'archivage de la preuve en base de données. Base inaccessible",
-//						HttpStatus.SERVICE_UNAVAILABLE);
-//			} else {
-//				throwExceptionRequestError(e,
-//						"Requête abandonnée pour problème d'archivage de la preuve en base de données. ",
-//						HttpStatus.INTERNAL_SERVER_ERROR);
-//			}
-//		}
 		return report;
 	}
-
 }

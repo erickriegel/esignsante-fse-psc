@@ -1,15 +1,11 @@
 package fr.ans.api.sign.esignsante.psc.prosantecall;
 
-
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @Service
 public class ProsanteConnectCalls {
@@ -36,53 +31,40 @@ public class ProsanteConnectCalls {
 	public String pscClientID;
 
 	@Value("${psc.clientSecret}")
-	public  String pscSecret;
-	
+	public String pscSecret;
+
 	@Value("#{new Boolean('${psc.bypass}')}")
 	public Boolean pscBypass = false;
-	
-	
-	private /*public*/ HttpHeaders getHeaders () throws UnsupportedEncodingException
-    {
-        String adminuserCredentials = pscClientID +":" + pscSecret;
-        String encodedCredentials = Helper.encodeBase64(adminuserCredentials);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization", "Basic " + encodedCredentials);
-        httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        return httpHeaders;
-    }
-	
-//	public HttpHeaders getCustomHeaders (String pscClientID, String pscSecret) throws UnsupportedEncodingException
-//    {
-//        String adminuserCredentials = pscClientID +":" + pscSecret;
-//        String encodedCredentials = Helper.encodeBase64(adminuserCredentials);
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.add("Authorization", "Basic " + encodedCredentials);
-//        httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-//        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//        return httpHeaders;
-//    }
 
+	private HttpHeaders getHeaders() throws UnsupportedEncodingException {
+		String adminuserCredentials = pscClientID + ":" + pscSecret;
+		String encodedCredentials = Helper.encodeBase64(adminuserCredentials);
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Authorization", "Basic " + encodedCredentials);
+		httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		return httpHeaders;
+	}
 
-	public String isTokenActive(String accessToken) throws URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
+	public String isTokenActive(String accessToken)
+			throws URISyntaxException, UnsupportedEncodingException, JsonProcessingException {
 		RestTemplate restTemplate = new RestTemplate();
 		log.debug("uri connection à ProSanteConnect: {}", pscUrl);
 		log.debug("ClientID pour proSanteConnect: {}", pscClientID);
 		log.debug("Bypass resultat Introspection: {}", pscBypass);
-		URI uri = new URI(pscUrl);      		
+		URI uri = new URI(pscUrl);
 
-		//payload
-		MultiValueMap<String, String> params= new LinkedMultiValueMap<>();
+		// payload
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("token", accessToken);
-	    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, getHeaders());
-	    ResponseEntity<String> result = restTemplate.postForEntity(uri, requestEntity, String.class);
+		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, getHeaders());
+		ResponseEntity<String> result = restTemplate.postForEntity(uri, requestEntity, String.class);
 
-
-	log.trace("Appel ProSanteConnect REsponse: StatusCode {} \n body: {}",
-			 result.getStatusCode(), result.getBody() );
-		return result.getBody();	
+		log.debug("Appel ProSanteConnect REsponse: StatusCode {} \n body: {}", result.getStatusCode(),
+				result.getBody());
+		return result.getBody();
 	}
+
 	public Boolean bypassResultatPSC() {
 		log.debug(" Bypass resultat de PSC: {}", pscBypass);
 		return pscBypass;

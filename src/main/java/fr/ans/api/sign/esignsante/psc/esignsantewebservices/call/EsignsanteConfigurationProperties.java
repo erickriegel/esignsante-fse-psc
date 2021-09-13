@@ -3,7 +3,6 @@ package fr.ans.api.sign.esignsante.psc.esignsantewebservices.call;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import io.swagger.annotations.Scope;
 import lombok.Getter;
 
 /*

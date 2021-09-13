@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import fr.ans.api.sign.esignsante.psc.api.CaApiDelegate;
-import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
@@ -19,28 +18,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDelegate{
+public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDelegate {
 
 	@Autowired
 	EsignsanteCall esignWS;
-	
+
 	@Override
-	public ResponseEntity<List<String>> getCa()   {
+	public ResponseEntity<List<String>> getCa() {
 		log.debug(" Réception d'une demande des CAs");
-  
-		//le contrôle des headers 'accept' est géré par Spring			
-//		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
-//			throwExceptionRequestError(
-//					"Header 'accept' non conforme: attendu application/json",
-//					HttpStatus.NOT_ACCEPTABLE);
-//		}
-     
+
+		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+			throwExceptionRequestError("Header 'accept' non conforme: attendu application/json",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
 		List<String> results = null;
 		try {
-		 results = esignWS.getCA();
-		} catch (ResourceAccessException e) {		
-			throwExceptionRequestError(e,
-					"Exception sur appel esignWS. Service inaccessible",
+			results = esignWS.getCA();
+		} catch (ResourceAccessException e) {
+			throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
 					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 		log.debug(" Demande des CAs traitée avec succès");

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.5.2</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<relativePath />
 	</parent>
 	<groupId>fr.ans.sign</groupId>
 	<artifactId>esignsante-psc</artifactId>
@@ -16,13 +18,11 @@
 	<packaging>jar</packaging>
 
 	<scm>
-		<!-- <developerConnection>scm:svn:http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-ws/applicatif/tags/esignsante-webservices-2.4.1.99</developerConnection> -->
 		<developerConnection>scm:svn:http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-psc/trunk</developerConnection>
 	</scm>
 
 	<description>webservice REST de signature à partir d'un jeton prosante connect</description>
 	<properties>
-		<!-- <project-version>0.0.1-SNAPSHOT</project-version> -->
 		<springfox-version>3.0.0</springfox-version>
 		<jackson-version>2.12.3</jackson-version>
 		<start-class>fr.ans.sign.esignsantepsc.EsignsantePscApplication</start-class>
@@ -42,10 +42,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
-
-		<!-- forcer upgrade pour BsonUTils => asBson -->
-		<!-- <dependency> <groupId>org.springframework.data</groupId> <artifactId>spring-data-mongodb</artifactId> 
-			<version>3.2.4</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -75,25 +71,15 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- CJU -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<!-- <version>5.3.8</version> -->
 			<scope>test</scope>
 		</dependency>
-
-		<!-- <dependency> <groupId>org.junit.jupiter</groupId> <artifactId>junit-jupiter-api</artifactId> 
-			<scope>test</scope> </dependency> <dependency> <groupId>org.junit.jupiter</groupId> 
-			<artifactId>junit-jupiter-engine</artifactId> <scope>test</scope> </dependency> -->
-
-		<!-- FIN CJU -->
-
 
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<!-- <scope>test</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.restdocs</groupId>
@@ -169,7 +155,6 @@
 			<version>1.5.1</version>
 		</dependency>
 
-		<!-- Bean Validation API support -->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -191,21 +176,18 @@
 			<version>2.1.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.github.tomakehurst/wiremock -->
-		<!-- mock des appels WS esignWS et ProSanteConnect -->
-<!-- 		<dependency>
-     <groupId>com.github.tomakehurst</groupId>
-    <artifactId>wiremock-jre8</artifactId> >wiremock-jre8-standalone versus wiremock-jre8 versus wiremock 
-    <version>2.27.2</version>
-    <type>pom</type> 
-    <scope>test</scope>
-</dependency> 
- -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
-
-
-
 
 	<build>
 		<resources>
@@ -216,9 +198,6 @@
 				</excludes>
 
 			</resource>
-			<!-- <resource> -->
-			<!-- <directory>src/main/resources/${dist}</directory> -->
-			<!-- </resource> -->
 		</resources>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testResources>
@@ -232,7 +211,6 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<!-- <version>1.5.8</version> -->
 				<version>2.1.0</version>
 
 				<executions>
@@ -244,8 +222,9 @@
 						</goals>
 
 						<configuration>
-							<!-- ce fichier doit être dans src/main/asciidoc qui doit contenir les snippets à intégrer -->
-							<sourceDocumentName>esignsante-psc-api.adoc</sourceDocumentName> 
+							<!-- ce fichier doit être dans src/main/asciidoc qui doit contenir 
+								les snippets à intégrer -->
+							<sourceDocumentName>esignsante-psc-api.adoc</sourceDocumentName>
 
 							<backend>html</backend>
 							<doctype>book</doctype>
@@ -257,28 +236,11 @@
 								<sectanchors>true</sectanchors>
 								<!-- set the idprefix to blank -->
 								<idprefix />
-								<snippets>${project.build.directory}/generated-snippets</snippets> 
+								<snippets>${project.build.directory}/generated-snippets</snippets>
 							</attributes>
-
-							<!-- CJU TODO ASCIIDOC -->
-							<!-- <project> -->
-							<!-- <name> TODO POM.xml: NOM du PROJET</name> <artifactId>@{project.artifactId}</artifactId> 
-								<description>TODO POM.xml: description</description> <version>@{project.version}</version> -->
-							<!-- </project> -->
-							<!-- FIN CJU TODO ASCIIDOC -->
-
 						</configuration>
 
 					</execution>
-
-
-					<!-- <execution> <id>generated-output-pdf</id> <phase>generate-resources</phase> 
-						<goals> <goal>process-asciidoc</goal> </goals> <configuration> <backend>pdf</backend> 
-						<sourceHighlighter>coderay</sourceHighlighter> <doctype>book</doctype> <attributes> 
-						<icons>font</icons> <pagenums/> <toc/> <idprefix/> <idseparator>-</idseparator> 
-						<pdf-fontsdir>data/fonts</pdf-fontsdir> <pdf-stylesdir>data/themes</pdf-stylesdir> 
-						<pdf-style>cn</pdf-style> </attributes> </configuration> </execution> -->
-
 				</executions>
 
 				<dependencies>
@@ -289,7 +251,6 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-			<!-- FIN Generation doc par Spring restdocs -->
 
 
 
@@ -298,11 +259,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<jvmArguments>
-
-						<!-- <jvmArguments>-Dfile.encoding=UTF8</jvmArguments> -->
-
-						<!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 -->
-						<!-- -add-opens java.base/java.lang=ALL-UNNAMED -illegal-access=permit -->
 					</jvmArguments>
 					<excludes>
 						<exclude>
@@ -327,10 +283,8 @@
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/esignsante-psc.yaml</inputSpec>
 							<generatorName>spring</generatorName>
-							<!-- <language>spring</language> -->
 							<library>spring-boot</library>
 							<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
-							<!-- <generateModels>true</generateModels> -->
 
 							<additionalProperties>
 								<additionalProperty />
@@ -346,7 +300,6 @@
 								<useBeanValidation>true</useBeanValidation>
 								<skipOverwrite>true</skipOverwrite>
 								<disableHtmlEscaping>true</disableHtmlEscaping>
-								<!-- param with no effect! <skipFormModel>false</skipFormModel> -->
 
 							</configOptions>
 							<withXml>true</withXml>
@@ -355,29 +308,20 @@
 				</executions>
 			</plugin>
 
-			<!-- compilation -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<!-- <version>3.8.0</version> -->
 				<configuration>
 					<source>11</source>
 					<target>11</target>
 					<compilerArgs>
-						<!-- <arg>-Xlint:deprecation</arg> -->
 					</compilerArgs>
 				</configuration>
 			</plugin>
-			<!-- FIN compilation -->
-			<!-- copie des restdocs dans le folder static -->
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
-
-
-
-
-
 					<execution>
 						<id>copy-resources</id>
 						<phase>prepare-package</phase>
@@ -399,8 +343,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- FIN copie des restdocs dans le folder static -->
-
 
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
@@ -421,8 +363,6 @@
 							<username>jenkins</username>
 							<password>${jenkins.password}</password>
 						</auth>
-						<!-- <jib.to.auth.username>${artificatory.username}</jib.to.auth.username> 
-							<jib.to.auth.password>${artificatory.password}</jib.to.auth.password> -->
 					</to>
 					<container>
 						<user>daemon:daemon</user>
@@ -434,13 +374,12 @@
 						<!--this sacrifices reproducibility since the timestamp will change 
 							with every build -->
 						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-						<!--<creationTime>2020-09-01T10:15:30+09:00</creationTime> -->
 					</container>
 					<allowInsecureRegistries>true</allowInsecureRegistries>
 				</configuration>
 			</plugin>
 
-						<!-- license pour Hook SVN -->
+			<!-- license pour Hook SVN -->
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -461,11 +400,8 @@
 					<strictCheck>true</strictCheck>
 				</configuration>
 			</plugin>
-			<!-- FIN license pour Hook SVN -->
 
-			
-			<!-- demarrage- arret EmbeddedMongoDB pour les tests -->
-			<!-- exemple de conf ICI: https://github.com/joelittlejohn/embedmongo-maven-plugin -->
+			<!-- EmbeddedMongoDB pour les tests - ex conf: https://github.com/joelittlejohn/embedmongo-maven-plugin -->
 			<plugin>
 				<groupId>com.github.joelittlejohn.embedmongo</groupId>
 				<artifactId>embedmongo-maven-plugin</artifactId>
@@ -473,13 +409,13 @@
 				<executions>
 					<execution>
 						<id>start</id>
-						 <phase>process-test-classes</phase> 
+						<phase>process-test-classes</phase>
 						<goals>
-							<goal>start</goal>						
+							<goal>start</goal>
 						</goals>
 						<configuration>
 							<port>27017</port>
-							
+
 							<version>3.4.24</version>
 							<logging>console</logging>
 							<downloadPath>${embededMongoDownloadUrl}</downloadPath>
@@ -494,8 +430,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<!-- FIN demarrage- arret EmbeddedMongoDB pour les tests -->
 
 		</plugins>
 	</build>
@@ -525,13 +459,10 @@
 				<artifactory.hostname>http://st-forge.asipsante.fr:8081</artifactory.hostname>
 				<ldap.server.url>ldap://annuaire-igc.esante.gouv.fr:389</ldap.server.url>
 				<docker.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</docker.registry>
-				<!--<image.registry>esignsante-registry.repo.artifactory-interne.henix.asipsante.fr</image.registry> -->
 				<image.registry>registry.repo.docker.proxy-prod-forge.asip.hst.fluxus.net</image.registry>
 				<embededMongoDownloadUrl>http://st-forge.asipsante.fr:8081/artifactory/fastdl.mongodb.org/</embededMongoDownloadUrl>
 			</properties>
 			<distributionManagement>
-				<!-- <repository> <id>artifactory</id> <url>${distributionRepositoryJenkinsfile}</url> 
-					</repository> -->
 				<repository>
 					<id>artifactory</id>
 					<url>${artifactory.hostname}/artifactory/asip-releases</url>
@@ -562,7 +493,6 @@
 						<artifactId>maven-release-plugin</artifactId>
 						<version>3.0.0-M1</version>
 						<configuration>
-							<!--username>${svn.username}</username> <password>${svn.password}</password -->
 							<checkModificationExcludes>
 								<checkModificationExclude>pom.xml</checkModificationExclude>
 								<checkModificationExclude>pom.xml.versionsBackup</checkModificationExclude>
@@ -575,6 +505,5 @@
 			</build>
 		</profile>
 	</profiles>
-
 
 </project>

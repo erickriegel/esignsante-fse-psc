@@ -4,9 +4,7 @@ import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
-import org.bson.BsonDocument;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 //import org.bson.Document;
@@ -16,8 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@EqualsAndHashCode(of= {"preferred_username","timestamp"})
-@ToString(of= {"id","subjectOrganization","preferred_username","given_name","family_name","timestamp"})
+@EqualsAndHashCode(of = { "preferred_username", "timestamp" })
+@ToString(of = { "id", "subjectOrganization", "preferred_username", "given_name", "family_name", "timestamp" })
 @Getter
 
 /*
@@ -25,11 +23,12 @@ import lombok.ToString;
  */
 @Document(collection = "preuves")
 public class ProofStorage {
-	
-	public ProofStorage() {}; //findAll
-	
-	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name, String family_name,
-			Date timestamp , String proof) {
+
+	public ProofStorage() {
+	}; // findAll
+
+	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name,
+			String family_name, Date timestamp, String proof) {
 		super();
 		this.requestId = requestID;
 		this.subjectOrganization = subjectOrganization;
@@ -39,9 +38,9 @@ public class ProofStorage {
 		this.timestamp = timestamp;
 		this.proof = proof;
 	}
-	
-	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name, String family_name,
-			Date timestamp) {
+
+	public ProofStorage(String requestID, String subjectOrganization, String preferred_username, String given_name,
+			String family_name, Date timestamp) {
 		super();
 		this.requestId = requestID;
 		this.subjectOrganization = subjectOrganization;
@@ -65,43 +64,34 @@ public class ProofStorage {
 		this.family_name = family_name;
 		this.timestamp = timestamp;
 		this.proof = proof;
-		
-	
+
 	}
+
 	@Id
-    //private String id; 
 	private ObjectId _id;
-	
-	
+
 	@Setter
 	@NotNull(message = "Persistence: le champ  'requestId'ne doit pas être nul")
-    private String requestId;
-	
+	private String requestId;
+
 	@Setter
-	//@NotNull(message = "Persistence: le champ 'subjectOrganization' ne doit pas être nul")
-    private String subjectOrganization;
-	
+	private String subjectOrganization;
+
 	@Setter
-	//@NotNull(message = "Persistence: le champ 'preferred_username' ne doit pas être nul")
-    private String preferred_username;
-	
+	private String preferred_username;
+
 	@Setter
-	//@NotNull(message = "Persistence: le champ 'given_name' ne doit pas être nul")
-    private String given_name;
-	
+	private String given_name;
+
 	@Setter
-	//@NotNull(message = "Persistence: le champ 'family_name' ne doit pas être nul")
-    private String family_name;
-	
+	private String family_name;
+
 	@Setter
 	@NotNull(message = "Persistence: le 'timestamp' ne doit pas être nul")
-    private Date timestamp;
-	
+	private Date timestamp;
+
 	@Setter
 	@NotNull(message = "Persistence: la 'proof' ne doit pas être nulle")
-    private String proof;
+	private String proof;
 
-
-	
-	
 }

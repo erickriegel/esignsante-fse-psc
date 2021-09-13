@@ -1,8 +1,6 @@
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +27,13 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 
 	@Autowired
 	MongoTemplate mongoTemplate;
-	
+
 	@Autowired
 	EsignsanteCall esignWS;
-	
+
 	/**
 	 * The log.
 	 */
-//	Logger log = LoggerFactory.getLogger(DefaultApiDelegateImpl.class);
 
 	/**
 	 * Gets the operations.
@@ -45,32 +42,44 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 	 */
 	@Override
 	public ResponseEntity<Set<Operation>> getOperations() {
-		final Optional<String> acceptHeader = getAcceptHeader();
-		ResponseEntity<Set<Operation>> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		log.trace("Réception d'une demande des opérations disponibles");
-		
-		//vérification du Headers accept
+
+		log.debug("Réception d'une demande des opérations disponibles");
+
+		// vérification du Headers accept
 		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
-			log.debug("Demande getOperation rejetée (NOT_IMPLEMENTED) Accept Head = APPLICATION/JSON non présent");
-			return re;
+			throwExceptionRequestError("Header 'accept' non conforme: attendu application/json",
+					HttpStatus.NOT_ACCEPTABLE);
 		}
 
-			final Set<Operation> setOperations = new HashSet<Operation>();
-			setOperations.add(setOperation("/", "Liste des opérations disponibles", "", ""));
-
-			setOperations.add(setOperation("/ca",
-					"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.",
-					"", ""));
-
-			setOperations.add(setOperation("/asksignature/xades",
-					"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.", "",
-					"Access_token, accept:json, usertoken"));
-
-			re = new ResponseEntity<>(setOperations, HttpStatus.OK);
-
+		final Set<Operation> setOperations = new HashSet<Operation>();
+		setOperations.add(setOperation("/", "Liste des opérations disponibles",
+				"", "accept:application/json"));
 		
-	
-		return re;
+
+		setOperations.add(setOperation("/ca",
+				"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.",
+				"", 
+				"accept:application/json"));
+
+		setOperations.add(setOperation("/asksignature/xades",
+				"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.",
+				"[\"file: docXMLToSign\", \"userToken:userToken\"]",
+				"[\"accept:application/json\", \"accept:application/json\", \"access_token: PSCVAlidAccessToken\"]"));
+
+		setOperations.add(setOperation("/asksignature/pades",
+				"Opération qui permet au client de demander de signer un document au format PADES Baseline-B.", 
+				"[\"file: docXMLToSign\", \"userToken:userToken\"]",
+				"[\"accept:application/json\", \"accept:application/json\", \"access_token: PSCVAlidAccessToken\"]"));
+
+		setOperations.add(setOperation("/checksignature/xades",
+				"Opération qui permet de vérifier un document signé au format XADES Baseline-B.", 
+				"file:sigendXadesDoc", "accept:application/json"));
+
+		setOperations.add(setOperation("/checksignature/xades",
+				"Opération qui permet de vérifier un document signé au format PADES Baseline-B.", 
+				"file:sigendPadesDoc","accept:application/json" ));
+
+		return new ResponseEntity<Set<Operation>>(setOperations, HttpStatus.OK);
 	}
 
 	private Operation setOperation(String path, String description, String payload, String requiredHeaders) {
@@ -81,5 +90,5 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 		op.setPayload(payload);
 		return op;
 	}
-	
+
 }

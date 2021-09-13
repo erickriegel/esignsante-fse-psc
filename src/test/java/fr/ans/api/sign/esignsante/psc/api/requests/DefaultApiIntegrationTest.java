@@ -1,6 +1,5 @@
 package fr.ans.api.sign.esignsante.psc.api.requests;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -28,91 +27,74 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.nimbusds.common.contenttype.ContentType;
-
 /**
  * Test des EndPoints offerts par l'API esignsante-psc.
  */
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // pour restdocs
-@SpringBootTest //(properties = "file.encoding=UTF-8")
+@ExtendWith({ RestDocumentationExtension.class, SpringExtension.class }) // pour restdocs
+@SpringBootTest
 @AutoConfigureMockMvc
 public class DefaultApiIntegrationTest {
 
-	 private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
-	            MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
-	
+	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
+			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
+
 	/*
 	 * setUp pour restdocs
 	 */
 	@BeforeEach
-	public void setUp(WebApplicationContext webApplicationContext,
-	  RestDocumentationContextProvider restDocumentation) {
-	    this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-	      .apply(documentationConfiguration(restDocumentation)).build();
+	public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+				.apply(documentationConfiguration(restDocumentation)).build();
 	}
-	
-    /** The mock mvc. */
-    @Autowired
-    private MockMvc mockMvc;
-	
-//    @MockBean
-//    private MongoTemplate mongoTemplate;
 
-    /**
-     * Vérification de la liste des services disponibles.
-     *
-     * @throws Exception the exception
-     */
-   @Test
-    @DisplayName("Vérification de la liste des services disponibles.")
-    public void rootGetTest() throws Exception {
-   
-    	final String body =  "[{\"path\":\"/ca\",\"description\":\"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.\",\"payload\":\"\",\"requiredHeaders\":\"\"},{\"path\":\"/asksignature/xades\",\"description\":\"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.\",\"payload\":\"\",\"requiredHeaders\":\"Access_token, accept:json, usertoken\"},{\"path\":\"/\",\"description\":\"Liste des opérations disponibles\",\"payload\":\"\",\"requiredHeaders\":\"\"}]";
-    	
-       	    
-    	
-    	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/json"))    			
-        	    .andExpect(status().isOk()).andExpect(content().json(body));
-    	
-        // .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8).json(body));
-    	  returned.andDo(print()); //pour debug console: a supprimer
-    	  returned.andDo(document("Liste_des_services/OK")); //RestDcos
-    }   
-   
-   @Test
-   @DisplayName("Lecture des Headers 'accept'")
-   public void rootGetTestBadAcceptHeader() throws Exception {
-      	      	
-   	ResultActions returned = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML)).andExpect(status().isNotAcceptable());
-   	
-   	returned.andDo(print()); //pour debug console: a supprimer
-	  returned.andDo(document("Liste_des_services/KO_NotAcceptable")); 
-	  
-	  
-   	//ResultActions toto = mockMvc.perform(get("/v1/"));
-   	MvcResult titi = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_JSON)).andReturn();
-   	assertTrue(titi.getResponse().getHeaderValues("Content-Type").size()==1);
-   	System.out.println("MediaType.APPLICATION_JSON.getType(): " + MediaType.APPLICATION_JSON.getType());
-   	System.out.println("getResponse().getHeaderValues" + titi.getResponse().getHeaderValues("Content-Type").get(0));
-   	assertTrue(titi.getResponse().getHeaderValues("Content-Type").get(0).equals("application/json"));
-   	
-//   	returned  = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML))
-//		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//		.andExpect()
-//		returned.andDo(print()); //pour debug console: a supprimer
-//  	     returned.andDo(document("Liste_des_services/KO")); //RestDcos
-	
-   }
-   
-   
-   @Test
-   @DisplayName("Multiple Headers 'accept'")
-   public void rootGetTestMultipledAcceptHeader() throws Exception {
-      	      	
-   	ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml").accept("application/json"))
-   			     	    .andExpect(status().isOk());
-   	returned.andDo(print()); //pour debug console: a supprimer
-	  returned.andDo(document("Liste_des_services/OK_BIS"));  	    
-   } 
+	/** The mock mvc. */
+	@Autowired
+	private MockMvc mockMvc;
+
+	/**
+	 * Vérification de la liste des services disponibles.
+	 *
+	 * @throws Exception the exception
+	 */
+	@Test
+	@DisplayName("Cas passant. Vérification de la liste des services disponibles.")
+	public void rootGetTest() throws Exception {
+		
+		final String body= "[{\"path\":\"/ca\",\"description\":\"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.\",\"payload\":\"\",\"requiredHeaders\":\"accept:application/json\"},{\"path\":\"/checksignature/xades\",\"description\":\"Opération qui permet de vérifier un document signé au format PADES Baseline-B.\",\"payload\":\"file:sigendPadesDoc\",\"requiredHeaders\":\"accept:application/json\"},{\"path\":\"/asksignature/xades\",\"description\":\"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.\",\"payload\":\"[\\\"file: docXMLToSign\\\", \\\"userToken:userToken\\\"]\",\"requiredHeaders\":\"[\\\"accept:application/json\\\", \\\"accept:application/json\\\", \\\"access_token: PSCVAlidAccessToken\\\"]\"},{\"path\":\"/checksignature/xades\",\"description\":\"Opération qui permet de vérifier un document signé au format XADES Baseline-B.\",\"payload\":\"file:sigendXadesDoc\",\"requiredHeaders\":\"accept:application/json\"},{\"path\":\"/asksignature/pades\",\"description\":\"Opération qui permet au client de demander de signer un document au format PADES Baseline-B.\",\"payload\":\"[\\\"file: docXMLToSign\\\", \\\"userToken:userToken\\\"]\",\"requiredHeaders\":\"[\\\"accept:application/json\\\", \\\"accept:application/json\\\", \\\"access_token: PSCVAlidAccessToken\\\"]\"},{\"path\":\"/\",\"description\":\"Liste des opérations disponibles\",\"payload\":\"\",\"requiredHeaders\":\"accept:application/json\"}]";
+		System.out.println("!!!!body");
+		System.out.println(body);
+		ResultActions returned = mockMvc.perform(get("/v1/").accept("application/json")).andExpect(status().isOk());
+		returned.andDo(print());
+		returned.andExpect(content().json(body));
+
+		returned.andDo(print()); // pour debug console
+		returned.andDo(document("Liste_des_services/OK"));
+	}
+
+	@Test
+	@DisplayName("/: cas non passant. Header 'accept' non valide")
+	public void rootGetTestBadAcceptHeader() throws Exception {
+
+		ResultActions returned = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML))
+				.andExpect(status().isNotAcceptable());
+
+		returned.andDo(document("Liste_des_services/KO_NotAcceptable"));
+
+		MvcResult res = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_JSON)).andReturn();
+		assertTrue(res.getResponse().getHeaderValues("Content-Type").size() == 1);
+		System.out.println("MediaType.APPLICATION_JSON.getType(): " + MediaType.APPLICATION_JSON.getType());
+		System.out.println("getResponse().getHeaderValues" + res.getResponse().getHeaderValues("Content-Type").get(0));
+		assertTrue(res.getResponse().getHeaderValues("Content-Type").get(0).equals("application/json"));
+
+	}
+
+	@Test
+	@DisplayName("Multiple Headers 'accept'")
+	public void rootGetTestMultipledAcceptHeader() throws Exception {
+
+		ResultActions returned = mockMvc.perform(get("/v1/").accept("application/xml").accept("application/json"))
+				.andExpect(status().isOk());
+		returned.andDo(document("Liste_des_services/OK_BIS"));
+	}
 
 }

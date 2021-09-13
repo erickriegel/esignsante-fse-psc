@@ -22,7 +22,7 @@ start class (from POM properties)=>:: {start-class}
 == Interrogation de l'API
 Liste des services exposés
 
-=== cas passant simple
+=== cas passant 200
 .request
 http:
 include::{snippets}/Liste_des_services/OK/http-request.adoc[]
@@ -39,7 +39,7 @@ include::{snippets}/Liste_des_services/OK/http-response.adoc[]
 Payload:
 include::{snippets}/Liste_des_services/OK/response-body.adoc[]
 
-=== cas non passant mauvais header accept
+=== cas non passant mauvais header accept 406
 
 http:
 include::{snippets}/Liste_des_services/KO_NotAcceptable/http-request.adoc[]
@@ -53,19 +53,18 @@ include::{snippets}/Liste_des_services/KO_NotAcceptable/curl-request.adoc[]
 .response
 include::{snippets}/Liste_des_services/KO_NotAcceptable/http-response.adoc[]
 
-Payload:
-include::{snippets}/Liste_des_services/KO_NotAcceptable/response-body.adoc[]
-
 
 == Demande de la liste des Cas
 
-=== Cas passant
+=== Cas passant 200
 .request
 include::{snippets}/CA/OK/http-request.adoc[]
 
-payload:
-include::{snippets}/CA/OK/request-body.adoc[]
+httpIE:
+include::{snippets}/CA/OK/httpie-request.adoc[]
 
+Requête avec curl:
+include::{snippets}/CA/OK/curl-request.adoc[]
 
 .response
 include::{snippets}/CA/OK/http-response.adoc[]
@@ -73,7 +72,7 @@ include::{snippets}/CA/OK/http-response.adoc[]
 payload:
 include::{snippets}/CA/OK/response-body.adoc[]
 
-=== cas non passant mauvais header accept
+=== cas non passant-header accept invalide 406
 
 http:
 include::{snippets}/CA/KO_NotAcceptable/http-request.adoc[]
@@ -87,10 +86,8 @@ include::{snippets}/CA/KO_NotAcceptable/curl-request.adoc[]
 .response
 include::{snippets}/CA/KO_NotAcceptable/http-response.adoc[]
 
-Payload:
-include::{snippets}/CA/Liste_des_services/KO_NotAcceptable/response-body.adoc[]
 
-=== cas non passant esignsanteWebservices non disponible
+=== cas non passant esignsanteWebservices non disponible 503
 
 http:
 include::{snippets}/CA/esginWS_OFF/http-request.adoc[]
@@ -104,10 +101,65 @@ include::{snippets}/CA/esginWS_OFF/curl-request.adoc[]
 .response
 include::{snippets}/CA/esginWS_OFF/http-response.adoc[]
 
-Payload:
-include::{snippets}/CA/esginWS_OFFresponse-body.adoc[]
+== Demande de contrôle de signature XADES
+
+=== Cas passant 200
+.request
+include::{snippets}/checkSignXADES/OK/http-request.adoc[]
+
+httpIE:
+include::{snippets}/checkSignXADES/OK/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/checkSignXADES/OK/curl-request.adoc[]
+
+.response
+include::{snippets}/checkSignXADES/OK/http-response.adoc[]
+
+payload:
+include::{snippets}/checkSignXADES/OK/response-body.adoc[]
+
+=== Cas non passant esignWS Off 503
+http:
+include::{snippets}/checkSignXADES/esginWS_OFF/http-request.adoc[]
+
+httpIE:
+include::{snippets}/checkSignXADES/esginWS_OFF/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/checkSignXADES/esginWS_OFF/curl-request.adoc[]
+
+.response
+include::{snippets}/checkSignXADES/esginWS_OFF/http-response.adoc[]
 
 
+=== Cas non passant fichier non xml 501 (415?)
+.request
+http:
+include::{snippets}/checkSignXADES/BadFileFormat/http-request.adoc[]
+
+httpIE:
+include::{snippets}/checkSignXADES/BadFileFormat/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/checkSignXADES/BadFileFormat/curl-request.adoc[]
+
+.response
+include::{snippets}/checkSignXADES/BadFileFormat/http-response.adoc[]
+
+=== cas non passant-header accept invalide 406
+
+http:
+include::{snippets}/checkSignXADES/KO_NotAcceptable/http-request.adoc[]
+
+httpIE:
+include::{snippets}/checkSignXADES/KO_NotAcceptable/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/checkSignXADES/KO_NotAcceptable/curl-request.adoc[]
+
+.response
+include::{snippets}/checkSignXADES/KO_NotAcceptable/http-response.adoc[]
 
 == Demande de signature XADES
 
