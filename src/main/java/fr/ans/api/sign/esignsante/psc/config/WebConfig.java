@@ -30,6 +30,7 @@ public class WebConfig {
 	@Autowired
 	private BuildProperties buildProperties;
 
+	@Bean
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
 				.title("EsignSante-psc V " + buildProperties.getVersion())
