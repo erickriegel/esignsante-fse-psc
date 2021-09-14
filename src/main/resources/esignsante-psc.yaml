@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: esignsante-psc
+  title: esignsante-psc @project.version@
   version: '1.0'
   description: This API can be used to sign PDF or XML documents with an A.N.S X509 certificate
   contact:

@@ -188,10 +188,17 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources/</directory>
+				<includes>
+					<include>*.yaml</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources/</directory>
 				<excludes>
-					<exclude>esignsante-psc.yaml</exclude>
+					<exclude>*.yaml</exclude>
 				</excludes>
-
+				<filtering>false</filtering>
 			</resource>
 		</resources>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -274,7 +281,7 @@
 						</goals>
 
 						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/esignsante-psc.yaml</inputSpec>
+							<inputSpec>${project.basedir}/target/classes/esignsante-psc.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<library>spring-boot</library>
 							<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
