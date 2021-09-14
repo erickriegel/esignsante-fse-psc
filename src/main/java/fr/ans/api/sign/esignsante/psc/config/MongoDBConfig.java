@@ -1,3 +1,6 @@
+/**
+ * (c) Copyright 1998-2021, ANS. All rights reserved.
+ */
 package fr.ans.api.sign.esignsante.psc.config;
 
 import java.io.IOException;
@@ -5,7 +8,6 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
-//import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
