@@ -30,7 +30,7 @@ public class WebConfig {
 	@Autowired
 	private BuildProperties buildProperties;
 
-	ApiInfo apiInfo() {
+	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
 				.title("EsignSante-psc V " + buildProperties.getVersion())
 				.description("Api de signature à partir d'un jeton ProSantéConnect")
@@ -48,7 +48,8 @@ public class WebConfig {
 				.useDefaultResponseMessages(false)
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("fr.ans.api.sign.esignsante.psc.api"))
-				.paths(PathSelectors.any()).build();
+				.paths(PathSelectors.any())
+				.build();
 
 	}
 
