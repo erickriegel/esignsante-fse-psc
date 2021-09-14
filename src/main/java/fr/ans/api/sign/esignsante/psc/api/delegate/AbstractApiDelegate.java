@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.tika.Tika;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -25,11 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  * générique des requêtes
  */
 @Slf4j
-abstract public class AbstractApiDelegate {
+public abstract class AbstractApiDelegate {
 
-	final protected String HEADER_TYPE = "application/json";
+	final protected static String HEADER_TYPE = "application/json";
 	protected String msgError = "";
 
+	final private static Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir")); 
 	/**
 	 * Gets the request
 	 *
@@ -68,7 +71,7 @@ abstract public class AbstractApiDelegate {
 
 		log.debug(" multipart.getOriginalFilename: {}", multipart.getOriginalFilename());
 
-		Path tempFile = Files.createTempFile(multipart.getOriginalFilename(), null);
+		Path tempFile = Files.createTempFile(TMP_PATH, multipart.getOriginalFilename(), null);
 		log.debug("tempFile {}", tempFile.getFileName().toString());
 		multipart.transferTo(tempFile);
 		return tempFile.toFile();

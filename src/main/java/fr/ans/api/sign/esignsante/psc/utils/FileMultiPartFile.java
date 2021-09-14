@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,7 +55,13 @@ public class FileMultiPartFile implements MultipartFile{
 
 	@Override
 	public void transferTo(File dest) throws IOException, IllegalStateException {
-		new FileOutputStream(dest).write(data);
+		OutputStream stream = null;
+		try {
+			stream = new FileOutputStream(dest);
+			stream.write(data);
+		}  finally {
+			stream.close();
+		}
 	}
 	
 }

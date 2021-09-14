@@ -151,7 +151,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 			}
 		} catch (JsonProcessingException | UnsupportedEncodingException | URISyntaxException e1) {
-			msgError.concat(" , JsonProcessingException");
+			msgError = msgError.concat(" , JsonProcessingException");
 			e1.printStackTrace();
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}

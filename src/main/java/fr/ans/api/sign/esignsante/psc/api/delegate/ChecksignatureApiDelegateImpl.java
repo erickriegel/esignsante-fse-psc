@@ -58,7 +58,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		log.debug("message {} \n", e.getMessage());
 		log.debug("toString {} \n", e.toString());
 		log.debug("class Name {} \n", e.getClass().getName());
-		log.debug("class Canoicalname {} \n", e.getClass().getCanonicalName());
+		log.debug("class Canonicalname {} \n", e.getClass().getCanonicalName());
 
 		switch (e.getClass().getCanonicalName()) {
 
@@ -137,6 +137,13 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			}
 		} catch (Exception e) {
 			interceptErrorCheckSignature(e);
+		}
+		//sonar compliant
+		if (report == null)
+		{
+			throwExceptionRequestError(
+					"Echec appel esignWebservices ",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		Result result = esignsanteReportToResult(report);
 		re = new ResponseEntity<>(result, HttpStatus.OK);
