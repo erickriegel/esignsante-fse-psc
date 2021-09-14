@@ -20,9 +20,13 @@ public class WebConfig {
 
 	@Bean
 	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2).useDefaultResponseMessages(false).select()
+		return new Docket(DocumentationType.SWAGGER_2)
+				.pathMapping("/v1")
+				.useDefaultResponseMessages(false).select()
 				.apis(RequestHandlerSelectors.basePackage("fr.ans.api.sign.esignsante.psc.api"))
-				.paths(PathSelectors.any()).build();
+				.paths(PathSelectors.any())
+				.build();
+		
 	}
 
 }
