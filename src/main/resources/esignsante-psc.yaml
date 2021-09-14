@@ -6,7 +6,7 @@ info:
   contact:
     email: esignsante@esante.gouv.fr
 servers:
-  - url: 'https://esignsante.psc.esante.gouv.fr/v1'
+  - url: 'https://esignsante.psc.esante.gouv.fr'
     description: Sandbox esignsante.psc
 tags:
   - name: utils
