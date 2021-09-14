@@ -276,6 +276,8 @@
 				<version>5.2.0</version>
 				<executions>
 					<execution>
+					<!-- Déplacement pour exécuter la génération après la mise à jour du numéro de version -->
+					    <phase>process-resources</phase>
 						<goals>
 							<goal>generate</goal>
 						</goals>
