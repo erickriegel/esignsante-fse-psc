@@ -31,7 +31,7 @@ public class WebConfig {
 	private BuildProperties buildProperties;
 
 	@Bean
-	private ApiInfo apiInfo() {
+	ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
 				.title("EsignSante-psc V " + buildProperties.getVersion())
 				.description("Api de signature à partir d'un jeton ProSantéConnect")
