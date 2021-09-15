@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultApiDelegateImpl extends AbstractApiDelegate implements DefaultApiDelegate {
 
-//	final String HEADER_TYPE = "application/json";
+	final String ACCEPT_HEADER_JSON = "accept:"+Helper.APPLICATION_JSON;
 
 	@Autowired
 	MongoTemplate mongoTemplate;
@@ -56,13 +56,13 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 
 		final Set<Operation> setOperations = new HashSet<Operation>();
 		setOperations.add(setOperation("/", "Liste des opérations disponibles",
-				"", "accept:application/json"));
+				"", ACCEPT_HEADER_JSON));
 		
 
 		setOperations.add(setOperation("/ca",
 				"Opération qui permet au client de prendre connaissance des Autorités de Certification de confiance utilisées par la plateforme.",
 				"", 
-				"accept:application/json"));
+				ACCEPT_HEADER_JSON));
 
 		setOperations.add(setOperation("/asksignature/xades",
 				"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.",
@@ -76,11 +76,11 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 
 		setOperations.add(setOperation("/checksignature/xades",
 				"Opération qui permet de vérifier un document signé au format XADES Baseline-B.", 
-				"file:sigendXadesDoc", "accept:application/json"));
+				"file:sigendXadesDoc", ACCEPT_HEADER_JSON));
 
 		setOperations.add(setOperation("/checksignature/xades",
 				"Opération qui permet de vérifier un document signé au format PADES Baseline-B.", 
-				"file:sigendPadesDoc","accept:application/json" ));
+				"file:sigendPadesDoc",ACCEPT_HEADER_JSON ));
 
 		return new ResponseEntity<Set<Operation>>(setOperations, HttpStatus.OK);
 	}

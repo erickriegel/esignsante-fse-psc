@@ -1,3 +1,4 @@
+#(c) Copyright 1998-2021, ANS. All rights reserved.
 openapi: 3.0.0
 info:
   title: esignsante-psc @project.version@
