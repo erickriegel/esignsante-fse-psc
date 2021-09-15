@@ -3,14 +3,12 @@
  */
 package fr.ans.api.sign.esignsante.psc.api.exception;
 
-import java.io.Serializable;
-
 import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
 import lombok.Setter;
 
-public class EsignPSCRequestException extends RuntimeException implements Serializable{
+public class EsignPSCRequestException extends RuntimeException{
 	/**
 	 * 
 	 */
@@ -18,7 +16,7 @@ public class EsignPSCRequestException extends RuntimeException implements Serial
 
 	@Getter
 	@Setter
-	private fr.ans.api.sign.esignsante.psc.model.Error erreur;
+	private transient fr.ans.api.sign.esignsante.psc.model.Error erreur;
 
 	@Getter
 	@Setter

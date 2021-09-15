@@ -35,6 +35,7 @@ public abstract class AbstractApiDelegate {
 	final protected static String HEADER_TYPE = "application/json";
 	protected String msgError = "";
 
+	final private static File TMP_DIR = new File(System.getProperty("java.io.tmpdir")); 
 	final private static Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir")); 
 	/**
 	 * Gets the request
@@ -72,14 +73,16 @@ public abstract class AbstractApiDelegate {
 
 	protected File multipartFileToFile(MultipartFile multipart) throws IOException {
 
-		log.debug(" multipart.getOriginalFilename: {}", multipart.getOriginalFilename());
-
+		String unsafeFileName =  multipart.getOriginalFilename();
+		String pureFilename = (new File(unsafeFileName)).getName();
 		
+		log.debug(" multipart.getOriginalFilename: {}. Use {} as name", unsafeFileName, pureFilename);
 		
-		Path tempFile = Files.createTempFile(TMP_PATH, multipart.getOriginalFilename(), null);
+		Path tempFile = Files.createTempFile(TMP_PATH, pureFilename, null);
 		log.debug("tempFile {}", tempFile.getFileName().toString());
 		multipart.transferTo(tempFile);
 		return tempFile.toFile();
+	
 	}
 
 	protected File getMultiPartFile(MultipartFile file) {
