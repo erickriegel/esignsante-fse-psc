@@ -1,3 +1,6 @@
+/**
+ * (c) Copyright 1998-2021, ANS. All rights reserved.
+ */
 package fr.ans.api.sign.esignsante.psc.api.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

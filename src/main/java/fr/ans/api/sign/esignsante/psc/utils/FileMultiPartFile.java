@@ -1,3 +1,6 @@
+/**
+ * (c) Copyright 1998-2021, ANS. All rights reserved.
+ */
 package fr.ans.api.sign.esignsante.psc.utils;
 
 import java.io.ByteArrayInputStream;
@@ -9,11 +12,11 @@ import java.io.OutputStream;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileMultiPartFile implements MultipartFile{
+public class FileMultiPartFile implements MultipartFile {
 	private final byte[] data;
 	private final String fileName;
 
-	public FileMultiPartFile(byte[] data, String fileSourceName ) {
+	public FileMultiPartFile(byte[] data, String fileSourceName) {
 		this.data = data;
 		fileName = "SIGNE_".concat(fileSourceName);
 	}
@@ -55,13 +58,8 @@ public class FileMultiPartFile implements MultipartFile{
 
 	@Override
 	public void transferTo(File dest) throws IOException, IllegalStateException {
-		OutputStream stream = null;
-		try {
-			stream = new FileOutputStream(dest);
+		try (OutputStream stream = new FileOutputStream(dest)) {
 			stream.write(data);
-		}  finally {
-			stream.close();
-		}
+		} 
 	}
-	
 }

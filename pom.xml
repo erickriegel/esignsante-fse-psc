@@ -402,7 +402,6 @@
 					<header>licence-header.txt</header>
 					<includes>
 						<include>**/*.java</include>
-			<!-- 			<include>**/*.properties</include> -->
 					</includes>
 					<strictCheck>true</strictCheck>
 				</configuration>

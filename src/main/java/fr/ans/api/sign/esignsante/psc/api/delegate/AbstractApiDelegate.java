@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.tika.Tika;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -73,6 +74,8 @@ public abstract class AbstractApiDelegate {
 
 		log.debug(" multipart.getOriginalFilename: {}", multipart.getOriginalFilename());
 
+		
+		
 		Path tempFile = Files.createTempFile(TMP_PATH, multipart.getOriginalFilename(), null);
 		log.debug("tempFile {}", tempFile.getFileName().toString());
 		multipart.transferTo(tempFile);
@@ -90,6 +93,7 @@ public abstract class AbstractApiDelegate {
 			throwExceptionRequestError(e, "Erreur dans la lecture du fichier reçu", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return fileToCheck;
+		
 	}
 
 	protected Boolean isExpectedAcceptHeader(Optional<String> header, String expectedAcceptHeader) {
