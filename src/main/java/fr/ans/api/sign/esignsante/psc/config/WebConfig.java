@@ -32,7 +32,7 @@ public class WebConfig {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
-				.title("EsignSante-psc V " + buildProperties.getVersion())
+				.title("eSignSante-PSC v" + buildProperties.getVersion())
 				.description("Api de signature à partir d'un jeton ProSantéConnect")
 				.license("Apache 2.0")
 				.licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
