@@ -9,13 +9,13 @@
 	</parent>
 	<groupId>fr.ans.sign</groupId>
 	<artifactId>esignsante-psc</artifactId>
-	<version>0.0.45-SNAPSHOT</version>
+	<version>0.0.45</version>
 	<name>esignsante-psc</name>
 
 	<packaging>jar</packaging>
 
 	<scm>
-		<developerConnection>scm:svn:http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-psc/trunk</developerConnection>
+		<developerConnection>scm:svn:http://scm-forge.asipsante.fr:18080/svn/esignsante/esignsante-psc/tags/esignsante-psc-0.0.45</developerConnection>
 	</scm>
 
 	<description>webservice REST de signature à partir d'un jeton prosante connect</description>
