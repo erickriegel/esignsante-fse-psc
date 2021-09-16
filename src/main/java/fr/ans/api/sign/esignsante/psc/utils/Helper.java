@@ -105,7 +105,7 @@ public class Helper {
 
 		} catch (Exception e) {
 			log.error("Erreur technique durant le parse de la reponse d'intropection PSC: champ {} ", e.getMessage());
-			e.printStackTrace();
+			log.debug(e.toString());
 			retour = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.tika.Tika;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -35,8 +34,8 @@ public abstract class AbstractApiDelegate {
 	final protected static String HEADER_TYPE = "application/json";
 	protected String msgError = "";
 
-	final private static File TMP_DIR = new File(System.getProperty("java.io.tmpdir")); 
-	final private static Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir")); 
+	private static final Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
+
 	/**
 	 * Gets the request
 	 *
@@ -73,16 +72,16 @@ public abstract class AbstractApiDelegate {
 
 	protected File multipartFileToFile(MultipartFile multipart) throws IOException {
 
-		String unsafeFileName =  multipart.getOriginalFilename();
+		String unsafeFileName = multipart.getOriginalFilename();
 		String pureFilename = (new File(unsafeFileName)).getName();
-		
+
 		log.debug(" multipart.getOriginalFilename: {}. Use {} as name", unsafeFileName, pureFilename);
-		
+
 		Path tempFile = Files.createTempFile(TMP_PATH, pureFilename, null);
 		log.debug("tempFile {}", tempFile.getFileName().toString());
 		multipart.transferTo(tempFile);
 		return tempFile.toFile();
-	
+
 	}
 
 	protected File getMultiPartFile(MultipartFile file) {
@@ -92,11 +91,11 @@ public abstract class AbstractApiDelegate {
 			log.debug("fileToCheck isFile: {} \t name: {} \t length {}", fileToCheck.isFile(), fileToCheck.getName(),
 					fileToCheck.length());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 			throwExceptionRequestError(e, "Erreur dans la lecture du fichier reçu", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return fileToCheck;
-		
+
 	}
 
 	protected Boolean isExpectedAcceptHeader(Optional<String> header, String expectedAcceptHeader) {
@@ -118,7 +117,7 @@ public abstract class AbstractApiDelegate {
 			detectedType = tika.detect(fichierAtester);
 			log.debug("Verification du fichier {} type detecté: {}", fichierAtester.getName(), detectedType);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 			throwExceptionRequestError(e, "Execption sur vérification du type de fichier transmis",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}

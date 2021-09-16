@@ -67,6 +67,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	@Autowired
 	ProsanteConnectCalls pscApi;
 
+	private static final String SIGNER_XADES = "Délégataire de signature pour ";
+	
+	private static final String SIGNER_PADES = "Signé pour le compte de ";
+	
 	@Override
 	public ResponseEntity<org.springframework.core.io.Resource> postAskSignaturePades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
@@ -92,7 +96,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		try {
 			signedDoc = Helper.decodeBase64toByteArray(signedStringBase64);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		Resource resource = new FileResource(signedDoc, "SIGNED_" + file.getOriginalFilename());
@@ -103,6 +107,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 	}
 
+	@Override
 	public ResponseEntity<String> postAsksignatureXades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
 			@ApiParam(value = "Objet contenant le fichier ) signer et le UserInfo") @Valid @RequestPart(value = "file", required = true) MultipartFile file,
@@ -127,7 +132,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		try {
 			signedString = Helper.decodeBase64toString(signedStringBase64);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
@@ -155,7 +160,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			}
 		} catch (JsonProcessingException | UnsupportedEncodingException | URISyntaxException e1) {
 			msgError = msgError.concat(" , JsonProcessingException");
-			e1.printStackTrace();
+			log.debug(e1.toString());
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
@@ -180,7 +185,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		try {
 			dao.archivePreuve(proof);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 			throwExceptionRequestError(e,
 					"Requête abandonnée pour problème d'archivage de la preuve en base de données. ",
 					HttpStatus.SERVICE_UNAVAILABLE);
@@ -194,7 +199,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		try {
 			userInfo = Helper.jsonBase64StringToUserInfo(jsonUserInfoBase64);
 		} catch (JsonProcessingException | UnsupportedEncodingException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 			throwExceptionRequestError(e, "Exception en parsant le userInfo reçu: " + jsonUserInfoBase64,
 					HttpStatus.BAD_REQUEST);
 		}
@@ -264,7 +269,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
 
 		// liste des signataires
-		List<String> signers = new ArrayList<String>();
+		List<String> signers = setSigners(typeSignature, user);
 
 		// Appel esignsante
 		log.debug("Appel esignWS pour une signature de type {}", typeSignature.getTypeSignature());
@@ -282,5 +287,21 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		archivagePreuve(report, params.getRequestID(), user, params.getDate());
 		return report;
+	}
+	
+	private List<String> setSigners(TYPE_SIGNATURE typeSignature, UserInfo userinfo) {
+		List<String> retour = new ArrayList<String>();
+		String signer = SIGNER_XADES;
+		
+		if (typeSignature.getTypeSignature().equals(TYPE_SIGNATURE.PADES.toString())) {
+			signer = SIGNER_PADES;
+		}
+		signer = signer.concat(userinfo.getFamilyName())
+				.concat(" (")
+				.concat(userinfo.getSubjectNameID())
+				.concat(")");
+		log.error("signer: " + signer);
+		retour.add(signer);
+		return retour;
 	}
 }
