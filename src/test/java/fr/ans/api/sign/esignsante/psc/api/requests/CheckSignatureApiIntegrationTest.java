@@ -147,8 +147,6 @@ public class CheckSignatureApiIntegrationTest {
 
     	//TODO argumentMatcher sur le début du nom de fichier
     	 Mockito.doReturn(report).when(esignWS).chekSignaturePades(any(File.class));
-    	
-    	
   		
    		ResultActions returned = mockMvc
  				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/pades")
@@ -160,46 +158,5 @@ public class CheckSignatureApiIntegrationTest {
 	}
 
     
-//    @Test
-//	@DisplayName("CheckSignature PADES. Mauvais type fichier")
-//	public void checkSignPADES_BadFileTest() throws Exception {
-//
-//    	MockMultipartFile fileSignedXML = new MockMultipartFile(
-//    			"file",
-//    			"signedipsfra.xml",
-//    			null,
-//				Files.readAllBytes(
-//						new ClassPathResource("EsignSanteWS/Xades/signedipsfra.xml").getFile().toPath()));
-//
-//    	 Mockito.doThrow(new org.springframework.web.client.HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED)).when(esignWS)
-//    			 .chekSignaturePades(any(File.class));
-//
-////   	 Mockito.doReturn(new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED)).when(esignWS)
-////			 .chekSignaturePades(any(File.class));
-//	 
-//    	ResultActions returned = mockMvc
-// 				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/pades")
-// 						.file(fileSignedXML)				
-// 						.characterEncoding("UTF-8").accept(MediaType.APPLICATION_JSON))
-// 				.andExpect(status().isNotImplemented()).andExpect(content().json(body501));
-//		
-//		returned.andDo(document("checkSignPADES/BadFileFormat"));
-//	}
-
-//    @Test
-//	@DisplayName("CheckSignature XADES. Mauvais type fichier")
-//	public void checkSignXADES_BadFileTest() throws Exception {
-//
-//		ResultActions returned = mockMvc
-//				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/xades")
-//						.file("file",
-//								Files.readAllBytes(
-//										new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()))
-//						.characterEncoding("UTF-8").accept(MediaType.APPLICATION_JSON))
-//				.andExpect(status().isNotImplemented()).andExpect(content().json(body501));
-//		
-//		returned.andDo(document("checkSignXADES/BadFileFormat"));
-//	}
    
-
 }

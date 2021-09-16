@@ -78,7 +78,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Pades");
-
+	
 //		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
 //				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
 //			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}",
@@ -114,6 +114,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Xades");
+
 //
 //		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
 //				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)) == false) {
@@ -152,7 +153,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			result = pscApi.isTokenActive(token);
 			httpStatus = Helper.parsePSCresponse(result);
 			log.debug("Appel PSC intropesction: token= {}  reponse PSC = {} ", token, result);
-			log.debug("TODELETE" + httpStatus);
 			if (httpStatus == HttpStatus.BAD_REQUEST) {
 				msgError = "L'accessToken fourni dans la requête n'est pas reconnu comme un token actif par ProSanteConnect token: "
 						+ token + " response PSC: " + result;
@@ -195,6 +195,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	}
 
 	private UserInfo extractUserInfoFromRequest(String jsonUserInfoBase64) {
+		log.debug("ICI TODELETE jsonUserInfoBase64: " +jsonUserInfoBase64);
 		UserInfo userInfo = null;
 		try {
 			userInfo = Helper.jsonBase64StringToUserInfo(jsonUserInfoBase64);
@@ -251,7 +252,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		}
 
 		log.debug(
-				"Demande de signature valid: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
+				"Demande de signature valide: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
 				params.getPscReponse(), params.getFileToSign().getName(),
 				params.getUserinfo().getSubjectOrganization());
 

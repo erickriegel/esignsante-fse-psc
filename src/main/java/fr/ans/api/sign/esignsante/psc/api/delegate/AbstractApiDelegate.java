@@ -125,10 +125,10 @@ public abstract class AbstractApiDelegate {
 	}
 
 	protected void throwExceptionRequestError(Exception e, String msg, HttpStatus status) {
-		log.error("Requête en echec. Message retourné à l'utilisateur: {}", msg);
-		log.error("classe Exception: {}", e.getClass().getName());
-		log.error("cause de l'eException: {}", e.getCause());
-		log.error("message de l'exception {}", e.getMessage());
+		log.debug("Requête en echec. Message retourné à l'utilisateur: {}", msg);
+		log.debug("classe Exception: {}", e.getClass().getName());
+		log.debug("cause de l'eException: {}", e.getCause());
+		log.debug("message de l'exception {}", e.getMessage());
 		throwExceptionRequestError(msg, status);
 	}
 
