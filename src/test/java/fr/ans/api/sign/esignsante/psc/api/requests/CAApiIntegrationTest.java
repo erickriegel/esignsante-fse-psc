@@ -86,7 +86,7 @@ public class CAApiIntegrationTest {
 
 	@Test
 	@DisplayName("/ca: cas non passant. Header 'accept' non valide")
-	public void rootGetTestBadAcceptHeader() throws Exception {
+	public void rootGetBadAcceptHeaderTest() throws Exception {
 
 		ResultActions returned = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML))
 				.andExpect(status().isNotAcceptable());

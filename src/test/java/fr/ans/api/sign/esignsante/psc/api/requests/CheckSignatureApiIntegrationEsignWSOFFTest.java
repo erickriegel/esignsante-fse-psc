@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -81,5 +82,50 @@ public class CheckSignatureApiIntegrationEsignWSOFFTest {
 
 		returned.andDo(document("checkSignPADES/esginWS_OFF"));
 	}
+
+	 @Test
+		@DisplayName("PADES  cas non passant. Header 'accept' non valide")
+		public void checkPADESBadAcceptHeaderTest() throws Exception {
+
+
+	    	MockMultipartFile fileSignedPDF = new MockMultipartFile(
+	    			"file",
+	    			"ANS_SIGNED.pdf",
+	    			null,
+					Files.readAllBytes(
+							new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
+
+	    	
+	    	ResultActions returned = mockMvc
+	 				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/pades")
+	 						.file(fileSignedPDF)				
+	 						.characterEncoding("UTF-8").accept(MediaType.APPLICATION_XML))
+	 				.andExpect(status().isNotAcceptable());
+	    	
+			returned.andDo(document("checkSignPADES/KO_NotAcceptable"));
+		}
+	    
+
+	    @Test
+		@DisplayName("XADES  cas non passant. Header 'accept' non valide")
+		public void checkXADESBadAcceptHeaderTest() throws Exception {
+
+	    	MockMultipartFile fileSignedXML = new MockMultipartFile(
+	    			"file",
+	    			"signedipsfra.xml",
+	    			null,
+					Files.readAllBytes(
+							new ClassPathResource("EsignSanteWS/Xades/signedipsfra.xml").getFile().toPath()));
+
+	    	
+	    	
+	    	ResultActions returned = mockMvc
+	 				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/pades")
+	 						.file(fileSignedXML)				
+	 						.characterEncoding("UTF-8").accept(MediaType.APPLICATION_PDF))
+	 				.andExpect(status().isNotAcceptable());
+	    	
+			returned.andDo(document("checkSignPADES/KO_NotAcceptable"));
+		}
 
 }

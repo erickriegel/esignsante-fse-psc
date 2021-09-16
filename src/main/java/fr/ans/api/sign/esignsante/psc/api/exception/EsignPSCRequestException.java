@@ -16,7 +16,7 @@ public class EsignPSCRequestException extends RuntimeException{
 
 	@Getter
 	@Setter
-	private transient fr.ans.api.sign.esignsante.psc.model.Error erreur;
+	private fr.ans.api.sign.esignsante.psc.model.Error erreur;
 
 	@Getter
 	@Setter

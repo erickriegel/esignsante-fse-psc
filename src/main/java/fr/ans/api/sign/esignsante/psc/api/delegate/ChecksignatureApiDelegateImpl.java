@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 import fr.ans.api.sign.esignsante.psc.api.ChecksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Error;
@@ -95,6 +96,8 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			// comprend erreur 400: requête mal formée, 404 id conf introuvable.
 			throwExceptionRequestError("Echec de l'appel à esignsanteWS: Exception non gérée",
 					HttpStatus.INTERNAL_SERVER_ERROR);
+			break;
+
 		}
 		return status;
 	}
@@ -142,7 +145,10 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			//lève une Exception http avec un status dépendant de la classe de l'exception
 			interceptErrorCheckSignature(e);
 		}
-		
+		if (report == null) {
+			throwExceptionRequestError("Exception technique inattendue",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		Result result = esignsanteReportToResult(report);
 		re = new ResponseEntity<>(result, HttpStatus.OK);
 

@@ -101,9 +101,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal Server Error
+          description: Erreur interne du serveur
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
@@ -154,9 +154,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '500':
-          description: Internal Server Error
+          description: Erreur interne du serveur
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
@@ -198,7 +198,7 @@ paths:
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
@@ -230,7 +230,7 @@ paths:
         '501':
           description: L'opération n'est pas supportée par le serveur.
         '503':
-          description: Service Unavailable
+          description: Service indisponible
       requestBody:
         content:
           multipart/form-data:
