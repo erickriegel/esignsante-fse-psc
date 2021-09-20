@@ -3,14 +3,9 @@
  */
 package fr.ans.api.sign.esignsante.psc.api.requests;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,43 +19,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.nimbusds.common.contenttype.ContentType;
 
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.esignsante.model.ESignSanteValidationReport;
 import fr.ans.esignsante.model.Erreur;
 
-//import static org.mockito.Mockito.*;
-
-// pour COnfigWireMock -> https://stackoverflow.com/questions/46403420/import-static-com-github-tomakehurst-wiremock-core-wiremockconfiguration-wiremoc
-//import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 /**
  * Test des EndPoints offerts par l'API esignsante-psc.
@@ -94,7 +75,7 @@ public class CheckSignatureApiIntegrationTest {
     EsignsanteCall esignWS;
     
     final String bodyOK = "{\"valid\":true,\"errors\":[]}";
-    final String body501 = "{\"code\":\"501 NOT_IMPLEMENTED\",\"message\":\"Echec de l'appel à esignsanteWS. Cause possible: erreur sur le type de fichier fourni (par exemple non xml pour Xades, non PDF pour PADES) \"}";
+
     
     ESignSanteValidationReport report;
     List<Erreur> erreurs;
@@ -157,6 +138,6 @@ public class CheckSignatureApiIntegrationTest {
 		returned.andDo(document("checkSignPADES/OK")); 
 	}
 
-    
+  
    
 }

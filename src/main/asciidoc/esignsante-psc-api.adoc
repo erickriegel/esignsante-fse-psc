@@ -256,7 +256,7 @@ include::{snippets}/signXADES/OK/http-response.adoc[]
 Payload:
 include::{snippets}/signXADES/OK/response-body.adoc[]
 
-=== Cas non passant
+=== Cas non passant 400 (token non actif)
 L'access Token fourni dans la requête n'est plus vu comme un token actif par ProSanteConnect
 
 .request
@@ -269,26 +269,71 @@ include::{snippets}/signXADES/TokenKo/request-body.adoc[]
 .response
 include::{snippets}/signXADES/TokenKo/http-response.adoc[]
 
-=== Cas Header Accept non Json
+
+=== Cas non passant 503 (WS OFF)
+Le webservices 'esignsanteWebservices' n'est pas disponible
+
+http:
+include::{snippets}/signXADES/esginWS_OFF/http-request.adoc[]
+
+httpIE:
+include::{snippets}/signXADES/esginWS_OFF/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/signXADES/esginWS_OFF/curl-request.adoc[]
+
+.response
+include::{snippets}/signXADES/esginWS_OFF/http-response.adoc[]
+
+
+
+== Demande de signature PADES
+
+=== cas passant 200
 .request
-include::{snippets}/signXADES/HeaderKO/http-request.adoc[]
+http:
+include::{snippets}/signPADES/OK/http-request.adoc[]
+
+httpIE:
+include::{snippets}/signPADES/OK/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/signPADES/OK/curl-request.adoc[]
+
+.response
+include::{snippets}/signPADES/OK/http-response.adoc[]
+
+Payload:
+include::{snippets}/signPADES/OK/response-body.adoc[]
+
+=== Cas non passant 400 (token non actif)
+L'access Token fourni dans la requête n'est plus vu comme un token actif par ProSanteConnect
+
+.request
+include::{snippets}/signPADES/TokenKo/http-request.adoc[]
 
 payload:
-include::{snippets}/signXADES/HeaderKO/request-body.adoc[]
+include::{snippets}/signPADES/TokenKo/request-body.adoc[]
 
 
 .response
-include::{snippets}/signXADES/HeaderKO/http-response.adoc[]
+include::{snippets}/signPADES/TokenKo/http-response.adoc[]
 
 
-=== Cas Stream In KO
-.request
-include::{snippets}/signXADES/StreamKo/http-request.adoc[]
+=== Cas non passant 503 (WS OFF)
+Le webservices 'esignsanteWebservices' n'est pas disponible
 
+http:
+include::{snippets}/signPADES/esginWS_OFF/http-request.adoc[]
+
+httpIE:
+include::{snippets}/signPADES/esginWS_OFF/httpie-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/signPADES/esginWS_OFF/curl-request.adoc[]
 
 .response
-include::{snippets}/signXADES/StreamKo/http-response.adoc[]
-
+include::{snippets}/signPADES/esginWS_OFF/http-response.adoc[]
 
 
 

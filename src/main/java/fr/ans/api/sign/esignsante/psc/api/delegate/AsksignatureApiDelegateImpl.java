@@ -191,11 +191,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
-		log.debug("Fin archivage de la preuve en BDD pour request id: {}\", requestID");
+		log.debug("Fin archivage de la preuve en BDD pour request id: {}", requestID);
 	}
 
-	private UserInfo extractUserInfoFromRequest(String jsonUserInfoBase64) {
-		log.debug("ICI TODELETE jsonUserInfoBase64: " +jsonUserInfoBase64);
+	private UserInfo extractUserInfoFromRequest(String jsonUserInfoBase64) {		
 		UserInfo userInfo = null;
 		try {
 			userInfo = Helper.jsonBase64StringToUserInfo(jsonUserInfoBase64);

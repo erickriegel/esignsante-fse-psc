@@ -3,6 +3,7 @@
  */
 package fr.ans.api.sign.esignsante.psc.api.requests;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -48,15 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AskApiIntegrationTest {
 
-	/*
-	 * setUp pour restdocs
-	 */
-	@BeforeEach
-	public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-				.apply(documentationConfiguration(restDocumentation)).build();
-	}
-
+	
 	/** The mock mvc. */
 	@Autowired
 	private MockMvc mockMvc;
@@ -66,6 +59,17 @@ public class AskApiIntegrationTest {
 	
 	@MockBean
 	ProsanteConnectCalls pscApi;
+
+	final String accessToken = "accessTokenValue";
+	
+	/*
+	 * setUp pour restdocs
+	 */
+	@BeforeEach
+	public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+				.apply(documentationConfiguration(restDocumentation)).build();
+	}
 
 	@Test
 	@DisplayName("ask XADES 200")
@@ -77,6 +81,7 @@ public class AskApiIntegrationTest {
 		
 		report.setDocSigne(Files.readString(
 				new ClassPathResource("EsignSanteWS/Xades/signedipsfra.xml.base64.txt").getFile().toPath()));
+
 		
 		String reponsePSCActif = Files.readString(
 				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
@@ -88,6 +93,9 @@ public class AskApiIntegrationTest {
     	report.setValide(true);    	
     	report.setErreurs(new ArrayList<Erreur>());
    
+    	final String bodyXMLOK = (Files.readString(
+				new ClassPathResource("EsignSanteWS/Xades/signedipsfra.xml").getFile().toPath()));
+		
     	
     	MockMultipartFile fileXML = new MockMultipartFile(
     			"file",
@@ -100,25 +108,33 @@ public class AskApiIntegrationTest {
     	//intro PSC
     	Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
     	
- //   	 Mock de signatureXades(File fileToSign, List<String> signers, String requestId, List<OpenidToken> openidTokens)
-    	 Mockito.doReturn(report).when(esignWS).signatureXades(any(File.class),any(List.class),any(),any(List.class) );
+     	 Mockito.doReturn(report).when(esignWS).signatureXades(any(File.class),any(List.class),any(),any(List.class) );
     		
     	 HttpHeaders httpHeaders = new HttpHeaders();
     	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
     	 acceptedMedia.add(MediaType.APPLICATION_JSON);
     	 acceptedMedia.add(MediaType.APPLICATION_XML);
     	 httpHeaders.setAccept(acceptedMedia);
-    	 httpHeaders.add("access_token", "err");
+    	 httpHeaders.add("access_token", accessToken);
     	 
  
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
   				.file(fileXML)
-  				.file("userinfo", userInfobase64.getBytes())
-  				//.header("access_token", "err")
-  				.headers(httpHeaders)
-                .accept("application/json,application/xml"))
-  				.andExpect(status().isOk());
- 				
+  				.file("userinfo", userInfobase64.getBytes())  				
+  				.headers(httpHeaders))
+    			 .andExpect(status().isOk());
+    	
+    	 
+ 		assertEquals(returned.andReturn().getResponse().getContentType(), "application/xml");	
+		
+
+    	    	 
+    	 String content = returned.andReturn().getResponse().getContentAsString();
+    	 System.out.println("content  " + content);
+    	 assertTrue(content.contains("<ds:X509SubjectName>"));
+    	 assertTrue(content.contains("URI=\"#xades-id"));
+    	 
+				
     	 //TODO contrôle de l'archivage
     	 
   		returned.andDo(document("signXADES/OK"));
@@ -133,6 +149,7 @@ public class AskApiIntegrationTest {
 		String reponsePSCNonActif = Files.readString(
 				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
 		
+		
     	MockMultipartFile fileXML = new MockMultipartFile(
     			"file",
     			"ipsfra.xml",
@@ -143,27 +160,123 @@ public class AskApiIntegrationTest {
     	String userInfobase64 = Files.readString(
 				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
     	
-    	 HttpHeaders httpHeaders = new HttpHeaders();
-    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
-    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
-    	 acceptedMedia.add(MediaType.APPLICATION_XML);
-    	 httpHeaders.setAccept(acceptedMedia);
-    	 httpHeaders.add("access_token", "err");
-    	 
-    	
     	//intro PSC
     	Mockito.doReturn(reponsePSCNonActif).when(pscApi).isTokenActive(any());
     	  	
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
   				.file(fileXML)
   				.file("userinfo", userInfobase64.getBytes())
-  				.header("access_token", "err")
+  				.header("access_token", accessToken)
                 .accept("application/json,application/xml"))
   				.andExpect(status().isBadRequest());
  				
+    	
+    	 
   		returned.andDo(document("signXADES/TokenKo"));
                
 	}
 
+
+	@Test
+	@DisplayName("ask PADES 200")
+	public void askPADESTest() throws Exception {
+		
+		ESignSanteSignatureReportWithProof report = new ESignSanteSignatureReportWithProof();
+		report.setValide(true);
+		report.setErreurs(new ArrayList<Erreur>());
+				
+		String reponsePSCActif = Files.readString(
+				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
+		
+//		report.setDocSigne(Files.readAllBytes(
+//				new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED_base64.txt").getFile().toPath()).toString());
+//		
+		report.setDocSigne("nonEditable");
+		
+		
+		String userInfobase64 = Files.readString(
+				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
+    	assertTrue(userInfobase64.endsWith("TVEUwMDIxODg5In0="));
+		
+        	    	
+    	MockMultipartFile filePDF = new MockMultipartFile(
+    			"file",
+    			"ANS.pdf",
+    			null,
+				Files.readAllBytes(
+						new ClassPathResource("EsignSanteWS/Pades/ANS.pdf").getFile().toPath()));
+
+    	
+    	//intro PSC
+    	Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
+    	
+    	 Mockito.doReturn(report).when(esignWS).signaturePades(any(File.class),any(List.class),any(),any(List.class) );
+    		
+    	 HttpHeaders httpHeaders = new HttpHeaders();
+    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
+    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
+    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
+    	 httpHeaders.setAccept(acceptedMedia);
+    	 httpHeaders.add("access_token", accessToken);
+    	 
+ 
+    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
+  				.file(filePDF)
+  				.file("userinfo", userInfobase64.getBytes())  				
+  				.headers(httpHeaders))
+  				.andExpect(status().isOk());
+ 				
+    	 assertEquals(returned.andReturn().getResponse().getContentType(), "application/pdf");
+    	
+//    	 byte[] content = returned.andReturn().getResponse().getContentAsByteArray();
+//    	 assertTrue(content.toString().contains("%PDF-1.7"));
+//    	 assertTrue(content.toString().contains("/Type /Sig"));
+//    	 
+    	     			 
+    			 //TODO contrôle de l'archivage
+    			 
+  		returned.andDo(document("signPADES/OK"));
+               
+	}
+	
+	
+	@Test
+	@DisplayName("ask PADES token non actif")
+	public void askPADESTokenKOTest() throws Exception {
+		
+		String reponsePSCNonActif = Files.readString(
+				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
+		
+    	MockMultipartFile fileXML = new MockMultipartFile(
+    			"file",
+    			"ANS_SIGNED.pdf",
+    			null,
+				Files.readAllBytes(
+						new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
+
+    	String userInfobase64 = Files.readString(
+				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
+    	
+    	 HttpHeaders httpHeaders = new HttpHeaders();
+    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
+    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
+    	 acceptedMedia.add(MediaType.APPLICATION_XML);
+    	 httpHeaders.setAccept(acceptedMedia);
+    	 httpHeaders.add("access_token", accessToken);
+    	 
+    	
+    	//intro PSC
+    	Mockito.doReturn(reponsePSCNonActif).when(pscApi).isTokenActive(any());
+    	  	
+    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
+  				.file(fileXML)
+  				.file("userinfo", userInfobase64.getBytes())
+  				.header("access_token",accessToken)
+                .accept("application/json,application/pdf"))
+  				.andExpect(status().isBadRequest());
+ 				
+  		returned.andDo(document("signPADES/TokenKo"));
+               
+	}
 
 }

@@ -120,12 +120,15 @@ public class CheckSignatureApiIntegrationEsignWSOFFTest {
 	    	
 	    	
 	    	ResultActions returned = mockMvc
-	 				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/pades")
+	 				.perform(MockMvcRequestBuilders.multipart("/v1/checksignature/xades")
 	 						.file(fileSignedXML)				
-	 						.characterEncoding("UTF-8").accept(MediaType.APPLICATION_PDF))
+	 						.characterEncoding("UTF-8").accept(MediaType.APPLICATION_XML))
 	 				.andExpect(status().isNotAcceptable());
 	    	
-			returned.andDo(document("checkSignPADES/KO_NotAcceptable"));
+			returned.andDo(document("checkSignXADES/KO_NotAcceptable"));
 		}
+	    
+	    
+	  
 
 }
