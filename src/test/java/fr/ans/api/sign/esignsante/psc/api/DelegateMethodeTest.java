@@ -4,8 +4,11 @@
 package fr.ans.api.sign.esignsante.psc.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +17,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.delegate.AsksignatureApiDelegateImpl;
 import fr.ans.api.sign.esignsante.psc.api.delegate.ChecksignatureApiDelegateImpl;
 import fr.ans.api.sign.esignsante.psc.model.Result;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
+import fr.ans.api.sign.esignsante.psc.utils.ParametresSign;
 import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
 import fr.ans.esignsante.model.ESignSanteValidationReport;
 import fr.ans.esignsante.model.Erreur;
@@ -83,5 +90,6 @@ public class DelegateMethodeTest {
 		assertTrue(signers.get(0).contains(userinfo.getFamilyName()));
 		assertTrue(signers.get(0).contains(userinfo.getSubjectNameID()));
 	}
+	
 
 }

@@ -138,16 +138,18 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			} else {
 				report = esignWS.chekSignaturePades(fileToCheck);
 			}
-			if (report == null) {
-				throwExceptionRequestError("Exception technique inattendue",
-						HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-				
+	
 
 		} catch (Exception e) {
 			//lève une Exception http avec un status dépendant de la classe de l'exception
 			interceptErrorCheckSignature(e);
 		}
+		
+		if (report == null) {
+			throwExceptionRequestError("Exception technique inattendue",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+			
 		Result result = esignsanteReportToResult(report);
 		re = new ResponseEntity<>(result, HttpStatus.OK);
 

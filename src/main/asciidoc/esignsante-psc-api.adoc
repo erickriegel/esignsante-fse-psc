@@ -9,15 +9,6 @@ http://localhost:8080:/esignsante-psc/v1/swagger-ui/ +
 Ne pas oublier d'activer le profil 'swagger' au démarrage de Spring: 
 java -jar *-Dspring.profiles.active=swagger* esignsante-psc-0.0.13-SNAPSHOT.jar .../application.properties ...
 
-== Pour DEV (à supprimer)
-URL racine http://localhost:8080:/esignsante-psc/v1 +
-version: +
-artifact: +
-
-start class (from POM properties)=>:: {start-class}
-
-<balise></balise>
-& é è " ^ $ à ç 
 
 == Interrogation de l'API
 Liste des services exposés
