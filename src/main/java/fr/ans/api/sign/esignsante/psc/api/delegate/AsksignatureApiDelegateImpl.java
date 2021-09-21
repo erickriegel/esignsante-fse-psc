@@ -271,14 +271,19 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			} else {
 				report = esignWS.signatureXades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
 			}
-			if (report != null) {
-			archivagePreuve(report, params.getRequestID(), user, params.getDate());
-			}
+			
 		} catch (RestClientException e) {
 			throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
 					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
+		if (report == null) {
+			throwExceptionRequestError("Exception technique sur appel esignWS",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+			
+		archivagePreuve(report, params.getRequestID(), user, params.getDate());
+		
 		return report;
 	}
 	
