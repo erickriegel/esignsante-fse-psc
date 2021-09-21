@@ -3,7 +3,6 @@
  */
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
-import java.io.File;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 import fr.ans.api.sign.esignsante.psc.api.ChecksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Error;
@@ -86,7 +84,6 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			// 404: erreur sur l'id de la conf d'esignsWS
 			log.error("Echec de l'appel à esignsanteWS => HttpClientErrorException.NotFound");
 			log.error("\t cause possible: identifiant de configuration esignWS invalid.");
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
 			throwExceptionRequestError(
 					"Echec de l'appel à esignsanteWS. Cause possible: identifiant de configuration esignWS invalid.) ",
 					HttpStatus.INTERNAL_SERVER_ERROR);
@@ -109,7 +106,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		List<Erreur> erreurs = report.getErreurs();
 		List<Error> errors = Helper.mapListErreurToListError(erreurs);
 
-		Result result = new Result();
+		var result = new Result();
 		result.setValid(report.isValide());
 		result.setErrors(errors);
 
@@ -127,19 +124,22 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 					HttpStatus.NOT_ACCEPTABLE);
 		}
 
-		File fileToCheck = getMultiPartFile(file);
+		var fileToCheck = getMultiPartFile(file);
 		if (fileToCheck == null) {
 			throwExceptionRequestError("Le fichier signé à contrôler n'a pas pu être lu",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		ESignSanteValidationReport report = null;
-
+		Result result = null;
 		try {
-			if (typeSignature.equals(TYPE_SIGNATURE.XADES)) {
+			if (TYPE_SIGNATURE.XADES.equals(typeSignature)) {
 				report = esignWS.chekSignatureXades(fileToCheck);
 			} else {
 				report = esignWS.chekSignaturePades(fileToCheck);
+			}
+			if (report != null) {
+				result = esignsanteReportToResult(report);				
 			}
 		} catch (Exception e) {
 			//lève une Exception http avec un status dépendant de la classe de l'exception
@@ -149,7 +149,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 			throwExceptionRequestError("Exception technique inattendue",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		Result result = esignsanteReportToResult(report);
+
 		re = new ResponseEntity<>(result, HttpStatus.OK);
 
 		return re;

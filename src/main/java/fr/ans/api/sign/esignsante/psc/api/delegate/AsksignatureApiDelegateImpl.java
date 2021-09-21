@@ -266,17 +266,19 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("Appel esignWS pour une signature de type {}", typeSignature.getTypeSignature());
 		ESignSanteSignatureReportWithProof report = null;
 		try {
-			if (typeSignature.getTypeSignature().equals(TYPE_SIGNATURE.PADES.toString())) {
+			if ((TYPE_SIGNATURE.PADES.toString()).equals(typeSignature.getTypeSignature())) {
 				report = esignWS.signaturePades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
 			} else {
 				report = esignWS.signatureXades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
+			}
+			if (report != null) {
+			archivagePreuve(report, params.getRequestID(), user, params.getDate());
 			}
 		} catch (RestClientException e) {
 			throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
 					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
-		archivagePreuve(report, params.getRequestID(), user, params.getDate());
 		return report;
 	}
 	

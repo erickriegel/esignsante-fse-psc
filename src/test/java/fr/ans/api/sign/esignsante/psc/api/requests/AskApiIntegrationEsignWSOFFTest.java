@@ -96,7 +96,7 @@ public class AskApiIntegrationEsignWSOFFTest {
   				.headers(httpHeaders))
 				.andExpect(status().isServiceUnavailable()).andExpect(content().json(body));
 
-		assertEquals(returned.andReturn().getResponse().getContentType(), "application/json");	
+		assertEquals("application/json",returned.andReturn().getResponse().getContentType());	
 		returned.andDo(document("signXADES/esginWS_OFF")); // RestDcos
 	}
 
@@ -133,7 +133,7 @@ public class AskApiIntegrationEsignWSOFFTest {
   				.headers(httpHeaders))
 				.andExpect(status().isServiceUnavailable());
 				
-		assertEquals(returned.andReturn().getResponse().getContentType(), "application/json");	
+		assertEquals("application/json",returned.andReturn().getResponse().getContentType());	
 		
 				returned.andExpect(content().json(body));
 				

@@ -125,7 +125,7 @@ public class AskApiIntegrationTest {
     			 .andExpect(status().isOk());
     	
     	 
- 		assertEquals(returned.andReturn().getResponse().getContentType(), "application/xml");	
+ 		assertEquals("application/xml", returned.andReturn().getResponse().getContentType());	
 		
 
     	    	 
@@ -226,13 +226,9 @@ public class AskApiIntegrationTest {
   				.headers(httpHeaders))
   				.andExpect(status().isOk());
  				
-    	 assertEquals(returned.andReturn().getResponse().getContentType(), "application/pdf");
+    	 assertEquals("application/pdf", returned.andReturn().getResponse().getContentType());
     	
-//    	 byte[] content = returned.andReturn().getResponse().getContentAsByteArray();
-//    	 assertTrue(content.toString().contains("%PDF-1.7"));
-//    	 assertTrue(content.toString().contains("/Type /Sig"));
-//    	 
-    	     			 
+   	     			 
     			 //TODO contrôle de l'archivage
     			 
   		returned.andDo(document("signPADES/OK"));
