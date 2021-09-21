@@ -191,7 +191,7 @@ public class AskApiIntegrationTest {
 //		report.setDocSigne(Files.readAllBytes(
 //				new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED_base64.txt").getFile().toPath()).toString());
 //		
-		report.setDocSigne("nonEditable");
+		report.setDocSigne("bm9uRWRpdGFibGU=");
 		
 		
 		String userInfobase64 = Files.readString(
@@ -279,4 +279,45 @@ public class AskApiIntegrationTest {
                
 	}
 
+	@Test
+	@DisplayName("ask PADES fichier non pdf")
+	public void askPADESNotPDF() throws Exception {
+		
+		
+		String reponsePSCActif = Files.readString(
+				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
+		
+		String userInfobase64 = Files.readString(
+				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
+    	assertTrue(userInfobase64.endsWith("TVEUwMDIxODg5In0="));
+		
+    	MockMultipartFile fileXML = new MockMultipartFile(
+    			"file",
+    			"ipsfra.xml",
+    			null,
+				Files.readAllBytes(
+						new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
+
+   	
+    	 HttpHeaders httpHeaders = new HttpHeaders();
+    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
+    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
+    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
+    	 httpHeaders.setAccept(acceptedMedia);
+    	 httpHeaders.add("access_token", accessToken);
+    	 
+    	
+    	//intro PSC
+    	Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
+    	  	
+    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
+  				.file(fileXML)
+  				.file("userinfo", userInfobase64.getBytes())
+  				.header("access_token",accessToken)
+                .accept("application/json,application/pdf"))
+  				.andExpect(status().isBadRequest());
+ 				
+  		returned.andDo(document("signPADES/BadFileFormat"));
+               
+	}
 }

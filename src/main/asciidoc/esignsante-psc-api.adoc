@@ -319,6 +319,19 @@ include::{snippets}/signPADES/TokenKo/request-body.adoc[]
 .response
 include::{snippets}/signPADES/TokenKo/http-response.adoc[]
 
+=== Cas non passant 400 (fichier non pdf)
+Le fichier à signer fourni n'est pas reconnu comme un fichier PDF.
+
+.request
+include::{snippets}/signPADES/BadFileFormat/http-request.adoc[]
+
+payload:
+include::{snippets}/signPADES/BadFileFormat/request-body.adoc[]
+
+
+.response
+include::{snippets}/signPADES/BadFileFormat/http-response.adoc[]
+
 
 === Cas non passant 503 (WS OFF)
 Le webservices 'esignsanteWebservices' n'est pas disponible
