@@ -101,9 +101,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		}
 		Resource resource = new FileResource(signedDoc, "SIGNED_" + file.getOriginalFilename());
 
-		HttpHeaders httpHeaders = new HttpHeaders();
+		var httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_PDF);
-		return new ResponseEntity<org.springframework.core.io.Resource>(resource, httpHeaders, HttpStatus.OK);
+		return new ResponseEntity<>(resource, httpHeaders, HttpStatus.OK);
 
 	}
 
@@ -118,7 +118,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.XADES, accessToken, file,
 				userinfo);
 
-		String signedStringBase64 = report.getDocSigne();
+		var signedStringBase64 = report.getDocSigne();
 
 		String signedString = null;
 		try {
@@ -129,16 +129,16 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		}
 
-		HttpHeaders httpHeaders = new HttpHeaders();
+		var httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_XML);
 		return new ResponseEntity<>(signedString, httpHeaders, HttpStatus.OK);
 
 	}
 
 	private String checkPSCToken(String token) {
-		HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		String msgError = "Exception sur vérfication de la validté du token PSC: " + token;
-		String result = "Reponse ProSanteConnect inconnue";
+		var result = "Reponse ProSanteConnect inconnue";
 		Boolean bypass = pscApi.bypassResultatPSC();
 		try {
 			result = pscApi.isTokenActive(token);
@@ -155,7 +155,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
-		if (!bypass) {
+		if (Boolean.FALSE.equals(bypass)) {
 			if (!httpStatus.equals(HttpStatus.OK)) {
 				throwExceptionRequestError(msgError, httpStatus);
 			}
@@ -211,11 +211,11 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		resultat.setPscReponse(pscResult);
 
 		// fichier reçu
-		File fileToSign = getMultiPartFile(file);
+		var fileToSign = getMultiPartFile(file);
 		resultat.setFileToSign(fileToSign);
 
 		// extraction du userInfo
-		UserInfo userToPersit = extractUserInfoFromRequest(userinfo);
+		var userToPersit = extractUserInfoFromRequest(userinfo);
 		resultat.setUserinfo(userToPersit);
 
 		// génération d'un UUDI
@@ -247,9 +247,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				params.getUserinfo().getSubjectOrganization());
 
 		// construction du OpenIDToken
-		UserInfo user = params.getUserinfo();
-		List<OpenidToken> openidTokens = new ArrayList<OpenidToken>();
-		OpenidToken openidToken = new OpenidToken();
+		var user = params.getUserinfo();
+		List<OpenidToken> openidTokens = new ArrayList<>();
+		var openidToken = new OpenidToken();
 		openidToken.setAccessToken(accessToken);
 		openidToken.setIntrospectionResponse(params.getPscReponse());
 		openidToken.setUserInfo(userinfo);
@@ -281,7 +281,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	}
 	
 	private List<String> setSigners(TYPE_SIGNATURE typeSignature, UserInfo userinfo) {
-		List<String> retour = new ArrayList<String>();
+		List<String> retour = new ArrayList<>();
 		String signer = SIGNER_XADES;
 		
 		if (typeSignature.getTypeSignature().equals(TYPE_SIGNATURE.PADES.toString())) {
