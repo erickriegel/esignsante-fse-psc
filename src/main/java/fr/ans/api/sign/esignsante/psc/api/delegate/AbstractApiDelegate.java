@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractApiDelegate {
 
-	final protected static String HEADER_TYPE = "application/json";
+	protected static final String HEADER_TYPE = "application/json";
 	protected String msgError = "";
 
 	private static final Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -70,21 +70,20 @@ public abstract class AbstractApiDelegate {
 		return new ArrayList<String>();
 	}
 
-	protected File multipartFileToFile(MultipartFile multipart) throws IOException {
+	public File multipartFileToFile(MultipartFile multipart) throws IOException {
 
 		String unsafeFileName = multipart.getOriginalFilename();
 		String pureFilename = (new File(unsafeFileName)).getName();
 
-		log.debug(" multipart.getOriginalFilename: {}. Use {} as name", unsafeFileName, pureFilename);
-
 		Path tempFile = Files.createTempFile(TMP_PATH, pureFilename, null);
+		log.debug(" multipart.getOriginalFilename: {}. Use {} as name", unsafeFileName, pureFilename);
 		log.debug("tempFile {}", tempFile.getFileName().toString());
 		multipart.transferTo(tempFile);
 		return tempFile.toFile();
 
 	}
 
-	protected File getMultiPartFile(MultipartFile file) {
+	public File getMultiPartFile(MultipartFile file) {
 		File fileToCheck = null;
 		try {
 			fileToCheck = multipartFileToFile(file);
@@ -111,8 +110,8 @@ public abstract class AbstractApiDelegate {
 	}
 
 	protected String checkTypeFile(File fichierAtester) {
-		Tika tika = new Tika();
-		String detectedType = "";
+		var tika = new Tika();
+		var detectedType = "";
 		try {
 			detectedType = tika.detect(fichierAtester);
 			log.debug("Verification du fichier {} type detecté: {}", fichierAtester.getName(), detectedType);
@@ -133,7 +132,7 @@ public abstract class AbstractApiDelegate {
 	}
 
 	protected void throwExceptionRequestError(String msg, HttpStatus status) {
-		fr.ans.api.sign.esignsante.psc.model.Error erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
+		var erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
 		erreur.setCode(status.toString());
 		erreur.setMessage(msg);
 		throw new EsignPSCRequestException(erreur, status);

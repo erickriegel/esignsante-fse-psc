@@ -114,8 +114,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 	}
 
 	private ResponseEntity<Result> execute(TYPE_SIGNATURE typeSignature, MultipartFile file) {
-		ResponseEntity<Result> re = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
+	
 		// controle du acceptheader
 		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
 			log.debug("Demande CheckSignature rejetée car le header Accept = APPLICATION/JSON non présent");
@@ -151,8 +150,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		}
 			
 		Result result = esignsanteReportToResult(report);
-		re = new ResponseEntity<>(result, HttpStatus.OK);
 
-		return re;
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 }

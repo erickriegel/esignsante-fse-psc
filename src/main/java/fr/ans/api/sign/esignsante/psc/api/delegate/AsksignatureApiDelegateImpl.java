@@ -79,14 +79,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		log.debug("Réception d'une demande de signature Pades");
 	
-//		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-//				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
-//			log.error("Demande de signature Xades: rejet pour accept Header non conforme. \n getAcceptHeaders(): {}",
-//					getAcceptHeaders());
-//			throwExceptionRequestError("Le header doit contenir s application/json et application/pdf",
-//					HttpStatus.NOT_ACCEPTABLE);
-//		}
-
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES, accessToken, file,
 				userinfo);
 
