@@ -182,11 +182,11 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		try {
 			userInfo = Helper.jsonBase64StringToUserInfo(jsonUserInfoBase64);
 		} catch (JsonProcessingException e) {
-			throwExceptionRequestError(e, "Le userinfo fourni ne semble pas codé en base 64. UserInfo reçu : " + jsonUserInfoBase64,
+			throwExceptionRequestError(e, "Exception en parsant le userInfo reçu: " + jsonUserInfoBase64,
 					HttpStatus.BAD_REQUEST);
 		}
 		catch (UnsupportedEncodingException | IllegalArgumentException e) {
-			throwExceptionRequestError(e, "Exception en decodant (base 64) le userInfo. Userinfo reçu avant décodage: " + jsonUserInfoBase64,
+			throwExceptionRequestError(e, "Le userinfo fourni ne semble pas codé en base 64. UserInfo reçu : " + jsonUserInfoBase64,
 					HttpStatus.BAD_REQUEST);
 		}
 		return userInfo;
