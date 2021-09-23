@@ -11,6 +11,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
+import fr.ans.api.sign.esignsante.psc.api.delegate.AsksignatureApiDelegateImpl;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
@@ -315,5 +318,52 @@ public class AskApiIntegrationTest {
  				
   		returned.andDo(document("signPADES/BadFileFormat"));
                
+	}
+	
+	@Test
+	public void checkNotEmptyInputParametersTest () throws IOException {
+		MockMultipartFile file = new MockMultipartFile(
+	    			"file",
+	    			"ipsfra.xml",
+	    			null,
+					Files.readAllBytes(
+							new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
+		
+		MockMultipartFile emptyFile = new MockMultipartFile(
+    			"file",
+    			"empty.zzz",
+    			null,
+				Files.readAllBytes(
+						new ClassPathResource("empty.zzz").getFile().toPath()));
+		//cas non passant
+		checkNotEmptyInputParametersKO (null,null,null);
+		checkNotEmptyInputParametersKO ("token",null,"userinfo");
+		checkNotEmptyInputParametersKO ("token",emptyFile,"userinfo");
+		checkNotEmptyInputParametersKO (null,emptyFile,null);
+		checkNotEmptyInputParametersKO (null,emptyFile,"userinfo");
+		checkNotEmptyInputParametersKO ("token",file,null);
+		checkNotEmptyInputParametersKO (null,file,null);
+		checkNotEmptyInputParametersKO ("",file,"userinfo");
+		checkNotEmptyInputParametersKO ("token",file,"");
+		checkNotEmptyInputParametersKO ("token",file,null);
+		checkNotEmptyInputParametersKO (null,file,"userinfo");
+		//cas  passant
+		AsksignatureApiDelegateImpl ask = new AsksignatureApiDelegateImpl();
+		try {
+			ask.checkNotEmptyInputParameters("token",file, "userinfo"); 
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+	}
+	
+	private void checkNotEmptyInputParametersKO(String accessToken, MultipartFile file, String userinfo ) {
+		var askKO = new AsksignatureApiDelegateImpl();
+		try {
+			askKO.checkNotEmptyInputParameters(accessToken, file, userinfo); 
+		assertTrue(false);
+		}
+		catch (Exception e) {
+			assertEquals("fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException",e.getClass().getName());
+		}
 	}
 }

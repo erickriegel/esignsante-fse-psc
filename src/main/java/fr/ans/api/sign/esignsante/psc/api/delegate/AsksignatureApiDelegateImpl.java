@@ -296,15 +296,14 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		return retour;
 	}
 
-	private void checkNotEmptyInputParameters(String accessToken, MultipartFile file, String userinfo) {
+	public void checkNotEmptyInputParameters(String accessToken, MultipartFile file, String userinfo) {
 		if ((accessToken == null) || (file == null) || (userinfo == null)) {
 			throwExceptionRequestError(
 					"Au moins un paramètre indispensable parmi {'file', 'userinfo', 'accessToken'} est nul ou non fourni",
 					HttpStatus.BAD_REQUEST);
 		}
 
-		if ((accessToken.isBlank()) || (accessToken.isEmpty()) || (file.getSize() <= 0) || (userinfo.isBlank())
-				|| (userinfo.isEmpty())) {
+		if ((accessToken.isEmpty()) || (accessToken.isBlank()) || (file.getSize() <= 0) ||  (userinfo.isEmpty()) || (userinfo.isBlank())) {
 			throwExceptionRequestError("Au moins un paramètre parmi {'file', 'userinfo', 'accessToken'} est vide",
 					HttpStatus.BAD_REQUEST);
 		}
