@@ -123,6 +123,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 					HttpStatus.NOT_ACCEPTABLE);
 		}
 
+				
 		var fileToCheck = getMultiPartFile(file);
 		if (fileToCheck == null) {
 			throwExceptionRequestError("Le fichier signé à contrôler n'a pas pu être lu",

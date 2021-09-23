@@ -310,7 +310,7 @@ include::{snippets}/signPADES/TokenKo/request-body.adoc[]
 .response
 include::{snippets}/signPADES/TokenKo/http-response.adoc[]
 
-=== Cas non passant 400 (fichier non pdf)
+=== Cas non passant 415 (fichier non pdf)
 Le fichier à signer fourni n'est pas reconnu comme un fichier PDF.
 
 .request

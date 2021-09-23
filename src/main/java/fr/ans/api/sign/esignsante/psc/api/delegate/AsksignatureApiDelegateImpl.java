@@ -68,9 +68,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	ProsanteConnectCalls pscApi;
 
 	private static final String SIGNER_XADES = "Délégataire de signature pour ";
-	
+
 	private static final String SIGNER_PADES = "Signé pour le compte de ";
-	
+
 	@Override
 	public ResponseEntity<org.springframework.core.io.Resource> postAskSignaturePades(
 			@ApiParam(value = "", required = true) @RequestHeader(value = "access_token", required = true) String accessToken,
@@ -78,7 +78,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Pades");
-	
+
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES, accessToken, file,
 				userinfo);
 
@@ -177,7 +177,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("Fin archivage de la preuve en BDD pour request id: {}", requestID);
 	}
 
-	private UserInfo extractUserInfoFromRequest(String jsonUserInfoBase64) {		
+	private UserInfo extractUserInfoFromRequest(String jsonUserInfoBase64) {
 		UserInfo userInfo = null;
 		try {
 			userInfo = Helper.jsonBase64StringToUserInfo(jsonUserInfoBase64);
@@ -220,6 +220,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	private ESignSanteSignatureReportWithProof executeAskSignature(TYPE_SIGNATURE typeSignature, String accessToken,
 			MultipartFile file, String userinfo) {
 
+		checkNotEmptyInputParameters(accessToken, file, userinfo);
+		
 		ParametresSign params = prepareAppelEsignWS(accessToken, file, userinfo);
 
 		// verification du type de fichier
@@ -263,35 +265,45 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			} else {
 				report = esignWS.signatureXades(params.getFileToSign(), signers, params.getRequestID(), openidTokens);
 			}
-			
+
 		} catch (RestClientException e) {
 			throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
 					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
 		if (report == null) {
-			throwExceptionRequestError("Exception technique sur appel esignWS",
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-			
+
 		archivagePreuve(report, params.getRequestID(), user, params.getDate());
-		
+
 		return report;
 	}
-	
+
 	private List<String> setSigners(TYPE_SIGNATURE typeSignature, UserInfo userinfo) {
 		List<String> retour = new ArrayList<>();
 		String signer = SIGNER_XADES;
-		
+
 		if (typeSignature.getTypeSignature().equals(TYPE_SIGNATURE.PADES.toString())) {
 			signer = SIGNER_PADES;
 		}
-		signer = signer.concat(userinfo.getFamilyName())
-				.concat(" (")
-				.concat(userinfo.getSubjectNameID())
-				.concat(")");
+		signer = signer.concat(userinfo.getFamilyName()).concat(" (").concat(userinfo.getSubjectNameID()).concat(")");
 		log.error("signer: " + signer);
 		retour.add(signer);
 		return retour;
+	}
+
+	private void checkNotEmptyInputParameters(String accessToken, MultipartFile file, String userinfo) {
+		if ((accessToken == null) || (file == null) || (userinfo == null)) {
+			throwExceptionRequestError(
+					"Au moins un paramètre indispensable parmi {'file', 'userinfo', 'accessToken'} est nul ou non fourni",
+					HttpStatus.BAD_REQUEST);
+		}
+
+		if ((accessToken.isBlank()) || (accessToken.isEmpty()) || (file.getSize() <= 0) || (userinfo.isBlank())
+				|| (userinfo.isEmpty())) {
+			throwExceptionRequestError("Au moins un paramètre parmi {'file', 'userinfo', 'accessToken'} est vide",
+					HttpStatus.BAD_REQUEST);
+		}
 	}
 }

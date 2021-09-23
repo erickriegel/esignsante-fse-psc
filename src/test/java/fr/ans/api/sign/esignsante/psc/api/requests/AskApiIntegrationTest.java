@@ -311,7 +311,7 @@ public class AskApiIntegrationTest {
   				.file("userinfo", userInfobase64.getBytes())
   				.header("access_token",accessToken)
                 .accept("application/json,application/pdf"))
-  				.andExpect(status().isBadRequest());
+  				.andExpect(status().isUnsupportedMediaType());
  				
   		returned.andDo(document("signPADES/BadFileFormat"));
                
