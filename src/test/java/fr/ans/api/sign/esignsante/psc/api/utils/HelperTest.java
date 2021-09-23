@@ -80,6 +80,22 @@ public class HelperTest {
 	}
 
 	@Test
+	public void decodeStringNotEncodedBase64Test() {
+		String test;
+		try {
+			test = "éàç_-a";
+			Helper.decodeBase64toString(test);
+			assertTrue(false);
+		} catch ( IllegalArgumentException | UnsupportedEncodingException e) {
+
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+	}
+	
+	
+
+	@Test
 	public void converterErrorErreurTest() {
 		log.debug("test conversion Erreur(esignsante) en Error (esigsante-psc");
 		final String codeErreur1 = "codeErreur1";
@@ -129,22 +145,22 @@ public class HelperTest {
 
 	@Test
 	public void parsePSCResponseTest() throws IOException {
-		
+
 		Resource resource = new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json");
-				String reponsePSCActif = Files.readString(resource.getFile().toPath());
-		
-				String reponsePSCNonActif = "{\"active\":false}";		
+		String reponsePSCActif = Files.readString(resource.getFile().toPath());
+
+		String reponsePSCNonActif = "{\"active\":false}";
 		String reponsePSCKO = "Mauvaise réponse..";
-				
-		//OK
+
+		// OK
 		assertEquals(HttpStatus.OK, Helper.parsePSCresponse(reponsePSCActif));
-		
-		//Non actif
-		assertEquals(HttpStatus.BAD_REQUEST,  Helper.parsePSCresponse(reponsePSCNonActif));
-		
-		//Erreur tech
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,  Helper.parsePSCresponse(reponsePSCKO));
-				
+
+		// Non actif
+		assertEquals(HttpStatus.BAD_REQUEST, Helper.parsePSCresponse(reponsePSCNonActif));
+
+		// Erreur tech
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, Helper.parsePSCresponse(reponsePSCKO));
+
 	}
 
 	@Test
@@ -162,15 +178,14 @@ public class HelperTest {
 	@Test
 	public void jsonToUserInfoExcepTest() {
 
-		
 		String userinfo = "{\"Secteur_Activite\":\"SA07^1.2.250.1.71.4.2.4\",\"sub\":\"f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700218896\",\"email_verified\":false,\"SubjectOrganization\":\"CABINET M SPECIALISTE0021889\",\"Mode_Acces_Raison\":\"\",\"preferred_username\":\"899700218896\",\"given_name\":\"ROBERT\",\"Acces_Regulation_Medicale\":\"FAUX\",\"UITVersion\":\"1.0\",\"Palier_Authentification\":\"APPPRIP3^1.2.250.1.213.1.5.1.1.1\",\"SubjectRefPro\":{\"codeCivilite\":\"M\",\"exercices\":[{\"codeProfession\":\"10\",\"codeCategorieProfessionnelle\":\"C\",\"codeCiviliteDexercice\":\"M\",\"nomDexercice\":\"SPECIALISTE0021889\",\"prenomDexercice\":\"ROBERT\",\"codeTypeSavoirFaire\":\"\",\"codeSavoirFaire\":\"\",\"activities\":[{\"codeModeExercice\":\"L\",\"codeSecteurDactivite\":\"SA07\",\"codeSectionPharmacien\":\"\",\"codeRole\":\"\",\"numeroSiretSite\":\"\",\"numeroSirenSite\":\"\",\"numeroFinessSite\":\"\",\"numeroFinessetablissementJuridique\":\"\",\"identifiantTechniqueDeLaStructure\":\"\",\"raisonSocialeSite\":\"CABINET M SPECIALISTE0021889\",\"enseigneCommercialeSite\":\"\",\"complementDestinataire\":\"\",\"complementPointGeographique\":\"\",\"numeroVoie\":\"1\",\"indiceRepetitionVoie\":\"\",\"codeTypeDeVoie\":\"R\",\"libelleVoie\":\"PASTEUR\",\"mentionDistribution\":\"\",\"bureauCedex\":\"\",\"codePostal\":\"75009\",\"codeCommune\":\"75109\",\"codePays\":\"\",\"telephone\":\"\",\"telephone2\":\"\",\"telecopie\":\"\",\"adresseEMail\":\"\",\"codeDepartement\":\"75\",\"ancienIdentifiantDeLaStructure\":\"\",\"autoriteDenregistrement\":\"\"}]}]},\"SubjectOrganizationID\":\"\",\"SubjectRole\":[\"10^1.2.250.1.213.1.1.5.5\"],\"PSI_Locale\":\"1.2.250.1.213.1.3.1.1\",\"SubjectNameID\":\"899700218896\",\"family_name\":\"SPECIALISTE0021889\"}";
 		String encodedUserinfo = "";
-		
+
 		// non encodé
 		try {
-			 Helper.jsonBase64StringToUserInfo(userinfo);
+			Helper.jsonBase64StringToUserInfo(userinfo);
 			assertFalse(true);
-		} catch (Exception  e) {
+		} catch (Exception e) {
 		}
 
 		// non UserUnfo

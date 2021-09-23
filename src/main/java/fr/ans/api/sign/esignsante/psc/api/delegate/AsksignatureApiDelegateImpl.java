@@ -87,9 +87,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		try {
 			signedDoc = Helper.decodeBase64toByteArray(signedStringBase64);
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException | IllegalArgumentException e) {
 			log.debug(e.toString());
-			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
+			throwExceptionRequestError(e, "Exception Serveur (décodage base64 du fichier signé PADES)", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		Resource resource = new FileResource(signedDoc, "SIGNED_" + file.getOriginalFilename());
 
@@ -115,9 +115,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		String signedString = null;
 		try {
 			signedString = Helper.decodeBase64toString(signedStringBase64);
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException | IllegalArgumentException e) {
 			log.debug(e.toString());
-			throwExceptionRequestError(e, "Exception Serveur", HttpStatus.INTERNAL_SERVER_ERROR);
+			throwExceptionRequestError(e, "Exception Serveur (décodage base64 du fichier signé XADES)", HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 
@@ -181,9 +181,12 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		UserInfo userInfo = null;
 		try {
 			userInfo = Helper.jsonBase64StringToUserInfo(jsonUserInfoBase64);
-		} catch (JsonProcessingException | UnsupportedEncodingException e) {
-			log.debug(e.toString());
-			throwExceptionRequestError(e, "Exception en parsant le userInfo reçu: " + jsonUserInfoBase64,
+		} catch (JsonProcessingException e) {
+			throwExceptionRequestError(e, "Exception en parsant le userInfo reçu (après décodage base64): " + jsonUserInfoBase64,
+					HttpStatus.BAD_REQUEST);
+		}
+		catch (UnsupportedEncodingException | IllegalArgumentException e) {
+			throwExceptionRequestError(e, "Exception en decodant (base 64) le userInfo reçu: " + jsonUserInfoBase64,
 					HttpStatus.BAD_REQUEST);
 		}
 		return userInfo;

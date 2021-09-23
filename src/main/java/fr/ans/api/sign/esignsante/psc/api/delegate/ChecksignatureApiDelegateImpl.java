@@ -117,9 +117,8 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 	
 		// controle du acceptheader
 		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
-			log.debug("Demande CheckSignature rejetée car le header Accept = APPLICATION/JSON non présent");
 			throwExceptionRequestError(
-					"Requête rejetée car le header e fichier transmis semble ne pas être un PDF, type détecté  ",
+					"Requête rejetée car le header 'accept=application/json' n'a pas été trouvé dans la requête",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
 

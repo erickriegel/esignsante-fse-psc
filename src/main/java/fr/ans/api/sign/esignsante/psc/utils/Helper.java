@@ -56,12 +56,14 @@ public class Helper {
 		return Base64.getEncoder().encodeToString(stringToEncode.getBytes("UTF-8"));
 	}
 
-	public static String decodeBase64toString(String stringToDecode) throws UnsupportedEncodingException {
+	public static String decodeBase64toString(String stringToDecode) throws UnsupportedEncodingException, IllegalArgumentException{
 		byte[] decodedBytes = Base64.getDecoder().decode(stringToDecode);
 		return new String(decodedBytes, "UTF-8");
 	}
 
-	public static byte[] decodeBase64toByteArray(String stringToDecode) throws UnsupportedEncodingException {
+
+	
+	public static byte[] decodeBase64toByteArray(String stringToDecode) throws UnsupportedEncodingException, IllegalArgumentException {
 		return Base64.getDecoder().decode(stringToDecode);
 	}
 
