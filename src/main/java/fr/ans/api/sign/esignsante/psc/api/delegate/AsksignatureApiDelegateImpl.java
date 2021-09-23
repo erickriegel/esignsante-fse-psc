@@ -229,7 +229,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			if (!typeFile.equals(Helper.APPLICATION_PDF)) {
 				throwExceptionRequestError(
 						"Requête rejetée car le fichier transmis semble ne pas être un PDF, type détecté  " + typeFile,
-						HttpStatus.BAD_REQUEST);
+						HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 			}
 		}
 
