@@ -79,6 +79,13 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		log.debug("Réception d'une demande de signature Pades");
 
+		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
+				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
+			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/pdf",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
+		
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES, accessToken, file,
 				userinfo);
 
@@ -89,7 +96,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			signedDoc = Helper.decodeBase64toByteArray(signedStringBase64);
 		} catch (UnsupportedEncodingException | IllegalArgumentException e) {
 			log.debug(e.toString());
-			throwExceptionRequestError(e, "Exception Serveur (décodage base64 du fichier signé PADES)", HttpStatus.INTERNAL_SERVER_ERROR);
+			throwExceptionRequestError(e, "Exception Serveur (décodage base64 du fichier signé PADES)",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		Resource resource = new FileResource(signedDoc, "SIGNED_" + file.getOriginalFilename());
 
@@ -107,6 +115,13 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		log.debug("Réception d'une demande de signature Xades");
 
+		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
+				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)) == false) {
+
+			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/xml",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.XADES, accessToken, file,
 				userinfo);
 
@@ -117,7 +132,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			signedString = Helper.decodeBase64toString(signedStringBase64);
 		} catch (UnsupportedEncodingException | IllegalArgumentException e) {
 			log.debug(e.toString());
-			throwExceptionRequestError(e, "Exception Serveur (décodage base64 du fichier signé XADES)", HttpStatus.INTERNAL_SERVER_ERROR);
+			throwExceptionRequestError(e, "Exception Serveur (décodage base64 du fichier signé XADES)",
+					HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 
@@ -184,9 +200,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		} catch (JsonProcessingException e) {
 			throwExceptionRequestError(e, "Exception en parsant le userInfo reçu: " + jsonUserInfoBase64,
 					HttpStatus.BAD_REQUEST);
-		}
-		catch (UnsupportedEncodingException | IllegalArgumentException e) {
-			throwExceptionRequestError(e, "Le userinfo fourni ne semble pas codé en base 64. UserInfo reçu : " + jsonUserInfoBase64,
+		} catch (UnsupportedEncodingException | IllegalArgumentException e) {
+			throwExceptionRequestError(e,
+					"Le userinfo fourni ne semble pas codé en base 64. UserInfo reçu : " + jsonUserInfoBase64,
 					HttpStatus.BAD_REQUEST);
 		}
 		return userInfo;
@@ -224,7 +240,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			MultipartFile file, String userinfo) {
 
 		checkNotEmptyInputParameters(accessToken, file, userinfo);
-		
+
 		ParametresSign params = prepareAppelEsignWS(accessToken, file, userinfo);
 
 		// verification du type de fichier
@@ -303,7 +319,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 					HttpStatus.BAD_REQUEST);
 		}
 
-		if ((accessToken.isEmpty()) || (accessToken.isBlank()) || (file.getSize() <= 0) ||  (userinfo.isEmpty()) || (userinfo.isBlank())) {
+		if ((accessToken.isEmpty()) || (accessToken.isBlank()) || (file.getSize() <= 0) || (userinfo.isEmpty())
+				|| (userinfo.isBlank())) {
 			throwExceptionRequestError("Au moins un paramètre parmi {'file', 'userinfo', 'accessToken'} est vide",
 					HttpStatus.BAD_REQUEST);
 		}

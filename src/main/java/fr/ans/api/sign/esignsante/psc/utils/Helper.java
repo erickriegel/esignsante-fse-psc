@@ -25,20 +25,23 @@ import lombok.extern.slf4j.Slf4j;
 public class Helper {
 
 	// champs du UserInfo
-	public final static String GIVEN_NAME = "given_name";
-	public final static String PREFERRED_USERNAME = "preferred_username";
-	public final static String SUBJECT_ORGANIZATION = "SubjectOrganization";
-	public final static String FAMILY_NAME = "family_name";
+	public static final  String GIVEN_NAME = "given_name";
+	public static final String PREFERRED_USERNAME = "preferred_username";
+	public static final String SUBJECT_ORGANIZATION = "SubjectOrganization";
+	public static final String FAMILY_NAME = "family_name";
 
 	// champs reponse intropestion PSC
-	public final static String TOKEN_ACTIVE_FIELD = "active";
-	public final static String TOKEN_ACTIVE_FALSE = "false";
-	public final static String TOKEN_ACTIVE_TRUE = "true";
+	public static final String TOKEN_ACTIVE_FIELD = "active";
+	public static final String TOKEN_ACTIVE_FALSE = "false";
+	public static final String TOKEN_ACTIVE_TRUE = "true";
 
 	// type de Header
-	public final static String APPLICATION_JSON = "application/json";
-	public final static String APPLICATION_XML = "application/xml";
-	public final static String APPLICATION_PDF = "application/pdf";
+	public static final String APPLICATION_JSON = "application/json";
+	public static final String APPLICATION_XML = "application/xml";
+	public static final String APPLICATION_PDF = "application/pdf";
+	public static final String HEADER_TYPE_APP_WILDCARD = "application/*";
+	public static final String HEADER_TYPE_FULL_WILDCARD = "*/*";
+
 
 	private Helper() {
 	}

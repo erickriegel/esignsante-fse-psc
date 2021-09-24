@@ -10,9 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -22,7 +24,9 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
+import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.dynamic.scaffold.MethodRegistry.Handler.ForAbstractMethod;
 
 /**
  * The Class ApiDelegate. Classe mère de tous les delegates. Traitement
@@ -31,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractApiDelegate {
 
-	protected static final String HEADER_TYPE = "application/json";
 	protected String msgError = "";
 
 	private static final Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -57,17 +60,19 @@ public abstract class AbstractApiDelegate {
 	 *
 	 * @return the accept header
 	 */
-	public Optional<String> getAcceptHeader() {
-		return getRequest().map(r -> r.getHeader("Accept"));
-	}
 
+	//renvoie une liste de tous les headers 'accept' de la requête
 	public List<String> getAcceptHeaders() {
-
-		Optional<String[]> accpetHeaders = getRequest().map(r -> r.getHeaderValues("accept"));
-		if (accpetHeaders.isPresent() && !accpetHeaders.isEmpty()) {
-			return Arrays.asList(accpetHeaders.get());
+		List<String> acceptes = new ArrayList<String>();
+		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
+				.currentRequestAttributes();
+		Enumeration<String> acceptheaders = attrs.getRequest().getHeaders("accept");
+		while (acceptheaders.hasMoreElements()) {
+			List<String> tmp = Arrays.asList(acceptheaders.nextElement().trim().split(","));
+			tmp.replaceAll(x -> x.trim());
+			acceptes.addAll(tmp);
 		}
-		return new ArrayList<String>();
+		return acceptes;
 	}
 
 	public File multipartFileToFile(MultipartFile multipart) throws IOException {
@@ -97,16 +102,22 @@ public abstract class AbstractApiDelegate {
 
 	}
 
-	protected Boolean isExpectedAcceptHeader(Optional<String> header, String expectedAcceptHeader) {
-		Boolean retour = false;
-		if (header.isPresent() && header.get().contains(expectedAcceptHeader)) {
-			retour = true;
-		}
-		return retour;
-	}
+//	protected Boolean isExpectedAcceptHeader(Optional<String> header, String expectedAcceptHeader) {
+//		Boolean retour = false;
+//		if (header.isPresent() && header.get().contains(expectedAcceptHeader)) {
+//			retour = true;
+//		}
+//		return retour;
+//	}
 
-	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders, String expectedAcceptHeader) {
-		return acceptheaders.contains(expectedAcceptHeader);
+	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders, String expectedAcceptHeader ) {	
+		log.debug("expectedAcceptHeader: " + expectedAcceptHeader);
+		log.debug("acceptheaders.contains(expectedAcceptHeader): " + acceptheaders.contains(expectedAcceptHeader));
+		log.debug("aacceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCAR: " + acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD));
+		log.debug("acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD)): " + acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
+		return ( acceptheaders.contains(expectedAcceptHeader)
+				 || acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD)
+				 || acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
 	}
 
 	protected String checkTypeFile(File fichierAtester) {

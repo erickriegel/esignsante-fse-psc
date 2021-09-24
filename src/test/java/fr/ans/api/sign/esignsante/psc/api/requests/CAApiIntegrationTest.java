@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -83,12 +84,111 @@ public class CAApiIntegrationTest {
 
 		returned.andDo(document("CA/OK")); // RestDcos
 	}
+	
+	@Test
+	@DisplayName("Header wildard")
+	public void caGetHeaderWildcardTest() throws Exception {
 
+		List<String> listeCA = new ArrayList<String>();
+		listeCA.add(
+				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+
+		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
+		Mockito.doReturn(listeCA).when(esignWS).getCA();
+
+		ResultActions returned = mockMvc.perform(get("/v1/ca").accept("*/*")).andExpect(status().isOk())
+				.andExpect(content().json(body));
+
+		returned.andDo(document("CA/OK")); // RestDcos
+	}
+	
+	@Test
+	@DisplayName("Header wildard Bis")
+	public void caGetHeaderWildcardBisTest() throws Exception {
+
+		List<String> listeCA = new ArrayList<String>();
+		listeCA.add(
+				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+
+		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
+		Mockito.doReturn(listeCA).when(esignWS).getCA();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("accept", "application/xml");
+		httpHeaders.add("accept", "*/*");
+
+		ResultActions returned = mockMvc.perform(get("/v1/ca")
+				.headers(httpHeaders))
+				.andExpect(status().isOk())
+				.andExpect(content().json(body));
+
+		returned.andDo(document("CA/OK")); // RestDcos
+	}
+	
+	
+	@Test
+	@DisplayName("Header wildard Bisbis")
+	public void caGetHeaderWildcardBisbisTest() throws Exception {
+
+		List<String> listeCA = new ArrayList<String>();
+		listeCA.add(
+				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+
+		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
+		Mockito.doReturn(listeCA).when(esignWS).getCA();
+	
+		ResultActions returned = mockMvc.perform(get("/v1/ca")
+				.accept(" application/xml , application/json  "))
+				.andExpect(status().isOk())
+				.andExpect(content().json(body));
+
+		returned.andDo(document("CA/OK")); // RestDcos
+	}
+	
+	@Test
+	@DisplayName("Header wildard 3")
+	public void caGetHeaderWildcardTerTest() throws Exception {
+
+		List<String> listeCA = new ArrayList<String>();
+		listeCA.add(
+				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+
+		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
+		Mockito.doReturn(listeCA).when(esignWS).getCA();
+
+		ResultActions returned = mockMvc.perform(get("/v1/ca").accept("application/xml").accept("application/*")).andExpect(status().isOk())
+				.andExpect(content().json(body));
+
+		returned.andDo(document("CA/OK")); // RestDcos
+	}
+
+	@Test
+	@DisplayName("Header wildard 4")
+	public void caGetHeaderWildcardQuatroTest() throws Exception {
+
+		List<String> listeCA = new ArrayList<String>();
+		listeCA.add(
+				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+
+		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
+		Mockito.doReturn(listeCA).when(esignWS).getCA();
+
+		ResultActions returned = mockMvc.perform(get("/v1/ca").accept("application/xml").accept("application/json")).andExpect(status().isOk())
+				.andExpect(content().json(body));
+
+		returned.andDo(document("CA/OK")); // RestDcos
+	}
+
+	
 	@Test
 	@DisplayName("/ca: cas non passant. Header 'accept' non valide")
 	public void rootGetBadAcceptHeaderTest() throws Exception {
 
-		ResultActions returned = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_XML))
+		ResultActions returned = mockMvc.perform(get("/v1/ca").accept(MediaType.APPLICATION_XML))
 				.andExpect(status().isNotAcceptable());
 		returned.andDo(document("CA/KO_NotAcceptable"));
 	}

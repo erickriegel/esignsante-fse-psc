@@ -123,6 +123,12 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 		}
 
 				
+		if  ((file == null) || (file.getSize() <= 0))  {
+			throwExceptionRequestError(
+					"Le fichier signé à contrôler n'a pas été transmis ou est vide(MultiPartFile 'file')",
+					HttpStatus.BAD_REQUEST);
+		}
+		
 		var fileToCheck = getMultiPartFile(file);
 		if (fileToCheck == null) {
 			throwExceptionRequestError("Le fichier signé à contrôler n'a pas pu être lu",
