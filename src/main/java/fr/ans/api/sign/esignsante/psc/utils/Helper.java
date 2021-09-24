@@ -101,7 +101,7 @@ public class Helper {
 				if (token_active_field.equalsIgnoreCase(TOKEN_ACTIVE_TRUE)) {
 					retour = HttpStatus.OK;
 				} else {
-					retour = HttpStatus.BAD_REQUEST;
+					retour = HttpStatus.UNAUTHORIZED;
 				}
 			} else {
 				retour = HttpStatus.INTERNAL_SERVER_ERROR;

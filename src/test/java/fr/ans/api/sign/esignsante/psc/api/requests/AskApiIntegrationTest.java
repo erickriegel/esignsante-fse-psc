@@ -171,7 +171,7 @@ public class AskApiIntegrationTest {
   				.file("userinfo", userInfobase64.getBytes())
   				.header("access_token", accessToken)
                 .accept("application/json,application/xml"))
-  				.andExpect(status().isBadRequest());
+  				.andExpect(status().isUnauthorized());
  				
     	
     	 
@@ -272,7 +272,7 @@ public class AskApiIntegrationTest {
   				.file("userinfo", userInfobase64.getBytes())
   				.header("access_token",accessToken)
                 .accept("application/json,application/pdf"))
-  				.andExpect(status().isBadRequest());
+  				.andExpect(status().isUnauthorized());
  				
   		returned.andDo(document("signPADES/TokenKo"));
                

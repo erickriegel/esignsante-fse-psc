@@ -156,7 +156,7 @@ public class HelperTest {
 		assertEquals(HttpStatus.OK, Helper.parsePSCresponse(reponsePSCActif));
 
 		// Non actif
-		assertEquals(HttpStatus.BAD_REQUEST, Helper.parsePSCresponse(reponsePSCNonActif));
+		assertEquals(HttpStatus.UNAUTHORIZED, Helper.parsePSCresponse(reponsePSCNonActif));
 
 		// Erreur tech
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, Helper.parsePSCresponse(reponsePSCKO));

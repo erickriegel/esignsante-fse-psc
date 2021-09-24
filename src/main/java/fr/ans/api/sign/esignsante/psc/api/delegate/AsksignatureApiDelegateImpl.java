@@ -152,7 +152,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			result = pscApi.isTokenActive(token);
 			httpStatus = Helper.parsePSCresponse(result);
 			log.debug("Appel PSC intropesction: token= {}  reponse PSC = {} ", token, result);
-			if (httpStatus == HttpStatus.BAD_REQUEST) {
+			if (httpStatus == HttpStatus.UNAUTHORIZED) {
 				msgError = "L'accessToken fourni dans la requête n'est pas reconnu comme un token actif par ProSanteConnect token: "
 						+ token + " response PSC: " + result;
 

@@ -247,7 +247,7 @@ include::{snippets}/signXADES/OK/http-response.adoc[]
 Payload:
 include::{snippets}/signXADES/OK/response-body.adoc[]
 
-=== Cas non passant 400 (token non actif)
+=== Cas non passant 401 (token non actif)
 L'access Token fourni dans la requête n'est plus vu comme un token actif par ProSanteConnect
 
 .request
@@ -297,7 +297,7 @@ include::{snippets}/signPADES/OK/http-response.adoc[]
 Payload:
 include::{snippets}/signPADES/OK/response-body.adoc[]
 
-=== Cas non passant 400 (token non actif)
+=== Cas non passant 401 (token non actif)
 L'access Token fourni dans la requête n'est plus vu comme un token actif par ProSanteConnect
 
 .request
