@@ -49,9 +49,7 @@ public abstract class AbstractApiDelegate {
 		final ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
 				.currentRequestAttributes();
 
-		if (attrs != null) {
-			request = Optional.of(new ServletWebRequest(attrs.getRequest()));
-		}
+		request = Optional.of(new ServletWebRequest(attrs.getRequest()));
 		return request;
 	}
 
@@ -95,26 +93,13 @@ public abstract class AbstractApiDelegate {
 			log.debug("fileToCheck isFile: {} \t name: {} \t length {}", fileToCheck.isFile(), fileToCheck.getName(),
 					fileToCheck.length());
 		} catch (IOException e) {
-			log.debug(e.toString());
 			throwExceptionRequestError(e, "Erreur dans la lecture du fichier reçu", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return fileToCheck;
 
 	}
 
-//	protected Boolean isExpectedAcceptHeader(Optional<String> header, String expectedAcceptHeader) {
-//		Boolean retour = false;
-//		if (header.isPresent() && header.get().contains(expectedAcceptHeader)) {
-//			retour = true;
-//		}
-//		return retour;
-//	}
-
 	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders, String expectedAcceptHeader ) {	
-		log.debug("expectedAcceptHeader: " + expectedAcceptHeader);
-		log.debug("acceptheaders.contains(expectedAcceptHeader): " + acceptheaders.contains(expectedAcceptHeader));
-		log.debug("aacceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCAR: " + acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD));
-		log.debug("acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD)): " + acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
 		return ( acceptheaders.contains(expectedAcceptHeader)
 				 || acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD)
 				 || acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
