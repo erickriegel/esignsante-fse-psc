@@ -5,6 +5,8 @@ package fr.ans.api.sign.esignsante.psc.api.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -44,7 +46,7 @@ public class HelperTest {
 			test = Helper.encodeBase64(STRING_TO_ENCODE);
 			log.debug("encodebase64");
 			log.debug(test);
-			assertEquals(test.compareTo(STRING_TO_DECODE), 0);
+			assertEquals(0, test.compareTo(STRING_TO_DECODE));
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(false, "UnsupportedEncodingException durant le codage...");
 			e.printStackTrace();
@@ -58,7 +60,7 @@ public class HelperTest {
 			test = Helper.decodeBase64toString(STRING_TO_DECODE);
 			log.debug("decodebase64");
 			log.debug(test);
-			assertEquals(test.compareTo(STRING_TO_ENCODE), 0);
+			assertEquals(0, test.compareTo(STRING_TO_ENCODE));
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(false, "UnsupportedEncodingException durant le decodage...");
 			e.printStackTrace();
@@ -120,7 +122,7 @@ public class HelperTest {
 		error2.setMessage(message2);
 
 		List<Error> errors = Helper.mapListErreurToListError(erreurs);
-		assertTrue(errors.size() == erreurs.size());
+		assertEquals(errors.size(), erreurs.size());
 
 		errors.stream().forEach(error -> {
 			Erreur er = new Erreur();
@@ -136,11 +138,11 @@ public class HelperTest {
 	public void generateRequestIdTest() {
 		String test = null;
 		test = Helper.generateRequestId();
-		assertTrue(test != null);
+		assertNotNull(test);
 		assertFalse(test.isEmpty());
 		assertFalse(test.isBlank());
 		assertTrue(test.length() > 30);
-		assertFalse(test.compareTo(Helper.generateRequestId()) == 0);
+		assertNotEquals(0, test.compareTo(Helper.generateRequestId()));
 	}
 
 	@Test
@@ -169,10 +171,10 @@ public class HelperTest {
 		String userinfo = "{\"Secteur_Activite\":\"SA07^1.2.250.1.71.4.2.4\",\"sub\":\"f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:899700218896\",\"email_verified\":false,\"SubjectOrganization\":\"CABINET M SPECIALISTE0021889\",\"Mode_Acces_Raison\":\"\",\"preferred_username\":\"899700218896\",\"given_name\":\"ROBERT\",\"Acces_Regulation_Medicale\":\"FAUX\",\"UITVersion\":\"1.0\",\"Palier_Authentification\":\"APPPRIP3^1.2.250.1.213.1.5.1.1.1\",\"SubjectRefPro\":{\"codeCivilite\":\"M\",\"exercices\":[{\"codeProfession\":\"10\",\"codeCategorieProfessionnelle\":\"C\",\"codeCiviliteDexercice\":\"M\",\"nomDexercice\":\"SPECIALISTE0021889\",\"prenomDexercice\":\"ROBERT\",\"codeTypeSavoirFaire\":\"\",\"codeSavoirFaire\":\"\",\"activities\":[{\"codeModeExercice\":\"L\",\"codeSecteurDactivite\":\"SA07\",\"codeSectionPharmacien\":\"\",\"codeRole\":\"\",\"numeroSiretSite\":\"\",\"numeroSirenSite\":\"\",\"numeroFinessSite\":\"\",\"numeroFinessetablissementJuridique\":\"\",\"identifiantTechniqueDeLaStructure\":\"\",\"raisonSocialeSite\":\"CABINET M SPECIALISTE0021889\",\"enseigneCommercialeSite\":\"\",\"complementDestinataire\":\"\",\"complementPointGeographique\":\"\",\"numeroVoie\":\"1\",\"indiceRepetitionVoie\":\"\",\"codeTypeDeVoie\":\"R\",\"libelleVoie\":\"PASTEUR\",\"mentionDistribution\":\"\",\"bureauCedex\":\"\",\"codePostal\":\"75009\",\"codeCommune\":\"75109\",\"codePays\":\"\",\"telephone\":\"\",\"telephone2\":\"\",\"telecopie\":\"\",\"adresseEMail\":\"\",\"codeDepartement\":\"75\",\"ancienIdentifiantDeLaStructure\":\"\",\"autoriteDenregistrement\":\"\"}]}]},\"SubjectOrganizationID\":\"\",\"SubjectRole\":[\"10^1.2.250.1.213.1.1.5.5\"],\"PSI_Locale\":\"1.2.250.1.213.1.3.1.1\",\"SubjectNameID\":\"899700218896\",\"family_name\":\"SPECIALISTE0021889\"}";
 		String encodedUserinfo = Helper.encodeBase64(userinfo);
 		fr.ans.api.sign.esignsante.psc.model.UserInfo obUserInfo = Helper.jsonBase64StringToUserInfo(encodedUserinfo);
-		assertEquals(obUserInfo.getFamilyName(), "SPECIALISTE0021889");
-		assertEquals(obUserInfo.getGivenName(), "ROBERT");
-		assertEquals(obUserInfo.getPreferredUsername(), "899700218896");
-		assertEquals(obUserInfo.getSubjectOrganization(), "CABINET M SPECIALISTE0021889");
+		assertEquals("SPECIALISTE0021889",obUserInfo.getFamilyName());
+		assertEquals("ROBERT", obUserInfo.getGivenName());
+		assertEquals("899700218896", obUserInfo.getPreferredUsername());
+		assertEquals("CABINET M SPECIALISTE0021889", obUserInfo.getSubjectOrganization());
 	}
 
 	@Test

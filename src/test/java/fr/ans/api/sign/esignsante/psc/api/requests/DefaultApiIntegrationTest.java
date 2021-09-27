@@ -3,6 +3,7 @@
  */
 package fr.ans.api.sign.esignsante.psc.api.requests;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -82,10 +83,10 @@ public class DefaultApiIntegrationTest {
 		returned.andDo(document("Liste_des_services/KO_NotAcceptable"));
 
 		MvcResult res = mockMvc.perform(get("/v1/").accept(MediaType.APPLICATION_JSON)).andReturn();
-		assertTrue(res.getResponse().getHeaderValues("Content-Type").size() == 1);
+		assertEquals(1 , res.getResponse().getHeaderValues("Content-Type").size());
 		System.out.println("MediaType.APPLICATION_JSON.getType(): " + MediaType.APPLICATION_JSON.getType());
 		System.out.println("getResponse().getHeaderValues" + res.getResponse().getHeaderValues("Content-Type").get(0));
-		assertTrue(res.getResponse().getHeaderValues("Content-Type").get(0).equals("application/json"));
+		assertEquals("application/json", res.getResponse().getHeaderValues("Content-Type").get(0));
 
 	}
 

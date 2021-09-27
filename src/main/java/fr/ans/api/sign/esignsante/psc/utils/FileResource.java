@@ -65,7 +65,7 @@ public class FileResource implements Resource{
 
 	@Override
 	public String getFilename() {
-		return null;
+		return fileName;
 	}
 
 	@Override

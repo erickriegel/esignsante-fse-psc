@@ -16,7 +16,10 @@ public class EsignPSCRequestException extends RuntimeException{
 
 	@Getter
 	@Setter
-	private fr.ans.api.sign.esignsante.psc.model.Error erreur;
+	//transient pour Sonar. 'Error' est généré par OpneAPI (serializable). 
+	//Cette exception est intercepté par un contrôleur Spring qui renverra une Http  en erreur
+	//avec l'objet sérializé
+	private transient fr.ans.api.sign.esignsante.psc.model.Error erreur;
 
 	@Getter
 	@Setter

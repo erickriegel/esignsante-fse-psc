@@ -88,7 +88,7 @@ public class MongoDbTest {
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
-		   assertEquals(result.getTimestamp().compareTo(prof1.getTimestamp()), 0);
+		   assertEquals(prof1.getTimestamp().compareTo(result.getTimestamp()), 0);
 		   assertTrue(result.getTimestamp().compareTo(new Date()) < 0);
 
 
@@ -98,7 +98,7 @@ public class MongoDbTest {
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
-		   assertEquals(result.getTimestamp().compareTo(prof1.getTimestamp()), 0);
+		   assertEquals(prof1.getTimestamp().compareTo(result.getTimestamp()), 0);
 		   assertTrue(result.getTimestamp().compareTo(new Date()) < 0);
 
 		   
@@ -108,7 +108,7 @@ public class MongoDbTest {
 		   assertEquals(result.getPreferred_username(), prof1.getPreferred_username());		
 		   assertEquals(result.getGiven_name(), prof1.getGiven_name());		
 		   assertEquals(result.getFamily_name(), prof1.getFamily_name());	
-		   assertEquals(result.getTimestamp().compareTo(prof1.getTimestamp()), 0);
+		   assertEquals(prof1.getTimestamp().compareTo(result.getTimestamp()), 0);
 		   assertTrue(result.getTimestamp().compareTo(new Date()) < 0);
 		   assertEquals(result.getProof(), preuve);		
 		   

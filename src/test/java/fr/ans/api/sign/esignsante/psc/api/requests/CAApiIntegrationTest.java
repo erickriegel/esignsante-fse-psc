@@ -71,37 +71,13 @@ public class CAApiIntegrationTest {
 	@DisplayName("Demande de la liste des CAs.")
 	public void caGetTest() throws Exception {
 
-		List<String> listeCA = new ArrayList<String>();
-		listeCA.add(
-				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
-		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
-
-		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
-		Mockito.doReturn(listeCA).when(esignWS).getCA();
-
-		ResultActions returned = mockMvc.perform(get("/v1/ca").accept("application/json")).andExpect(status().isOk())
-				.andExpect(content().json(body));
-
-		returned.andDo(document("CA/OK")); // RestDcos
+		caGet("application/json");
+		
+		caGet("*/*");
+		
+		caGet(" application/xml , application/json  ");
 	}
 	
-	@Test
-	@DisplayName("Header wildard")
-	public void caGetHeaderWildcardTest() throws Exception {
-
-		List<String> listeCA = new ArrayList<String>();
-		listeCA.add(
-				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
-		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
-
-		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
-		Mockito.doReturn(listeCA).when(esignWS).getCA();
-
-		ResultActions returned = mockMvc.perform(get("/v1/ca").accept("*/*")).andExpect(status().isOk())
-				.andExpect(content().json(body));
-
-		returned.andDo(document("CA/OK")); // RestDcos
-	}
 	
 	@Test
 	@DisplayName("Header wildard Bis")
@@ -127,25 +103,7 @@ public class CAApiIntegrationTest {
 	}
 	
 	
-	@Test
-	@DisplayName("Header wildard Bisbis")
-	public void caGetHeaderWildcardBisbisTest() throws Exception {
 
-		List<String> listeCA = new ArrayList<String>();
-		listeCA.add(
-				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
-		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
-
-		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
-		Mockito.doReturn(listeCA).when(esignWS).getCA();
-	
-		ResultActions returned = mockMvc.perform(get("/v1/ca")
-				.accept(" application/xml , application/json  "))
-				.andExpect(status().isOk())
-				.andExpect(content().json(body));
-
-		returned.andDo(document("CA/OK")); // RestDcos
-	}
 	
 	@Test
 	@DisplayName("Header wildard 3")
@@ -191,6 +149,27 @@ public class CAApiIntegrationTest {
 		ResultActions returned = mockMvc.perform(get("/v1/ca").accept(MediaType.APPLICATION_XML))
 				.andExpect(status().isNotAcceptable());
 		returned.andDo(document("CA/KO_NotAcceptable"));
+	}
+	
+	 private void caGetWithRestDoc(String acceptHeader) throws Exception {
+		 ResultActions returned = caGet(acceptHeader);
+		 returned.andDo(document("CA/OK")); // RestDcos
+	 }
+	private ResultActions caGet(String acceptHeader) throws Exception {
+
+		List<String> listeCA = new ArrayList<String>();
+		listeCA.add(
+				"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+		listeCA.add("CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR");
+
+		final String body = "[\"CN=TEST AC IGC-SANTE ELEMENTAIRE ORGANISATIONS,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\",\"CN=TEST AC RACINE IGC-SANTE ELEMENTAIRE,OU=IGC-SANTE TEST,OU=0002 187512751,O=ASIP-SANTE,C=FR\"]";
+		Mockito.doReturn(listeCA).when(esignWS).getCA();
+
+		ResultActions returned = mockMvc.perform(get("/v1/ca").accept(acceptHeader)).andExpect(status().isOk())
+				.andExpect(content().json(body));
+
+		return returned;
+		
 	}
 
 }

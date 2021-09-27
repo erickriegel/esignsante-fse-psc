@@ -45,11 +45,10 @@ public abstract class AbstractApiDelegate {
 	 * @return the request
 	 */
 	public Optional<NativeWebRequest> getRequest() {
-		Optional<NativeWebRequest> request = Optional.empty();
 		final ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
 				.currentRequestAttributes();
 
-		request = Optional.of(new ServletWebRequest(attrs.getRequest()));
+		Optional<NativeWebRequest> request = Optional.of(new ServletWebRequest(attrs.getRequest()));
 		return request;
 	}
 
@@ -61,7 +60,7 @@ public abstract class AbstractApiDelegate {
 
 	//renvoie une liste de tous les headers 'accept' de la requête
 	public List<String> getAcceptHeaders() {
-		List<String> acceptes = new ArrayList<String>();
+		List<String> acceptes = new ArrayList<>();
 		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
 				.currentRequestAttributes();
 		Enumeration<String> acceptheaders = attrs.getRequest().getHeaders("accept");

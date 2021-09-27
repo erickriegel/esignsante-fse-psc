@@ -80,7 +80,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("Réception d'une demande de signature Pades");
 
 		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)) == false) {
+				&& (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)))) {
 			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/pdf",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
@@ -116,7 +116,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("Réception d'une demande de signature Xades");
 
 		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-				&& isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)) == false) {
+				&& (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)))) {
 
 			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/xml",
 					HttpStatus.NOT_ACCEPTABLE);
@@ -246,13 +246,12 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		// verification du type de fichier
 		String typeFile = checkTypeFile(params.getFileToSign());
 		// contrôle uniquement des PDFs
-		if (typeSignature.equals(TYPE_SIGNATURE.PADES)) {
-			if (!typeFile.equals(Helper.APPLICATION_PDF)) {
+		if ((typeSignature.equals(TYPE_SIGNATURE.PADES)) && (!typeFile.equals(Helper.APPLICATION_PDF))) {
 				throwExceptionRequestError(
 						"Requête rejetée car le fichier transmis semble ne pas être un PDF, type détecté  " + typeFile,
 						HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 			}
-		}
+		
 
 		log.debug(
 				"Demande de signature valide: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
