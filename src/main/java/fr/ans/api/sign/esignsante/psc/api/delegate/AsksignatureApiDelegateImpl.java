@@ -3,7 +3,6 @@
  */
 package fr.ans.api.sign.esignsante.psc.api.delegate;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -79,11 +78,15 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		log.debug("Réception d'une demande de signature Pades");
 
-		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-				&& (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_PDF)))) {
+		List<String> acceptedHeaders = getAcceptHeaders();
+		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_JSON)) {
+			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+		}
+		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_PDF)) {
 			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/pdf",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
+
 
 		
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES, accessToken, file,
@@ -114,14 +117,15 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			@ApiParam(value = "") @Valid @RequestPart(value = "userinfo", required = false) String userinfo) {
 
 		log.debug("Réception d'une demande de signature Xades");
-
-		if ((isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)
-				&& (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_XML)))) {
-
+        
+		List<String> acceptedHeaders = getAcceptHeaders();
+		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_JSON)) {
+			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+		}
+		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_XML)) {
 			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/xml",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
-
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.XADES, accessToken, file,
 				userinfo);
 
