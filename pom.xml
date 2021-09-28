@@ -9,14 +9,15 @@
 	</parent>
 	<groupId>fr.ans.sign</groupId>
 	<artifactId>esignsante-psc</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 	<name>esignsante-psc</name>
 
 	<packaging>jar</packaging>
 
 	<scm>
 		<developerConnection>${developperConnectionJenkinsfile}</developerConnection>
-	</scm>
+	  <tag>esignsante-psc-1.0.3</tag>
+  </scm>
 
 	<description>webservice REST de signature à partir d'un jeton prosante connect</description>
 	<properties>
