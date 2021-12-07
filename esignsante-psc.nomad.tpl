@@ -92,7 +92,7 @@ EOF
 				check {
 					type = "http"
 					port = "http"
-					path = "/esignsante-psc/ca"
+					path = "/esignsante-psc/v1/ca"
 					header {
 						Accept = ["application/json"]
 					}
