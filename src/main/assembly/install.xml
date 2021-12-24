@@ -14,7 +14,7 @@
 			<outputDirectory/>
 			<includes>
 				<include>application.properties</include>
-				<include>log4j2.xml</include>
+				<include>logback.xml</include>
 			</includes>
 		</fileSet>
 	</fileSets>
