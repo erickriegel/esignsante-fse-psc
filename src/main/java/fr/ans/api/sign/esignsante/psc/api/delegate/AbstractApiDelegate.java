@@ -10,9 +10,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
@@ -39,6 +45,8 @@ public abstract class AbstractApiDelegate {
 
 	private static final Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
 
+	protected HttpServletRequest httpRequest = null;
+
 	/**
 	 * Gets the request
 	 *
@@ -53,23 +61,78 @@ public abstract class AbstractApiDelegate {
 	}
 
 	/**
+	 * Gets the HttpServletRequest
+	 *
+	 * @return the HttpServletRequest
+	 */
+
+	public HttpServletRequest getHttpRequest() {
+		if (this.httpRequest == null) {
+			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+			this.httpRequest = attrs.getRequest();
+		}
+		return this.httpRequest;
+	}
+
+	/*
+	 * 
+	 */
+	// String> => Map<String, LIst<String> ..
+	public Map<String, String> getUsedHeaders() {
+		List<String> usedHeaders = new ArrayList<String>();
+		usedHeaders.add(Helper.HEADER_NAME_AUTHORIZATION);
+		usedHeaders.add(Helper.HEADER_NAME_USERINFO);
+		usedHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE);
+		Map<String, String> headers = Collections.list(getHttpRequest().getHeaderNames()).stream()
+				.filter(h -> usedHeaders.contains(h)).collect(Collectors.toMap(h -> h, httpRequest::getHeader));
+		return headers;
+	}
+
+	/**
 	 * Gets the accept header.
 	 *
 	 * @return the accept header
 	 */
-
-	//renvoie une liste de tous les headers 'accept' de la requête
 	public List<String> getAcceptHeaders() {
+
 		List<String> acceptes = new ArrayList<>();
-		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
-				.currentRequestAttributes();
-		Enumeration<String> acceptheaders = attrs.getRequest().getHeaders("accept");
+		Enumeration<String> acceptheaders = getHttpRequest().getHeaders(Helper.HEADER_NAME_ACCEPT);
 		while (acceptheaders.hasMoreElements()) {
 			List<String> tmp = Arrays.asList(acceptheaders.nextElement().trim().split(","));
 			tmp.replaceAll(x -> x.trim());
 			acceptes.addAll(tmp);
 		}
 		return acceptes;
+	}
+
+	/**
+	 * Gets the accessToken
+	 *
+	 * @return the PSC accessToken
+	 */
+
+	public String getAccessToken() {
+		List<String> tmp = new ArrayList<String>();
+		Enumeration<String> tokens = getHttpRequest().getHeaders(Helper.HEADER_NAME_AUTHORIZATION);
+		while (tokens.hasMoreElements()) {
+			log.debug("Au moins un header 'Authorization' trouvé ");
+			String token = tokens.nextElement();
+			if (token.startsWith(Helper.TOKEN_HEADER_PREFIX_BEARER)) {
+				tmp.add(StringUtils.deleteWhitespace(token).substring(Helper.TOKEN_HEADER_PREFIX_BEARER.length()));
+				log.debug("token 'Bearer' trouvé dans un header 'Authorization': {} ", token);
+			}
+		}
+		if ((tmp.size() == 0) || (tmp.size() > 1)) {
+			throwExceptionRequestError("Token non trouvé dans les headers de la requête (ou plusieurs token)", HttpStatus.BAD_REQUEST);
+		}
+		log.debug("accessToken received (without prefix): {}", tmp.get(0));
+
+		return tmp.get(0);
+	}
+
+	public List<String> getHeaderNames() {
+		Enumeration<String> headerNames = getHttpRequest().getHeaderNames();
+		return Collections.list(headerNames);
 	}
 
 	public File multipartFileToFile(MultipartFile multipart) throws IOException {
@@ -82,7 +145,6 @@ public abstract class AbstractApiDelegate {
 		log.debug("tempFile {}", tempFile.getFileName().toString());
 		multipart.transferTo(tempFile);
 		return tempFile.toFile();
-
 	}
 
 	public File getMultiPartFile(MultipartFile file) {
@@ -98,10 +160,9 @@ public abstract class AbstractApiDelegate {
 
 	}
 
-	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders, String expectedAcceptHeader ) {	
-		return ( acceptheaders.contains(expectedAcceptHeader)
-				 || acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD)
-				 || acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
+	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders, String expectedAcceptHeader) {
+		return (acceptheaders.contains(expectedAcceptHeader) || acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD)
+				|| acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
 	}
 
 	protected String checkTypeFile(File fichierAtester) {

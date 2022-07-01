@@ -41,7 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.delegate.AsksignatureApiDelegateImpl;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
-import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
+import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
 import fr.ans.esignsante.model.Erreur;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +59,6 @@ public class AskApiIntegrationTest {
 
 	@MockBean
 	EsignsanteCall esignWS;
-	
-	@MockBean
-	ProsanteConnectCalls pscApi;
 
 	final String accessToken = "accessTokenValue";
 	
@@ -107,10 +104,6 @@ public class AskApiIntegrationTest {
 				Files.readAllBytes(
 						new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
 
-    	
-    	//intro PSC
-    	Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
-    	
      	 Mockito.doReturn(report).when(esignWS).signatureXades(any(File.class),any(List.class),any(),any(List.class) );
     		
     	 HttpHeaders httpHeaders = new HttpHeaders();
@@ -119,11 +112,12 @@ public class AskApiIntegrationTest {
     	 acceptedMedia.add(MediaType.APPLICATION_XML);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
+    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
     	 
- 
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
   				.file(fileXML)
-  				.file("userinfo", userInfobase64.getBytes())  				
+  		//		.file("userinfo", userInfobase64.getBytes())  				
   				.headers(httpHeaders))
     			 .andExpect(status().isOk());
     	
@@ -145,39 +139,36 @@ public class AskApiIntegrationTest {
 	}
 	
 	
-	@Test
-	@DisplayName("ask XADES token non actif")
-	public void askXADESTokenKOTest() throws Exception {
-		
-		String reponsePSCNonActif = Files.readString(
-				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
-		
-		
-    	MockMultipartFile fileXML = new MockMultipartFile(
-    			"file",
-    			"ipsfra.xml",
-    			null,
-				Files.readAllBytes(
-						new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
-
-    	String userInfobase64 = Files.readString(
-				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
-    	
-    	//intro PSC
-    	Mockito.doReturn(reponsePSCNonActif).when(pscApi).isTokenActive(any());
-    	  	
-    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
-  				.file(fileXML)
-  				.file("userinfo", userInfobase64.getBytes())
-  				.header("access_token", accessToken)
-                .accept("application/json,application/xml"))
-  				.andExpect(status().isUnauthorized());
- 				
-    	
-    	 
-  		returned.andDo(document("signXADES/TokenKo"));
-               
-	}
+//	@Test
+//	@DisplayName("ask XADES token non actif")
+//	public void askXADESTokenKOTest() throws Exception {
+//		
+//		String reponsePSCNonActif = Files.readString(
+//				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
+//		
+//		
+//    	MockMultipartFile fileXML = new MockMultipartFile(
+//    			"file",
+//    			"ipsfra.xml",
+//    			null,
+//				Files.readAllBytes(
+//						new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
+//
+//    	String userInfobase64 = Files.readString(
+//				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
+//    	  	
+//    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
+//  				.file(fileXML)
+//  				.file("userinfo", userInfobase64.getBytes())
+//  				.header("access_token", accessToken)
+//                .accept("application/json,application/xml"))
+//  				.andExpect(status().isUnauthorized());
+// 				
+//    	
+//    	 
+//  		returned.andDo(document("signXADES/TokenKo"));
+//               
+//	}
 
 
 	@Test
@@ -188,9 +179,9 @@ public class AskApiIntegrationTest {
 		report.setValide(true);
 		report.setErreurs(new ArrayList<Erreur>());
 				
-		String reponsePSCActif = Files.readString(
-				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
-		
+//		String reponsePSCActif = Files.readString(
+//				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
+//		
 //		report.setDocSigne(Files.readAllBytes(
 //				new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED_base64.txt").getFile().toPath()).toString());
 //		
@@ -210,9 +201,6 @@ public class AskApiIntegrationTest {
 						new ClassPathResource("EsignSanteWS/Pades/ANS.pdf").getFile().toPath()));
 
     	
-    	//intro PSC
-    	Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
-    	
     	 Mockito.doReturn(report).when(esignWS).signaturePades(any(File.class),any(List.class),any(),any(List.class) );
     		
     	 HttpHeaders httpHeaders = new HttpHeaders();
@@ -221,11 +209,13 @@ public class AskApiIntegrationTest {
     	 acceptedMedia.add(MediaType.APPLICATION_PDF);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
+    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
     	 
  
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
   				.file(filePDF)
-  				.file("userinfo", userInfobase64.getBytes())  				
+  			//	.file("userinfo", userInfobase64.getBytes())  				
   				.headers(httpHeaders))
   				.andExpect(status().isOk());
  				
@@ -239,53 +229,50 @@ public class AskApiIntegrationTest {
 	}
 	
 	
-	@Test
-	@DisplayName("ask PADES token non actif")
-	public void askPADESTokenKOTest() throws Exception {
-		
-		String reponsePSCNonActif = Files.readString(
-				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
-		
-    	MockMultipartFile fileXML = new MockMultipartFile(
-    			"file",
-    			"ANS_SIGNED.pdf",
-    			null,
-				Files.readAllBytes(
-						new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
-
-    	String userInfobase64 = Files.readString(
-				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
-    	
-    	 HttpHeaders httpHeaders = new HttpHeaders();
-    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
-    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
-    	 acceptedMedia.add(MediaType.APPLICATION_XML);
-    	 httpHeaders.setAccept(acceptedMedia);
-    	 httpHeaders.add("access_token", accessToken);
-    	 
-    	
-    	//intro PSC
-    	Mockito.doReturn(reponsePSCNonActif).when(pscApi).isTokenActive(any());
-    	  	
-    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
-  				.file(fileXML)
-  				.file("userinfo", userInfobase64.getBytes())
-  				.header("access_token",accessToken)
-                .accept("application/json,application/pdf"))
-  				.andExpect(status().isUnauthorized());
- 				
-  		returned.andDo(document("signPADES/TokenKo"));
-               
-	}
+//	@Test
+//	@DisplayName("ask PADES token non actif")
+//	public void askPADESTokenKOTest() throws Exception {
+//		
+//		String reponsePSCNonActif = Files.readString(
+//				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
+//		
+//    	MockMultipartFile fileXML = new MockMultipartFile(
+//    			"file",
+//    			"ANS_SIGNED.pdf",
+//    			null,
+//				Files.readAllBytes(
+//						new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
+//
+//    	String userInfobase64 = Files.readString(
+//				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
+//    	
+//    	 HttpHeaders httpHeaders = new HttpHeaders();
+//    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
+//    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
+//    	 acceptedMedia.add(MediaType.APPLICATION_XML);
+//    	 httpHeaders.setAccept(acceptedMedia);
+//    	 httpHeaders.add("access_token", accessToken);
+//    	 
+//    	  	
+//    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
+//  				.file(fileXML)
+//  				.file("userinfo", userInfobase64.getBytes())
+//  				.header("access_token",accessToken)
+//                .accept("application/json,application/pdf"))
+//  				.andExpect(status().isUnauthorized());
+// 				
+//  		returned.andDo(document("signPADES/TokenKo"));
+//               
+//	}
 
 	@Test
 	@DisplayName("ask PADES fichier non pdf")
 	public void askPADESNotPDF() throws Exception {
 		
 		
-		String reponsePSCActif = Files.readString(
-				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
-		
+//		String reponsePSCActif = Files.readString(
+//				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
+//		
 		String userInfobase64 = Files.readString(
 				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
     	assertTrue(userInfobase64.endsWith("TVEUwMDIxODg5In0="));
@@ -304,16 +291,17 @@ public class AskApiIntegrationTest {
     	 acceptedMedia.add(MediaType.APPLICATION_PDF);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
+    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
     	 
-    	
-    	//intro PSC
-    	Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
+    	 
     	  	
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
   				.file(fileXML)
-  				.file("userinfo", userInfobase64.getBytes())
-  				.header("access_token",accessToken)
-                .accept("application/json,application/pdf"))
+  		//		.file("userinfo", userInfobase64.getBytes())
+//  				.header("access_token",accessToken)
+//                .accept("application/json,application/pdf"))
+  				.headers(httpHeaders))
   				.andExpect(status().isUnsupportedMediaType());
  				
   		returned.andDo(document("signPADES/BadFileFormat"));
@@ -336,30 +324,32 @@ public class AskApiIntegrationTest {
 				Files.readAllBytes(
 						new ClassPathResource("empty.zzz").getFile().toPath()));
 		//cas non passant
-		checkNotEmptyInputParametersKO (null,null,null);
-		checkNotEmptyInputParametersKO ("token",null,"userinfo");
-		checkNotEmptyInputParametersKO ("token",emptyFile,"userinfo");
-		checkNotEmptyInputParametersKO (null,emptyFile,null);
-		checkNotEmptyInputParametersKO (null,emptyFile,"userinfo");
-		checkNotEmptyInputParametersKO ("token",file,null);
-		checkNotEmptyInputParametersKO (null,file,null);
-		checkNotEmptyInputParametersKO ("",file,"userinfo");
-		checkNotEmptyInputParametersKO ("token",file,"");
-		checkNotEmptyInputParametersKO ("token",file,null);
-		checkNotEmptyInputParametersKO (null,file,"userinfo");
+		checkNotEmptyInputParametersKO (null,null,null, null);
+		checkNotEmptyInputParametersKO ("token",null,"userinfo", "tokenValidationResponse");
+		checkNotEmptyInputParametersKO ("token",emptyFile,"userinfo", "tokenValidationResponse");
+		checkNotEmptyInputParametersKO (null,emptyFile,null, "tokenValidationResponse");
+		checkNotEmptyInputParametersKO (null,emptyFile,"userinfo", "tokenValidationResponse");
+		checkNotEmptyInputParametersKO ("token",file,null, "tokenValidationResponse");
+		checkNotEmptyInputParametersKO (null,file,null, "tokenValidationResponse");
+		checkNotEmptyInputParametersKO ("",file,"userinfo", "tokenValidationResponse");
+		checkNotEmptyInputParametersKO ("token",file,"", "tokenValidationResponse");
+		checkNotEmptyInputParametersKO ("token",file,null, "tokenValidationResponse");
+		checkNotEmptyInputParametersKO (null,file,"userinfo", "tokenValidationResponse");
+		checkNotEmptyInputParametersKO (null,file,"userinfo", null);
+		checkNotEmptyInputParametersKO ("token",file,"userinfo", null);
 		//cas  passant
 		AsksignatureApiDelegateImpl ask = new AsksignatureApiDelegateImpl();
 		try {
-			ask.checkNotEmptyInputParameters("token",file, "userinfo"); 
+			ask.checkNotEmptyInputParameters("token",file, "userinfo","tokenValidationResponse"); 
 		} catch (Exception e) {
 			assertTrue(false);
 		}
 	}
 	
-	private void checkNotEmptyInputParametersKO(String accessToken, MultipartFile file, String userinfo ) {
+	private void checkNotEmptyInputParametersKO(String accessToken, MultipartFile file, String userinfo, String tokenValidationResponse ) {
 		var askKO = new AsksignatureApiDelegateImpl();
 		try {
-			askKO.checkNotEmptyInputParameters(accessToken, file, userinfo); 
+			askKO.checkNotEmptyInputParameters(accessToken, file, userinfo, tokenValidationResponse); 
 		assertTrue(false);
 		}
 		catch (Exception e) {

@@ -35,10 +35,20 @@ public class Helper {
 	public static final String TOKEN_ACTIVE_FALSE = "false";
 	public static final String TOKEN_ACTIVE_TRUE = "true";
 
-	// type de Header
+	// Nom des headers attendus
+    public static final String HEADER_NAME_AUTHORIZATION = "authorization";
+    public static final String HEADER_NAME_USERINFO = "x-userinfo";
+    public static final String HEADER_NAME_TOKEN_VALIDATIONRESPONSE = "x-introspection-response";
+    public static final String HEADER_NAME_ACCEPT = "accept";
+    
+    //token
+    public static final String TOKEN_HEADER_PREFIX_BEARER = "Bearer";
+	
+	//Valeurs reconnues du Header 'accept'
 	public static final String APPLICATION_JSON = "application/json";
 	public static final String APPLICATION_XML = "application/xml";
 	public static final String APPLICATION_PDF = "application/pdf";
+	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	public static final String HEADER_TYPE_APP_WILDCARD = "application/*";
 	public static final String HEADER_TYPE_FULL_WILDCARD = "*/*";
 
@@ -86,6 +96,11 @@ public class Helper {
 	public static UserInfo jsonBase64StringToUserInfo(String sUserInfoEncodedBase64)
 			throws JsonMappingException, JsonProcessingException, UnsupportedEncodingException {
 		return new ObjectMapper().readValue(Helper.decodeBase64toString(sUserInfoEncodedBase64), UserInfo.class);
+	}
+	
+	public static UserInfo jsonStringToUserInfo(String sUserInfo)
+			throws JsonMappingException, JsonProcessingException, UnsupportedEncodingException {
+		return new ObjectMapper().readValue(sUserInfo, UserInfo.class);
 	}
 
 	public static HttpStatus parsePSCresponse(String reponsePSC) {

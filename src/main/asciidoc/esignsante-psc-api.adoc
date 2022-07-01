@@ -247,20 +247,6 @@ include::{snippets}/signXADES/OK/http-response.adoc[]
 Payload:
 include::{snippets}/signXADES/OK/response-body.adoc[]
 
-=== Cas non passant 401 (token non actif)
-L'access Token fourni dans la requête n'est plus vu comme un token actif par ProSanteConnect
-
-.request
-include::{snippets}/signXADES/TokenKo/http-request.adoc[]
-
-payload:
-include::{snippets}/signXADES/TokenKo/request-body.adoc[]
-
-
-.response
-include::{snippets}/signXADES/TokenKo/http-response.adoc[]
-
-
 === Cas non passant 503 (WS OFF)
 Le webservices 'esignsanteWebservices' n'est pas disponible
 
@@ -296,19 +282,6 @@ include::{snippets}/signPADES/OK/http-response.adoc[]
 
 Payload:
 include::{snippets}/signPADES/OK/response-body.adoc[]
-
-=== Cas non passant 401 (token non actif)
-L'access Token fourni dans la requête n'est plus vu comme un token actif par ProSanteConnect
-
-.request
-include::{snippets}/signPADES/TokenKo/http-request.adoc[]
-
-payload:
-include::{snippets}/signPADES/TokenKo/request-body.adoc[]
-
-
-.response
-include::{snippets}/signPADES/TokenKo/http-response.adoc[]
 
 === Cas non passant 415 (fichier non pdf)
 Le fichier à signer fourni n'est pas reconnu comme un fichier PDF.

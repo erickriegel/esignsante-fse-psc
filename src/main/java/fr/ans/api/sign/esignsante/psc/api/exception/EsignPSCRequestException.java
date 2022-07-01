@@ -30,4 +30,12 @@ public class EsignPSCRequestException extends RuntimeException{
 		this.erreur = erreur;
 		this.statusARetourner = statusARetourner;
 	}
+	
+	public static void throwExceptionRequestError(String msg, HttpStatus status) {
+		var erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
+		erreur.setCode(status.toString());
+		erreur.setMessage(msg);
+		throw new EsignPSCRequestException(erreur, status);
+
+	}
 }

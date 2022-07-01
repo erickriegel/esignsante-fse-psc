@@ -1,4 +1,3 @@
-#(c) Copyright 1998-2021, ANS. All rights reserved.
 openapi: 3.0.0
 info:
   title: esignsante-psc @project.version@
@@ -104,24 +103,28 @@ paths:
           description: Erreur interne du serveur
         '503':
           description: Service indisponible
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RichDocument'
-        required: true
-        description: Le document à signer au format XML.
       parameters:
         - schema:
             type: string
           in: header
-          name: access_token
-          required: true
+          name: X-Userinfo
+          description: userInfo Prosante Connect (json encodé base 64)
+        - schema:
+            type: string
+          in: header
+          name: X-Introspection-Response
+          description: response PSC sur introspection (json encodé base 64)
       tags:
         - signature
       description: Opération qui permet au client de demander de signer un document au format XADES Baseline-B.
       security:
         - PRO-SanteConnect: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Document'
+        description: Le document à signer au format XML.
     parameters: []
   /asksignature/pades:
     post:
@@ -131,7 +134,7 @@ paths:
         '200':
           description: OK
           content:
-            application/pdf:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
@@ -157,24 +160,28 @@ paths:
           description: Erreur interne du serveur
         '503':
           description: Service indisponible
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RichDocument'
-        required: true
-        description: Le document à signer au format PDF.
       parameters:
         - schema:
             type: string
           in: header
-          name: access_token
-          required: true
+          name: X-Userinfo
+          description: userInfo Prosante Connect (json encodé base 64)
+        - schema:
+            type: string
+          in: header
+          name: X-Introspection-Response
+          description: response PSC sur introspection (json encodé base 64)
       tags:
         - signature
       description: Opération qui permet au client de demander de signer un document au format PADES Baseline-B.
       security:
         - PRO-SanteConnect: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Document'
+        description: Le document à signer au format PDF.
     parameters: []
   /checksignature/xades:
     post:
@@ -240,6 +247,66 @@ paths:
       tags:
         - checksignature
       description: Opération qui permet au client de vérifier une signature au format PADES.
+  /asksignature/fse:
+    post:
+      summary: Signature d'un hash d'une FSE au format Cades BAseline B
+      operationId: post-askSignature-fse
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: erreur 400
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: erreur 415
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur interne du serveur
+        '503':
+          description: Service indisponible
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: X-Userinfo
+          description: userInfo Prosante Connect (json encodé base 64)
+        - schema:
+            type: string
+          in: header
+          name: X-Introspection-Response
+          description: response PSC sur introspection (json encodé base 64)
+        - schema:
+            type: string
+            format: byte
+          in: query
+          name: hashFSE
+          description: hash of the FSE to be signed
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: idFacturationPS
+        - schema:
+            type: string
+          in: query
+          name: typeFlux
+      tags:
+        - signature
+      description: Opération qui permet au client de signer le hash d'une feuille de soin au format CADES Baseline-B détaché
+      security:
+        - PRO-SanteConnect: []
+    parameters: []
 components:
   schemas:
     Exercice:
@@ -387,6 +454,17 @@ components:
           format: binary
       required:
         - file
+    hashFSE:
+      title: hashFSE
+      type: string
+      description: hash of the FSE to be signed
+      x-examples: {}
+      properties:
+        hashFSE:
+          type: string
+          format: binary
+      required:
+        - hashFSE
     Error:
       title: Error
       type: object
@@ -420,76 +498,328 @@ components:
           items:
             $ref: '#/components/schemas/Exercice'
     UserInfo:
-      description: ''
       type: object
       properties:
         Secteur_Activite:
           type: string
-          minLength: 1
         sub:
           type: string
-          minLength: 1
         email_verified:
           type: boolean
         SubjectOrganization:
           type: string
-          minLength: 1
         Mode_Acces_Raison:
           type: string
-          minLength: 1
         preferred_username:
           type: string
-          minLength: 1
         given_name:
           type: string
-          minLength: 1
         Acces_Regulation_Medicale:
           type: string
-          minLength: 1
         UITVersion:
           type: string
-          minLength: 1
         Palier_Authentification:
           type: string
-          minLength: 1
         SubjectRefPro:
-          $ref: '#/components/schemas/SubjectRefPro'
+          type: object
+          properties:
+            codeCivilite:
+              type: string
+            exercices:
+              type: array
+              items:
+                type: object
+                properties:
+                  codeProfession:
+                    type: string
+                  codeCategorieProfessionnelle:
+                    type: string
+                  codeCiviliteDexercice:
+                    type: string
+                  nomDexercice:
+                    type: string
+                  prenomDexercice:
+                    type: string
+                  codeTypeSavoirFaire:
+                    type: string
+                  codeSavoirFaire:
+                    type: string
+                  activities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        codeModeExercice:
+                          type: string
+                        codeSecteurDactivite:
+                          type: string
+                        codeSectionPharmacien:
+                          type: string
+                        codeRole:
+                          type: string
+                        codeGenreActivite:
+                          type: string
+                        numeroSiretSite:
+                          type: string
+                        numeroSirenSite:
+                          type: string
+                        numeroFinessSite:
+                          type: string
+                        numeroFinessetablissementJuridique:
+                          type: string
+                        identifiantTechniqueDeLaStructure:
+                          type: string
+                        raisonSocialeSite:
+                          type: string
+                        enseigneCommercialeSite:
+                          type: string
+                        complementDestinataire:
+                          type: string
+                        complementPointGeographique:
+                          type: string
+                        numeroVoie:
+                          type: string
+                        indiceRepetitionVoie:
+                          type: string
+                        codeTypeDeVoie:
+                          type: string
+                        libelleVoie:
+                          type: string
+                        mentionDistribution:
+                          type: string
+                        bureauCedex:
+                          type: string
+                        codePostal:
+                          type: string
+                        codeCommune:
+                          type: string
+                        codePays:
+                          type: string
+                        telephone:
+                          type: string
+                        telephone2:
+                          type: string
+                        telecopie:
+                          type: string
+                        adresseEMail:
+                          type: string
+                        codeDepartement:
+                          type: string
+                        ancienIdentifiantDeLaStructure:
+                          type: string
+                        autoriteDenregistrement:
+                          type: string
         SubjectOrganizationID:
           type: string
-          minLength: 1
         SubjectRole:
-          $ref: '#/components/schemas/SubjectRole'
+          type: array
+          items:
+            type: string
         PSI_Locale:
           type: string
-          minLength: 1
+        otherIds:
+          type: array
+          items:
+            type: object
+            properties:
+              identifiant:
+                type: string
+              origine:
+                type: string
+              qualite:
+                type: integer
         SubjectNameID:
           type: string
-          minLength: 1
         family_name:
           type: string
-          minLength: 1
-      required:
-        - SubjectOrganization
-        - preferred_username
-        - given_name
-        - family_name
+      x-examples:
+        example-1:
+          Secteur_Activite: SA07^1.2.250.1.71.4.2.4
+          sub: 'f:550dc1c8-d97b-4b1e-ac8c-8eb4471cf9dd:ANS20210107161422'
+          email_verified: false
+          SubjectOrganization: CAB MED BIS TOUBIB0023550
+          Mode_Acces_Raison: ''
+          preferred_username: ANS20210107161422
+          given_name: Paul
+          Acces_Regulation_Medicale: FAUX
+          UITVersion: '1.0'
+          Palier_Authentification: APPPRIP3^1.2.250.1.213.1.5.1.1.1
+          SubjectRefPro:
+            codeCivilite: M
+            exercices:
+              - codeProfession: '10'
+                codeCategorieProfessionnelle: C
+                codeCiviliteDexercice: M
+                nomDexercice: Docteur OIDC
+                prenomDexercice: Paul
+                codeTypeSavoirFaire: ''
+                codeSavoirFaire: ''
+                activities:
+                  - codeModeExercice: L
+                    codeSecteurDactivite: SA07
+                    codeSectionPharmacien: ''
+                    codeRole: ''
+                    codeGenreActivite: GENR01
+                    numeroSiretSite: ''
+                    numeroSirenSite: ''
+                    numeroFinessSite: ''
+                    numeroFinessetablissementJuridique: ''
+                    identifiantTechniqueDeLaStructure: ''
+                    raisonSocialeSite: CAB MED BIS TOUBIB0023550
+                    enseigneCommercialeSite: ''
+                    complementDestinataire: ''
+                    complementPointGeographique: ''
+                    numeroVoie: ''
+                    indiceRepetitionVoie: ''
+                    codeTypeDeVoie: R
+                    libelleVoie: PARIS
+                    mentionDistribution: ''
+                    bureauCedex: ''
+                    codePostal: '75009'
+                    codeCommune: '75109'
+                    codePays: ''
+                    telephone: ''
+                    telephone2: ''
+                    telecopie: ''
+                    adresseEMail: ''
+                    codeDepartement: '75'
+                    ancienIdentifiantDeLaStructure: ''
+                    autoriteDenregistrement: ''
+                  - codeModeExercice: L
+                    codeSecteurDactivite: SA07
+                    codeSectionPharmacien: ''
+                    codeRole: ''
+                    codeGenreActivite: GENR01
+                    numeroSiretSite: ''
+                    numeroSirenSite: ''
+                    numeroFinessSite: ''
+                    numeroFinessetablissementJuridique: ''
+                    identifiantTechniqueDeLaStructure: ''
+                    raisonSocialeSite: CABINET MEDICAL0023550
+                    enseigneCommercialeSite: ''
+                    complementDestinataire: ''
+                    complementPointGeographique: ''
+                    numeroVoie: '2'
+                    indiceRepetitionVoie: ''
+                    codeTypeDeVoie: R
+                    libelleVoie: LIBERTA
+                    mentionDistribution: ''
+                    bureauCedex: ''
+                    codePostal: '75009'
+                    codeCommune: '75109'
+                    codePays: ''
+                    telephone: ''
+                    telephone2: ''
+                    telecopie: ''
+                    adresseEMail: ''
+                    codeDepartement: '75'
+                    ancienIdentifiantDeLaStructure: ''
+                    autoriteDenregistrement: ''
+                  - codeModeExercice: S
+                    codeSecteurDactivite: SA01
+                    codeSectionPharmacien: ''
+                    codeRole: ''
+                    codeGenreActivite: GENR01
+                    numeroSiretSite: ''
+                    numeroSirenSite: ''
+                    numeroFinessSite: ''
+                    numeroFinessetablissementJuridique: ''
+                    identifiantTechniqueDeLaStructure: ''
+                    raisonSocialeSite: HOPITAL GENERIQUE
+                    enseigneCommercialeSite: ''
+                    complementDestinataire: ''
+                    complementPointGeographique: ''
+                    numeroVoie: '20'
+                    indiceRepetitionVoie: ''
+                    codeTypeDeVoie: R
+                    libelleVoie: DE PARIS
+                    mentionDistribution: ''
+                    bureauCedex: ''
+                    codePostal: '75020'
+                    codeCommune: '75120'
+                    codePays: ''
+                    telephone: ''
+                    telephone2: ''
+                    telecopie: ''
+                    adresseEMail: ''
+                    codeDepartement: '75'
+                    ancienIdentifiantDeLaStructure: ''
+                    autoriteDenregistrement: ''
+                  - codeModeExercice: S
+                    codeSecteurDactivite: SA43
+                    codeSectionPharmacien: ''
+                    codeRole: ''
+                    codeGenreActivite: GENR01
+                    numeroSiretSite: '00000000016972'
+                    numeroSirenSite: '000000000'
+                    numeroFinessSite: ''
+                    numeroFinessetablissementJuridique: ''
+                    identifiantTechniqueDeLaStructure: ''
+                    raisonSocialeSite: CONSEIL DES ORDRES
+                    enseigneCommercialeSite: ''
+                    complementDestinataire: ''
+                    complementPointGeographique: ''
+                    numeroVoie: '28'
+                    indiceRepetitionVoie: ''
+                    codeTypeDeVoie: R
+                    libelleVoie: DES INVALIDES
+                    mentionDistribution: ''
+                    bureauCedex: ''
+                    codePostal: '75009'
+                    codeCommune: '75109'
+                    codePays: ''
+                    telephone: ''
+                    telephone2: ''
+                    telecopie: ''
+                    adresseEMail: ''
+                    codeDepartement: '75'
+                    ancienIdentifiantDeLaStructure: ''
+                    autoriteDenregistrement: ''
+                  - codeModeExercice: S
+                    codeSecteurDactivite: SA43
+                    codeSectionPharmacien: ''
+                    codeRole: ''
+                    codeGenreActivite: GENR01
+                    numeroSiretSite: '00000000079608'
+                    numeroSirenSite: '000000000'
+                    numeroFinessSite: ''
+                    numeroFinessetablissementJuridique: ''
+                    identifiantTechniqueDeLaStructure: ''
+                    raisonSocialeSite: ORGANISME ND7960
+                    enseigneCommercialeSite: ''
+                    complementDestinataire: ''
+                    complementPointGeographique: ''
+                    numeroVoie: '2'
+                    indiceRepetitionVoie: ''
+                    codeTypeDeVoie: R
+                    libelleVoie: MOULIN VERT
+                    mentionDistribution: ''
+                    bureauCedex: ''
+                    codePostal: '75009'
+                    codeCommune: '75109'
+                    codePays: ''
+                    telephone: ''
+                    telephone2: ''
+                    telecopie: ''
+                    adresseEMail: ''
+                    codeDepartement: '75'
+                    ancienIdentifiantDeLaStructure: ''
+                    autoriteDenregistrement: ''
+          SubjectOrganizationID: ''
+          SubjectRole:
+            - 10^1.2.250.1.213.1.1.5.5
+          PSI_Locale: 1.2.250.1.213.1.3.1.1
+          otherIds:
+            - identifiant: ANS20210107161422
+              origine: EDIT
+              qualite: 1
+          SubjectNameID: ANS20210107161422
+          family_name: NOM
     SubjectRole:
       title: SubjectRole
       type: array
       items:
         type: string
-    RichDocument:
-      title: RichDocument
-      type: object
-      properties:
-        file:
-          description: Objet contenant le fichier ) signer et le UserInfo
-          type: string
-          format: binary
-        userinfo:
-          type: string
-      required:
-        - file
   responses: {}
   securitySchemes:
     PRO-SanteConnect:

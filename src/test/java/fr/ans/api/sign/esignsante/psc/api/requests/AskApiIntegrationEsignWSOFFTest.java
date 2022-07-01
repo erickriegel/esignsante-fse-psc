@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import fr.ans.api.sign.esignsante.psc.prosantecall.ProsanteConnectCalls;
+import fr.ans.api.sign.esignsante.psc.utils.Helper;
 
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class }) // pour restdocs
 @SpringBootTest 
@@ -62,17 +62,12 @@ public class AskApiIntegrationEsignWSOFFTest {
 	final String body = "{\"code\":\"503 SERVICE_UNAVAILABLE\",\"message\":\"Exception sur appel esignWS. Service inaccessible\"}";
 	final String accessToken = "accessTokenValue";
 	
-	@MockBean
-	ProsanteConnectCalls pscApi;
-	
 	@Test
 	@DisplayName("Ask signature XADES Cas non passant esignWS OFF")
 	public void askSignXADES_esignWS_OFFTest() throws Exception {
 
-		String reponsePSCActif = Files.readString(
-				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
-		
-		Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
+//		String reponsePSCActif = Files.readString(
+//				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());		
 		
 		MockMultipartFile fileXML = new MockMultipartFile(
     			"file",
@@ -90,9 +85,11 @@ public class AskApiIntegrationEsignWSOFFTest {
     	 acceptedMedia.add(MediaType.APPLICATION_XML);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
+    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
 		ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")				
 				.file(fileXML)
-  				.file("userinfo", userInfobase64.getBytes())
+  			//	.file("userinfo", userInfobase64.getBytes())
   				.headers(httpHeaders))
 				.andExpect(status().isServiceUnavailable()).andExpect(content().json(body));
 
@@ -105,8 +102,8 @@ public class AskApiIntegrationEsignWSOFFTest {
 	@DisplayName("Ask signature PADES Cas non passant esignWS OFF")
 	public void askSignPADES_esignWS_OFFTest() throws Exception {
 
-		String reponsePSCActif = Files.readString(
-				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
+//		String reponsePSCActif = Files.readString(
+//				new ClassPathResource("PSC/PSC200_activetrue_medecin_899700218896.json").getFile().toPath());
 		
 		MockMultipartFile filePDF = new MockMultipartFile(
     			"file",
@@ -117,19 +114,19 @@ public class AskApiIntegrationEsignWSOFFTest {
 
 		final String userInfobase64 = Files.readString(
 				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
-    	
-		Mockito.doReturn(reponsePSCActif).when(pscApi).isTokenActive(any());
-		
+    			
 		
    	 HttpHeaders httpHeaders = new HttpHeaders();
    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
    	 httpHeaders.setAccept(acceptedMedia);
-   	 httpHeaders.add("access_token", accessToken);
+   	 httpHeaders.add("access_token", "forwardedAccessToken");
+   	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
+   	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
 		ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")				
 				.file(filePDF)
-  				.file("userinfo", userInfobase64.getBytes())
+  			//	.file("userinfo", userInfobase64.getBytes())
   				.headers(httpHeaders))
 				.andExpect(status().isServiceUnavailable());
 				
@@ -137,7 +134,7 @@ public class AskApiIntegrationEsignWSOFFTest {
 		
 				returned.andExpect(content().json(body));
 				
-//String result = returned.andReturn().getResponse().getContentAsString();
+String result = returned.andReturn().getResponse().getContentAsString();
  
 		returned.andDo(document("signPADES/esginWS_OFF")); 
 	}
