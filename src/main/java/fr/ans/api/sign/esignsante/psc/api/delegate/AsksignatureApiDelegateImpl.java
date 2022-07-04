@@ -186,6 +186,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				//parametre optionnel type de flux
 				if ((typeFlux==null) || (typeFlux.isEmpty()) ) {
 					typeFlux = Helper.TYPE_FLUX_DEFAULT;
+					log.debug("Paramètre 'typeDeFLux' non fourni. On prend la valeur par défaut 'T'");
 				}
 				
 				//Mise à jour des données PSC: accessToken, reponse introspection, userInfo
@@ -204,25 +205,21 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				// Appel esignsante
 				log.debug("Appel esignWS pour une signature de type {}", typeSignature.getTypeSignature());
 				ESignSanteSignatureReportWithProof report = null;
-//				try {
-//					if ((TYPE_SIGNATURE.PADES.toString()).equals(typeSignature.getTypeSignature())) {
-//						report = esignWS.signaturePades(fileToSign, signers, params.getRequestID(), openidTokens);
-//					} else {
-//						report = esignWS.signatureXades(fileToSign, signers, params.getRequestID(), openidTokens);
-//					}
-//
-//				} catch (RestClientException e) {
-//					throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
-//							HttpStatus.SERVICE_UNAVAILABLE);
-//				}
-//
-//				if (report == null) {
-//					throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
-//				}
-//
-//				archivagePreuve(report, params.getRequestID(), user, params.getDate());
-//				
-//				ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES,  hashFSE, params);
+
+				try {
+					report = esignWS.signatureFSE(hashFSE, idFacturationPS, typeFlux, signers,
+							params.getRequestID(), openidTokens);
+
+				} catch (RestClientException e) {
+					throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
+							HttpStatus.SERVICE_UNAVAILABLE);
+				}
+
+				if (report == null) {
+					throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+
+				archivagePreuve(report, params.getRequestID(), user, params.getDate());
 				
 				//TODO BOUCHON ...
 				byte[] signatureValue = "signature".getBytes();

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import fr.ans.esignsante.ApiClient;
 import fr.ans.esignsante.api.CaApi;
+import fr.ans.esignsante.api.FseApi;
 import fr.ans.esignsante.api.PadesApi;
 import fr.ans.esignsante.api.XadesApi;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
@@ -78,6 +79,32 @@ public class EsignsanteCall {
 				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
 				openidTokens);
 
+		log.debug("nbError: " + report.getErreurs().size());
+		return report;
+	}
+	
+	public ESignSanteSignatureReportWithProof signatureFSE(byte[] hash, String idFacturationPS, String typeFLux, List<String> signers, String requestId,
+			List<OpenidToken> openidTokens) {
+
+		esignWSApiClient = confApiClient();
+
+		log.debug("appel esignsanteWebservices pour une demande de signature d'une FSE ");
+//		log.debug("fileToSign: {}", fileToSign.getName());
+
+		FseApi api = new FseApi(esignWSApiClient);
+		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n", esignWSApiClient.getBasePath(),
+				esignConf.getSignatureConfId(), esignConf.getProofConfId());
+		ESignSanteSignatureReportWithProof report = null;
+
+		/*
+		 * (String secret, Long idSignConf, String hash, String idFacturationPS, String typeFlux,
+		 *  List<String> signers, Long idVerifSignConf, String requestId, String proofTag, String applicantId, List<OpenidToken> xOpenidToken) throws RestClientException
+		 */
+		report = api.signatureFSEWithProof(esignConf.getSecret(), esignConf.getSignatureConfId(),
+				new String(hash),idFacturationPS,	typeFLux,	signers,
+				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
+				openidTokens);
+		
 		log.debug("nbError: " + report.getErreurs().size());
 		return report;
 	}
