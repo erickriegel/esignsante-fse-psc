@@ -6,7 +6,9 @@ package fr.ans.api.sign.esignsante.psc.utils;
 public enum TYPE_SIGNATURE {
     XADES ("XADES"),
 	
-    PADES ("PADES");
+    PADES ("PADES"),
+    
+    FSE ("FSE");
     	
 	private final String typeSignature;
 	

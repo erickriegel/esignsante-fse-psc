@@ -51,6 +51,8 @@ public class Helper {
 	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	public static final String HEADER_TYPE_APP_WILDCARD = "application/*";
 	public static final String HEADER_TYPE_FULL_WILDCARD = "*/*";
+	
+	public static final String TYPE_FLUX_DEFAULT = "T";
 
 
 	private Helper() {

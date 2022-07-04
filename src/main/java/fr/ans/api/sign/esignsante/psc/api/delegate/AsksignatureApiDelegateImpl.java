@@ -28,6 +28,7 @@ import org.springframework.web.client.RestClientException;
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
@@ -96,9 +97,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		//Mise à jour des données PSC: accessToken, reponse introspection, userInfo
 		ParametresSign params = prepareAppelEsignWSPSCDatas (xUserinfo, xIntrospectionResponse );
-			
-
-		//TODO revoir appel de checkNotEmptyInputParameters par 'executeAskSignature'
+					
 		ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES,  file, params);
 
 		String signedStringBase64 = report.getDocSigne();
@@ -166,15 +165,15 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 	}
 
+	        
 	@Override
 	public ResponseEntity<org.springframework.core.io.Resource> postAskSignatureFse(byte[] hashFSE,
-			String xUserinfo,
+			String idFacturationPS,
+	        String xUserinfo,
 	        String xIntrospectionResponse,
-	        String idFacturationPS,
-	        String typeFlux)	{
+	        String typeFlux) {
 
 				log.error("postAskSignatureFse");
-		//		Map<String,String> headersMap = getUsedHeaders();
 				List<String> acceptedHeaders = getAcceptHeaders();
 				if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_JSON)) {
 					return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -184,32 +183,46 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 							HttpStatus.NOT_ACCEPTABLE);
 				}
 				
-//				//L' accesstoken doit être dans les headers . methode de la classe mère abstraite..
-//				String accessToken = getAccessToken();
-//								
-//				//lecture dans les headers => doublon les paramètres de la méthode ....
-//				if ((jsonBase64UserInfo == null ) && (jsonBase64TokenValidationResponse == null) ) {
-//					log.debug("calling PSC to check validity of access token and get userInfo ...");
-//					//lecture dans les headers => doublon les paramètres de la méthode ....
-//					jsonBase64TokenValidationResponse = pscApi.getIntrospectionResult(accessToken);
-//					log.debug("responsePSC CALL PSC: {}", jsonBase64TokenValidationResponse);
-//					HttpStatus tmpStatus = Helper.parsePSCresponse(jsonBase64TokenValidationResponse);
-//					// si le token n'est pas valide, 
-//					if (tmpStatus != HttpStatus.OK) {
-//						throwExceptionRequestError("Problème sur la vérification de la validité du token",
-//								tmpStatus);
+				//parametre optionnel type de flux
+				if ((typeFlux==null) || (typeFlux.isEmpty()) ) {
+					typeFlux = Helper.TYPE_FLUX_DEFAULT;
+				}
+				
+				//Mise à jour des données PSC: accessToken, reponse introspection, userInfo
+				ParametresSign params = prepareAppelEsignWSPSCDatas (xUserinfo, xIntrospectionResponse );				
+				
+				// construction du OpenIDToken
+				var user = params.getUserinfo();
+				
+				//Preuves données PSC
+				List<OpenidToken> openidTokens = setOpenIdTokens(params);
+				
+				TYPE_SIGNATURE typeSignature = TYPE_SIGNATURE.FSE;
+				// liste des signataires
+				List<String> signers = setSigners(TYPE_SIGNATURE.FSE, user);
+
+				// Appel esignsante
+				log.debug("Appel esignWS pour une signature de type {}", typeSignature.getTypeSignature());
+				ESignSanteSignatureReportWithProof report = null;
+//				try {
+//					if ((TYPE_SIGNATURE.PADES.toString()).equals(typeSignature.getTypeSignature())) {
+//						report = esignWS.signaturePades(fileToSign, signers, params.getRequestID(), openidTokens);
+//					} else {
+//						report = esignWS.signatureXades(fileToSign, signers, params.getRequestID(), openidTokens);
 //					}
-//					jsonBase64UserInfo = pscApi.getUserInfo(accessToken);
-//					log.debug("userInfo CALL PSC: {}" ,jsonBase64UserInfo);
-//						
+//
+//				} catch (RestClientException e) {
+//					throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
+//							HttpStatus.SERVICE_UNAVAILABLE);
 //				}
-//				else {
-//					// les infos doivent être dans les headers
-//					log.debug("getting introspection result and userinfo from header's request...");
-//					log.debug("...response introspection PSC extrait des headers: {} ", jsonBase64TokenValidationResponse);
-//					log.debug("...userInfo extrait des headers: {}" , jsonBase64UserInfo);
+//
+//				if (report == null) {
+//					throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
 //				}
+//
+//				archivagePreuve(report, params.getRequestID(), user, params.getDate());
 //				
+//				ESignSanteSignatureReportWithProof report = executeAskSignature(TYPE_SIGNATURE.PADES,  hashFSE, params);
 				
 				//TODO BOUCHON ...
 				byte[] signatureValue = "signature".getBytes();
@@ -279,18 +292,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		private ESignSanteSignatureReportWithProof executeAskSignature(TYPE_SIGNATURE typeSignature, MultipartFile file, ParametresSign params) {
 		
-	
-
-	//	checkNotEmptyInputParameters(accessToken, file, userinfo, tokenValidationResponse);
-//			UserInfo objetUserInfo = null;
-//			try {
-//				objetUserInfo = Helper.jsonStringToUserInfo(userinfo);
-//			} catch (JsonProcessingException | UnsupportedEncodingException e1) {
-//				e1.printStackTrace();
-//				throwExceptionRequestError(e1, "Erreur technique sur traitement du UserInfo", HttpStatus.INTERNAL_SERVER_ERROR);						
-//				
-//			}	
-
 		java.io.File fileToSign = getMultiPartFile(file);	
 			
 		// verification du type de fichier
@@ -302,23 +303,21 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 						HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 			}
 		
-//		log.debug(
-//				"Demande de signature valide: verif AccessToken OK: {} \n, File OK {} \n, userInfo OK Organisation: {}",
-//				params.getPscReponse(), params.getFileToSign().getName(),
-//				params.getUserinfo().getSubjectOrganization());
 
 		// construction du OpenIDToken
 		var user = params.getUserinfo();
-		List<OpenidToken> openidTokens = new ArrayList<>();
-		var openidToken = new OpenidToken();
-		openidToken.setAccessToken(params.getAccessToken());
-		openidToken.setIntrospectionResponse(params.getJsonPscReponse());
-		openidToken.setUserInfo(params.getJsonUserInfo());
-		openidTokens.add(openidToken);
-		log.error("openidtoken[0] transmis à esignWS:");
-		log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
-		log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
-		log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
+		
+		List<OpenidToken> openidTokens = setOpenIdTokens(params);
+//		List<OpenidToken> openidTokens = new ArrayList<>();
+//		var openidToken = new OpenidToken();
+//		openidToken.setAccessToken(params.getAccessToken());
+//		openidToken.setIntrospectionResponse(params.getJsonPscReponse());
+//		openidToken.setUserInfo(params.getJsonUserInfo());
+//		openidTokens.add(openidToken);
+//		log.error("openidtoken[0] transmis à esignWS:");
+//		log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
+//		log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
+//		log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
 
 		// liste des signataires
 		List<String> signers = setSigners(typeSignature, user);
@@ -430,5 +429,19 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		params.setRequestID(Helper.generateRequestId());
 
 		return params;
+	}
+	
+	public 	List<OpenidToken> setOpenIdTokens(ParametresSign params) {
+	List<OpenidToken> openidTokens = new ArrayList<>();
+	var openidToken = new OpenidToken();
+	openidToken.setAccessToken(params.getAccessToken());
+	openidToken.setIntrospectionResponse(params.getJsonPscReponse());
+	openidToken.setUserInfo(params.getJsonUserInfo());
+	openidTokens.add(openidToken);
+	log.error("openidtoken[0] transmis à esignWS:");
+	log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
+	log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
+	log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
+	return openidTokens;
 	}
 }
