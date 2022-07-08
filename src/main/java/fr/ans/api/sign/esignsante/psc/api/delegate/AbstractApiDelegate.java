@@ -29,6 +29,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import ch.qos.logback.core.joran.action.ActionUtil.Scope;
 import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +71,9 @@ public abstract class AbstractApiDelegate {
 		if (this.httpRequest == null) {
 			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 			this.httpRequest = attrs.getRequest();
+			System.out.println(attrs.getAttributeNames(0));
 		}
+	
 		return this.httpRequest;
 	}
 

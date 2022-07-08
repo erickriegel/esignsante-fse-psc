@@ -89,7 +89,6 @@ public class EsignsanteCall {
 		esignWSApiClient = confApiClient();
 
 		log.debug("appel esignsanteWebservices pour une demande de signature d'une FSE ");
-//		log.debug("fileToSign: {}", fileToSign.getName());
 
 		FseApi api = new FseApi(esignWSApiClient);
 		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n", esignWSApiClient.getBasePath(),

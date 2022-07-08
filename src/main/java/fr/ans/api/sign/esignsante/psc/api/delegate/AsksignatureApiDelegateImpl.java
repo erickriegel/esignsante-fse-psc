@@ -40,6 +40,7 @@ import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.api.sign.esignsante.psc.utils.ParametresSign;
 import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
+import fr.ans.esignsante.model.Erreur;
 import io.swagger.annotations.ApiParam;
 import fr.ans.esignsante.model.OpenidToken;
 import lombok.extern.slf4j.Slf4j;
@@ -183,6 +184,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 							HttpStatus.NOT_ACCEPTABLE);
 				}
 				
+				getHttpRequest();
+				
 				//parametre optionnel type de flux
 				if ((typeFlux==null) || (typeFlux.isEmpty()) ) {
 					typeFlux = Helper.TYPE_FLUX_DEFAULT;
@@ -214,15 +217,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 					throwExceptionRequestError(e, "Exception sur appel esignWS. Service inaccessible",
 							HttpStatus.SERVICE_UNAVAILABLE);
 				}
-
-				if (report == null) {
-					throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-
-				archivagePreuve(report, params.getRequestID(), user, params.getDate());
+							
+				archivagePreuveSiOK(report, params.getRequestID(), user, params.getDate());
 				
-				//TODO BOUCHON ...
-				byte[] signatureValue = "signature".getBytes();
+				byte[] signatureValue = report.getDocSigne().getBytes();
 				Resource resource = new FileResource(signatureValue, "BINARY_SIGNATURE_VALUE" );
 		        return new ResponseEntity<>(resource,HttpStatus.OK);
 
@@ -253,9 +251,24 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		return result;
 	}
 
-	private void archivagePreuve(ESignSanteSignatureReportWithProof report, String requestID, UserInfo userToPersit,
+	private void archivagePreuveSiOK(ESignSanteSignatureReportWithProof report, String requestID, UserInfo userToPersit,
 			Date now) {
+		
+		if (report == null) {
+			throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
+		if (!report.isValide()) {
+			StringBuilder err = new StringBuilder();
+			for (Erreur erreur : report.getErreurs()) {
+				err.append(erreur.getCodeErreur()); 
+				err.append(": ");
+				err.append(erreur.getMessage());
+				err.append(";");
+			}
+			throwExceptionRequestError("La signature n'est pas valide. Erreur(s): " + err.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 		log.debug(" START archivage de la preuve en BDD pour request id: {}", requestID);
 		ProofStorage proof = new ProofStorage(requestID, userToPersit.getSubjectOrganization(),
 				userToPersit.getPreferredUsername(), userToPersit.getGivenName(), userToPersit.getFamilyName(), now,
@@ -334,11 +347,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 					HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
-		if (report == null) {
-			throwExceptionRequestError("Exception technique sur appel esignWS", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		archivagePreuve(report, params.getRequestID(), user, params.getDate());
+		archivagePreuveSiOK(report, params.getRequestID(), user, params.getDate());
 
 		return report;
 	}
@@ -432,8 +441,16 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	List<OpenidToken> openidTokens = new ArrayList<>();
 	var openidToken = new OpenidToken();
 	openidToken.setAccessToken(params.getAccessToken());
-	openidToken.setIntrospectionResponse(params.getJsonPscReponse());
-	openidToken.setUserInfo(params.getJsonUserInfo());
+//	openidToken.setIntrospectionResponse(params.getJsonPscReponse());
+//	openidToken.setUserInfo(params.getJsonUserInfo());
+	try {
+		openidToken.setIntrospectionResponse(Helper.encodeBase64(params.getJsonPscReponse()));
+		openidToken.setUserInfo(Helper.encodeBase64(params.getJsonUserInfo()));
+	} catch (UnsupportedEncodingException e) {
+		throwExceptionRequestError("Erreur technique lors de la construction du xOpenId (pb encodage base64)", HttpStatus.INTERNAL_SERVER_ERROR);
+		e.printStackTrace();
+	}
+	
 	openidTokens.add(openidToken);
 	log.error("openidtoken[0] transmis à esignWS:");
 	log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
@@ -441,4 +458,5 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
 	return openidTokens;
 	}
+	
 }
