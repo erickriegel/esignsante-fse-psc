@@ -45,10 +45,10 @@ import net.bytebuddy.dynamic.scaffold.MethodRegistry.Handler.ForAbstractMethod;
 public abstract class AbstractApiDelegate {
 
 	// Nom des headers attendus
-    public static final String HEADER_NAME_AUTHORIZATION = "authorization";
-    public static final String HEADER_NAME_USERINFO = "x-userinfo";
-    public static final String HEADER_NAME_TOKEN_VALIDATIONRESPONSE = "x-introspection-response";
-    public static final String HEADER_NAME_ACCEPT = "accept";
+    public static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+    public static final String HEADER_NAME_USERINFO = "X-Userinfo";
+    public static final String HEADER_NAME_INTROSPECTION_RESPONSE = "X-Introspection-Response";
+    public static final String HEADER_NAME_ACCEPT = "Accept";
     
     //token
     public static final String TOKEN_HEADER_PREFIX_BEARER = "Bearer";
@@ -88,11 +88,6 @@ public abstract class AbstractApiDelegate {
 	 */
 
 	public HttpServletRequest getHttpRequest() {
-//		if (this.httpRequest == null) {
-//			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-//			this.httpRequest = attrs.getRequest();
-//			System.out.println(attrs.getAttributeNames(0));
-//		}
 			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 			this.httpRequest = attrs.getRequest();
 			System.out.println(attrs.getAttributeNames(0));
@@ -108,7 +103,7 @@ public abstract class AbstractApiDelegate {
 		List<String> usedHeaders = new ArrayList<String>();
 		usedHeaders.add(HEADER_NAME_AUTHORIZATION);
 		usedHeaders.add(HEADER_NAME_USERINFO);
-		usedHeaders.add(HEADER_NAME_TOKEN_VALIDATIONRESPONSE);
+		usedHeaders.add(HEADER_NAME_INTROSPECTION_RESPONSE);
 		Map<String, String> headers = Collections.list(getHttpRequest().getHeaderNames()).stream()
 				.filter(h -> usedHeaders.contains(h)).collect(Collectors.toMap(h -> h, httpRequest::getHeader));
 		return headers;

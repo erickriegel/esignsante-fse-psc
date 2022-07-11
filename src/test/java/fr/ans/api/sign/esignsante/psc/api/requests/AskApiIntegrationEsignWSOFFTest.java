@@ -88,7 +88,7 @@ public class AskApiIntegrationEsignWSOFFTest {
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION, accessToken);
     	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
-       	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+       	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_INTROSPECTION_RESPONSE, "forwardedtokenValityResponse" );
 		ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")				
 				.file(fileXML)
   			//	.file("userinfo", userInfobase64.getBytes())
@@ -125,7 +125,7 @@ public class AskApiIntegrationEsignWSOFFTest {
    	 httpHeaders.setAccept(acceptedMedia);
    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION, accessToken);
    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
-   	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+   	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_INTROSPECTION_RESPONSE, "forwardedtokenValityResponse" );
 		ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")				
 				.file(filePDF)
   			//	.file("userinfo", userInfobase64.getBytes())

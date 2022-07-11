@@ -301,6 +301,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	}
 
 		private ESignSanteSignatureReportWithProof executeAskSignature(TYPE_SIGNATURE typeSignature, MultipartFile file, ParametresSign params) {
+			
+		checkNotEmptyInputParameters(params.getAccessToken(), file, params.getJsonUserInfo(), params.getJsonPscReponse());
 		
 		java.io.File fileToSign = getMultiPartFile(file);	
 			
@@ -393,6 +395,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		if (withGravitee.equals("true")) { //Fonctionnement avec gravitee: les infos doivent être dans les headers 
 			log.debug("getting introspection result and userinfo from header's request...");
 			log.debug("...response introspection PSC extrait des headers: {} ", xIntrospectionResponse);
+			checkPSCHeaderNotEmpty (xUserInfo,  xIntrospectionResponse);
 			try {	
 				decodedIntro = Helper.decodeBase64toString(xIntrospectionResponse);
 				log.debug("...... response PSC decodée : {} ", decodedIntro);
@@ -461,4 +464,14 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	return openidTokens;
 	}
 	
+	
+	public void checkPSCHeaderNotEmpty (final String xUserInfo, final String xIntrospectionResponse) {
+		if ((xUserInfo == null) || (xUserInfo.isEmpty()) || (xUserInfo.isBlank()) ){
+			throwExceptionRequestError("Erreur technique sur lecture du  header X-Userinfo", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		if ((xIntrospectionResponse == null) || (xIntrospectionResponse.isEmpty()) || (xIntrospectionResponse.isBlank()) ){
+			throwExceptionRequestError("Erreur technique sur lecture du  header X-Introspection-Response", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
