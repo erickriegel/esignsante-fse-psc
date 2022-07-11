@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.ans.api.sign.esignsante.psc.api.delegate.AbstractApiDelegate;
 import fr.ans.api.sign.esignsante.psc.api.delegate.AsksignatureApiDelegateImpl;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
@@ -112,8 +113,8 @@ public class AskApiIntegrationTest {
     	 acceptedMedia.add(MediaType.APPLICATION_XML);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
-    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
-       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
     	 
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
   				.file(fileXML)
@@ -209,8 +210,8 @@ public class AskApiIntegrationTest {
     	 acceptedMedia.add(MediaType.APPLICATION_PDF);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
-    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
-       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
     	 
  
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
@@ -291,8 +292,8 @@ public class AskApiIntegrationTest {
     	 acceptedMedia.add(MediaType.APPLICATION_PDF);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add("access_token", accessToken);
-    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
-       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
     	 
     	 
     	  	

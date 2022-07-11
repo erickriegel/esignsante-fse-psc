@@ -26,11 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultApiDelegateImpl extends AbstractApiDelegate implements DefaultApiDelegate {
 
-	final String ACCEPT_HEADER_JSON = "accept:"+Helper.APPLICATION_JSON;
+	final String ACCEPT_HEADER_JSON = "accept:"+ APPLICATION_JSON;
 
 	@Autowired
 	MongoTemplate mongoTemplate;
-
+ 
 	@Autowired
 	EsignsanteCall esignWS;
 
@@ -49,7 +49,7 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 		log.debug("Réception d'une demande des opérations disponibles");
 
 		// vérification du Headers accept
-		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+		if (!isAcceptHeaderPresent(getAcceptHeaders(), APPLICATION_JSON)) {
 			throwExceptionRequestError("Header 'accept' non conforme: attendu application/json",
 					HttpStatus.NOT_ACCEPTABLE);
 		}

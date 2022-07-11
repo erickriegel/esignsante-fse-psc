@@ -35,29 +35,11 @@ public class Helper {
 	public static final String TOKEN_ACTIVE_FALSE = "false";
 	public static final String TOKEN_ACTIVE_TRUE = "true";
 
-	// Nom des headers attendus
-    public static final String HEADER_NAME_AUTHORIZATION = "authorization";
-    public static final String HEADER_NAME_USERINFO = "x-userinfo";
-    public static final String HEADER_NAME_TOKEN_VALIDATIONRESPONSE = "x-introspection-response";
-    public static final String HEADER_NAME_ACCEPT = "accept";
-    
-    //token
-    public static final String TOKEN_HEADER_PREFIX_BEARER = "Bearer";
-	
-	//Valeurs reconnues du Header 'accept'
-	public static final String APPLICATION_JSON = "application/json";
-	public static final String APPLICATION_XML = "application/xml";
-	public static final String APPLICATION_PDF = "application/pdf";
-	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
-	public static final String HEADER_TYPE_APP_WILDCARD = "application/*";
-	public static final String HEADER_TYPE_FULL_WILDCARD = "*/*";
 	
 	public static final String TYPE_FLUX_DEFAULT = "T";
 
-
 	private Helper() {
 	}
-
 	/*
 	 * génération d'un identifiant 'metier' unique transmis sur appel à esignsante
 	 * pour une signature avec preuve et persisté

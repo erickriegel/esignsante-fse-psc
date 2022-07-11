@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.HeaderAssertions;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,12 +39,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import fr.ans.api.sign.esignsante.psc.api.delegate.AbstractApiDelegate;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class }) // pour restdocs
 @SpringBootTest 
 @AutoConfigureMockMvc
-
+@ActiveProfiles("test-withgravitee")
 public class AskApiIntegrationEsignWSOFFTest {
 
 	/*
@@ -60,7 +62,7 @@ public class AskApiIntegrationEsignWSOFFTest {
 	private MockMvc mockMvc;
 
 	final String body = "{\"code\":\"503 SERVICE_UNAVAILABLE\",\"message\":\"Exception sur appel esignWS. Service inaccessible\"}";
-	final String accessToken = "accessTokenValue";
+	final String accessToken = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJjaDNLZkFqOXZhX2tUZ2xGY01tTWlQVXZaSkNyU2l0NXZyeGVfZVgzbWpNIn0.eyJleHAiOjE2NTcyNjg2NDYsImlhdCI6MTY1NzI2ODU4NiwiYXV0aF90aW1lIjoxNjU3MjY4NTg2LCJqdGkiOiI2ZmY0OWMwNi1kNWM4LTQxYTgtYTZjZS03MjZmMWJiNGQzY2IiLCJpc3MiOiJodHRwczovL2F1dGguYmFzLmVzdy5lc2FudGUuZ291di5mci9hdXRoL3JlYWxtcy9lc2FudGUtd2FsbGV0Iiwic3ViIjoiZjo1NTBkYzFjOC1kOTdiLTRiMWUtYWM4Yy04ZWI0NDcxY2Y5ZGQ6ODk5NzAwMjQ1NjY3IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYW5zLXBvYy1iYXMtcHNjIiwibm9uY2UiOiIiLCJzZXNzaW9uX3N0YXRlIjoiODcxNmQ1OTktMWJjYS00ODU4LThkMjAtZGQ2YzhhMzNmYTYzIiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBzY29wZV9hbGwiLCJzaWQiOiI4NzE2ZDU5OS0xYmNhLTQ4NTgtOGQyMC1kZDZjOGEzM2ZhNjMiLCJhY3IiOiJlaWRhczMiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6Ijg5OTcwMDI0NTY2NyJ9.izsTSHGd_jkrRtY2VplyiyZwlUQ8E4WRS1mjcaDJPXfRa_UB36ekgUcz2-5a69lOXRI1Y3Xre3KfZ-G2rgYlA2UN0NOOzR0mAfELwzJToi2f0hEo_2WkqALxu9fceDHGPfdWypUIBjnY0v8NlGi4goCTFtWFXKFyarec9-qgPOwi_D9GcqP_GQylehH1bCiBNL0TImR7-73nlbMrPEtMUtqzr58S5G2eTirk9NBcziCepDovprrmIQ8ktuJW73DlHoq90ocRkBYXCtmTkdFlOjJ_GLwYhC9UONShB5iiIPCMK2ZrZ1RSD0ooEOuP4HPlsBC6rJ_oHJs4c2JoYXEY8A";
 	
 	@Test
 	@DisplayName("Ask signature XADES Cas non passant esignWS OFF")
@@ -84,9 +86,9 @@ public class AskApiIntegrationEsignWSOFFTest {
     	 acceptedMedia.add(MediaType.APPLICATION_JSON);
     	 acceptedMedia.add(MediaType.APPLICATION_XML);
     	 httpHeaders.setAccept(acceptedMedia);
-    	 httpHeaders.add("access_token", accessToken);
-    	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
-       	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION, accessToken);
+    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
+       	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
 		ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")				
 				.file(fileXML)
   			//	.file("userinfo", userInfobase64.getBytes())
@@ -121,9 +123,9 @@ public class AskApiIntegrationEsignWSOFFTest {
    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
    	 httpHeaders.setAccept(acceptedMedia);
-   	 httpHeaders.add("access_token", "forwardedAccessToken");
-   	 httpHeaders.add(Helper.HEADER_NAME_USERINFO,userInfobase64 );
-   	 httpHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
+   	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION, accessToken);
+   	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_USERINFO,userInfobase64 );
+   	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_TOKEN_VALIDATIONRESPONSE, "forwardedtokenValityResponse" );
 		ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")				
 				.file(filePDF)
   			//	.file("userinfo", userInfobase64.getBytes())

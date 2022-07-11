@@ -19,6 +19,15 @@ import lombok.Getter;
 
 public class EsignsanteConfigurationProperties {
 
+	@Value("${esignsante.webservices.basepath}")
+	private String basePath;
+
+	@Value("${esignsante.webservices.appliantId}")
+	private String appliantId;
+	
+	@Value("${esignsante.webservices.proofTag}")
+	private String proofTag;
+
 	@Value("${esignsante.webservices.signature.confId}")
 	private long signatureConfId;
 
@@ -30,14 +39,6 @@ public class EsignsanteConfigurationProperties {
 	
 	@Value("${esignsante.webservices.checksignature}")
 	private long checkSignatureConfId;
-	
-	@Value("${esignsante.webservices.basepath}")
-	private String basePath;
-	
-	@Value("${esignsante.webservices.appliantId}")
-	private String appliantId;
-	
-	@Value("${esignsante.webservices.proofTag}")
-	private String proofTag;
+		
 
 }

@@ -39,9 +39,29 @@ import net.bytebuddy.dynamic.scaffold.MethodRegistry.Handler.ForAbstractMethod;
  * The Class ApiDelegate. Classe mère de tous les delegates. Traitement
  * générique des requêtes
  */
+
+
 @Slf4j
 public abstract class AbstractApiDelegate {
 
+	// Nom des headers attendus
+    public static final String HEADER_NAME_AUTHORIZATION = "authorization";
+    public static final String HEADER_NAME_USERINFO = "x-userinfo";
+    public static final String HEADER_NAME_TOKEN_VALIDATIONRESPONSE = "x-introspection-response";
+    public static final String HEADER_NAME_ACCEPT = "accept";
+    
+    //token
+    public static final String TOKEN_HEADER_PREFIX_BEARER = "Bearer";
+	
+	//Valeurs reconnues du Header 'accept'
+	public static final String APPLICATION_JSON = "application/json";
+	public static final String APPLICATION_XML = "application/xml";
+	public static final String APPLICATION_PDF = "application/pdf";
+	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+	public static final String HEADER_TYPE_APP_WILDCARD = "application/*";
+	public static final String HEADER_TYPE_FULL_WILDCARD = "*/*";
+	
+	
 	protected String msgError = "";
 
 	private static final Path TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -68,12 +88,15 @@ public abstract class AbstractApiDelegate {
 	 */
 
 	public HttpServletRequest getHttpRequest() {
-		if (this.httpRequest == null) {
+//		if (this.httpRequest == null) {
+//			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+//			this.httpRequest = attrs.getRequest();
+//			System.out.println(attrs.getAttributeNames(0));
+//		}
 			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 			this.httpRequest = attrs.getRequest();
 			System.out.println(attrs.getAttributeNames(0));
-		}
-	
+			
 		return this.httpRequest;
 	}
 
@@ -83,9 +106,9 @@ public abstract class AbstractApiDelegate {
 	// String> => Map<String, LIst<String> ..
 	public Map<String, String> getUsedHeaders() {
 		List<String> usedHeaders = new ArrayList<String>();
-		usedHeaders.add(Helper.HEADER_NAME_AUTHORIZATION);
-		usedHeaders.add(Helper.HEADER_NAME_USERINFO);
-		usedHeaders.add(Helper.HEADER_NAME_TOKEN_VALIDATIONRESPONSE);
+		usedHeaders.add(HEADER_NAME_AUTHORIZATION);
+		usedHeaders.add(HEADER_NAME_USERINFO);
+		usedHeaders.add(HEADER_NAME_TOKEN_VALIDATIONRESPONSE);
 		Map<String, String> headers = Collections.list(getHttpRequest().getHeaderNames()).stream()
 				.filter(h -> usedHeaders.contains(h)).collect(Collectors.toMap(h -> h, httpRequest::getHeader));
 		return headers;
@@ -99,7 +122,7 @@ public abstract class AbstractApiDelegate {
 	public List<String> getAcceptHeaders() {
 
 		List<String> acceptes = new ArrayList<>();
-		Enumeration<String> acceptheaders = getHttpRequest().getHeaders(Helper.HEADER_NAME_ACCEPT);
+		Enumeration<String> acceptheaders = getHttpRequest().getHeaders(HEADER_NAME_ACCEPT);
 		while (acceptheaders.hasMoreElements()) {
 			List<String> tmp = Arrays.asList(acceptheaders.nextElement().trim().split(","));
 			tmp.replaceAll(x -> x.trim());
@@ -116,12 +139,12 @@ public abstract class AbstractApiDelegate {
 
 	public String getAccessToken() {
 		List<String> tmp = new ArrayList<String>();
-		Enumeration<String> tokens = getHttpRequest().getHeaders(Helper.HEADER_NAME_AUTHORIZATION);
+		Enumeration<String> tokens = getHttpRequest().getHeaders(HEADER_NAME_AUTHORIZATION);
 		while (tokens.hasMoreElements()) {
 			log.debug("Au moins un header 'Authorization' trouvé ");
 			String token = tokens.nextElement();
-			if (token.startsWith(Helper.TOKEN_HEADER_PREFIX_BEARER)) {
-				tmp.add(StringUtils.deleteWhitespace(token).substring(Helper.TOKEN_HEADER_PREFIX_BEARER.length()));
+			if (token.startsWith(TOKEN_HEADER_PREFIX_BEARER)) {
+				tmp.add(StringUtils.deleteWhitespace(token).substring(TOKEN_HEADER_PREFIX_BEARER.length()));
 				log.debug("token 'Bearer' trouvé dans un header 'Authorization': {} ", token);
 			}
 		}
@@ -164,8 +187,8 @@ public abstract class AbstractApiDelegate {
 	}
 
 	protected Boolean isAcceptHeaderPresent(List<String> acceptheaders, String expectedAcceptHeader) {
-		return (acceptheaders.contains(expectedAcceptHeader) || acceptheaders.contains(Helper.HEADER_TYPE_APP_WILDCARD)
-				|| acceptheaders.contains(Helper.HEADER_TYPE_FULL_WILDCARD));
+		return (acceptheaders.contains(expectedAcceptHeader) || acceptheaders.contains(HEADER_TYPE_APP_WILDCARD)
+				|| acceptheaders.contains(HEADER_TYPE_FULL_WILDCARD));
 	}
 
 	protected String checkTypeFile(File fichierAtester) {

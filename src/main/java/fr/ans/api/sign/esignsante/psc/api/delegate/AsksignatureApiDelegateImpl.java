@@ -88,10 +88,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		//Vérification des types acceptés en retour
 		List<String> acceptedHeaders = getAcceptHeaders();
-		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_JSON)) {
+		if (!isAcceptHeaderPresent(acceptedHeaders,APPLICATION_JSON)) {
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}
-		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_PDF)) {
+		if (!isAcceptHeaderPresent(acceptedHeaders, APPLICATION_PDF)) {
 			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/pdf",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
@@ -134,10 +134,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		log.debug("withGravitee: " + withGravitee);
         
 		List<String> acceptedHeaders = getAcceptHeaders();
-		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_JSON)) {
+		if (!isAcceptHeaderPresent(acceptedHeaders, APPLICATION_JSON)) {
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}
-		if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_XML)) {
+		if (!isAcceptHeaderPresent(acceptedHeaders, APPLICATION_XML)) {
 			throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/xml",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
@@ -176,10 +176,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 				log.error("postAskSignatureFse");
 				List<String> acceptedHeaders = getAcceptHeaders();
-				if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_JSON)) {
+				if (!isAcceptHeaderPresent(acceptedHeaders, APPLICATION_JSON)) {
 					return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 				}
-				if (!isAcceptHeaderPresent(acceptedHeaders, Helper.APPLICATION_OCTET_STREAM)) {
+				if (!isAcceptHeaderPresent(acceptedHeaders, APPLICATION_OCTET_STREAM)) {
 					throwExceptionRequestError("Le header 'accept' doit contenir  application/json et application/octet_stream",
 							HttpStatus.NOT_ACCEPTABLE);
 				}
@@ -307,7 +307,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		// verification du type de fichier
 		String typeFile = checkTypeFile(fileToSign);
 		// contrôle uniquement des PDFs
-		if ((typeSignature.equals(TYPE_SIGNATURE.PADES)) && (!typeFile.equals(Helper.APPLICATION_PDF))) {
+		if ((typeSignature.equals(TYPE_SIGNATURE.PADES)) && (!typeFile.equals(APPLICATION_PDF))) {
 				throwExceptionRequestError(
 						"Requête rejetée car le fichier transmis semble ne pas être un PDF, type détecté  " + typeFile,
 						HttpStatus.UNSUPPORTED_MEDIA_TYPE);
@@ -441,15 +441,17 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	List<OpenidToken> openidTokens = new ArrayList<>();
 	var openidToken = new OpenidToken();
 	openidToken.setAccessToken(params.getAccessToken());
-//	openidToken.setIntrospectionResponse(params.getJsonPscReponse());
-//	openidToken.setUserInfo(params.getJsonUserInfo());
-	try {
-		openidToken.setIntrospectionResponse(Helper.encodeBase64(params.getJsonPscReponse()));
-		openidToken.setUserInfo(Helper.encodeBase64(params.getJsonUserInfo()));
-	} catch (UnsupportedEncodingException e) {
-		throwExceptionRequestError("Erreur technique lors de la construction du xOpenId (pb encodage base64)", HttpStatus.INTERNAL_SERVER_ERROR);
-		e.printStackTrace();
-	}
+	openidToken.setIntrospectionResponse(params.getJsonPscReponse());
+	openidToken.setUserInfo(params.getJsonUserInfo());
+	
+	//cas encodage base64
+//	try {
+//		openidToken.setIntrospectionResponse(Helper.encodeBase64(params.getJsonPscReponse()));
+//		openidToken.setUserInfo(Helper.encodeBase64(params.getJsonUserInfo()));
+//	} catch (UnsupportedEncodingException e) {
+//		throwExceptionRequestError("Erreur technique lors de la construction du xOpenId (pb encodage base64)", HttpStatus.INTERNAL_SERVER_ERROR);
+//		e.printStackTrace();
+//	}
 	
 	openidTokens.add(openidToken);
 	log.error("openidtoken[0] transmis à esignWS:");

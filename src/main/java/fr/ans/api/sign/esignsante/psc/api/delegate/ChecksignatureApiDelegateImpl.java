@@ -116,7 +116,7 @@ public class ChecksignatureApiDelegateImpl extends AbstractApiDelegate implement
 	private ResponseEntity<Result> execute(TYPE_SIGNATURE typeSignature, MultipartFile file) {
 	
 		// controle du acceptheader
-		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+		if (!isAcceptHeaderPresent(getAcceptHeaders(), APPLICATION_JSON)) {
 			throwExceptionRequestError(
 					"Requête rejetée car le header 'accept=application/json' n'a pas été trouvé dans la requête",
 					HttpStatus.NOT_ACCEPTABLE);

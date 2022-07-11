@@ -101,7 +101,7 @@ public class EsignsanteCall {
 		 */
 		report = api.signatureFSEWithProof(esignConf.getSecret(), esignConf.getSignatureConfId(),
 				new String(hash),idFacturationPS,	typeFLux,	signers,
-				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
+				esignConf.getCheckSignatureConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
 				openidTokens);
 		
 		log.debug("nbError: " + report.getErreurs().size());

@@ -30,7 +30,7 @@ public class CaApiDelegateImpl extends AbstractApiDelegate implements CaApiDeleg
 	public ResponseEntity<List<String>> getCa() {
 		log.debug(" Réception d'une demande des CAs");
 
-		if (!isAcceptHeaderPresent(getAcceptHeaders(), Helper.APPLICATION_JSON)) {
+		if (!isAcceptHeaderPresent(getAcceptHeaders(),APPLICATION_JSON)) {
 			throwExceptionRequestError("Header 'accept' non conforme: attendu application/json",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
