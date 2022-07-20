@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,11 +28,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
-import ch.qos.logback.core.joran.action.ActionUtil.Scope;
 import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
-import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.dynamic.scaffold.MethodRegistry.Handler.ForAbstractMethod;
 
 /**
  * The Class ApiDelegate. Classe mère de tous les delegates. Traitement

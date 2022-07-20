@@ -5,14 +5,12 @@ package fr.ans.api.sign.esignsante.psc.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
 import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
 
 public class FileResource implements Resource{
 	private final byte[] data;

@@ -1,12 +1,12 @@
 package fr.ans.api.sign.esignsante.psc.prosantedatas;
 
+import static fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException.throwExceptionRequestError;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException.throwExceptionRequestError;
 
 @Slf4j
 @Service

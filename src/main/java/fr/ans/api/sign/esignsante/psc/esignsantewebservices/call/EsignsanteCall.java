@@ -4,7 +4,6 @@
 package fr.ans.api.sign.esignsante.psc.esignsantewebservices.call;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;

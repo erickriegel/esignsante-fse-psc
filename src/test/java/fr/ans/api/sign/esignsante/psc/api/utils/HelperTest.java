@@ -17,17 +17,14 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.model.Error;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.esignsante.model.Erreur;

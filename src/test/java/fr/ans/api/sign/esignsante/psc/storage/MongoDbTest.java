@@ -10,22 +10,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.bson.BsonDocument;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.ProofMongoRepository;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
-import springfox.documentation.spring.web.json.Json;
 
 /*
  * Classe utilisée uniquement pour les tests

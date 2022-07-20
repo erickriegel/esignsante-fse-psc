@@ -3,6 +3,8 @@
  */
 package fr.ans.api.sign.esignsante.psc.utils;
 
+import static fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException.throwExceptionRequestError;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
@@ -20,7 +22,6 @@ import fr.ans.api.sign.esignsante.psc.model.Error;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.esignsante.model.Erreur;
 import  lombok.extern.slf4j.Slf4j;
-import static fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException.throwExceptionRequestError;
 
 
 @Slf4j
@@ -89,35 +90,6 @@ public class Helper {
 		return new ObjectMapper().readValue(sUserInfo, UserInfo.class);
 	}
 
-//	public static HttpStatus parsePSCresponse(String reponsePSC) {
-//		HttpStatus retour = HttpStatus.INTERNAL_SERVER_ERROR;
-//		log.debug("parsePSCresponse IN with {}", reponsePSC);
-//
-//		ObjectNode node;
-//		try {
-//			node = new ObjectMapper().readValue(reponsePSC, ObjectNode.class);
-//
-//			if (node.has(TOKEN_ACTIVE_FIELD)) {
-//				String token_active_field = node.get(TOKEN_ACTIVE_FIELD).asText();
-//				if (token_active_field.equalsIgnoreCase(TOKEN_ACTIVE_TRUE)) {
-//					retour = HttpStatus.OK;
-//				} else {
-//					retour = HttpStatus.UNAUTHORIZED;
-//				}
-//			} else {
-//				retour = HttpStatus.INTERNAL_SERVER_ERROR;
-//				log.error("Reponse invalide introspection PSC: champ {} non trouvé", Helper.TOKEN_ACTIVE_FIELD);
-//			}
-//
-//		} catch (Exception e) {
-//			log.error("Erreur technique durant le parse de la reponse d'intropection PSC: champ {} ", e.getMessage());
-//			log.debug(e.toString());
-//			retour = HttpStatus.INTERNAL_SERVER_ERROR;
-//		}
-//
-//		log.debug("parsePSCresponse OUT status =  {}", retour);
-//		return retour;
-//	}
 	public static void parsePSCresponse(String reponsePSC) {
 		log.debug("parsePSCresponse IN with {}", reponsePSC);
 		HttpStatus status = HttpStatus.OK;
@@ -131,14 +103,12 @@ public class Helper {
 				if (token_active_field.equalsIgnoreCase(TOKEN_ACTIVE_TRUE)) {
 				} else {
 					msg = "Le token fourni n'est pas reconnu comme un token valide";
-					status = HttpStatus.UNAUTHORIZED;
-					//throwExceptionRequestError("Le token fourni n'est pas reconnu comme un token valide", HttpStatus.UNAUTHORIZED);					
+					status = HttpStatus.UNAUTHORIZED;					
 				}
 			} else {
 				log.error("Reponse invalide introspection PSC: champ {} non trouvé", Helper.TOKEN_ACTIVE_FIELD);
 				msg = "Erreur lors du parse de la réponse d'introspection de PSC";
-				status =  HttpStatus.INTERNAL_SERVER_ERROR;
-				//throwExceptionRequestError("Erreur lors du parse de la réponse d'introspection de PSCide", HttpStatus.INTERNAL_SERVER_ERROR);				
+				status =  HttpStatus.INTERNAL_SERVER_ERROR;			
 			}
 
 		} catch (Exception e) {

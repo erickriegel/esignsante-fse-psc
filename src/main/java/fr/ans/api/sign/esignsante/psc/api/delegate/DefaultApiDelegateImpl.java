@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import fr.ans.api.sign.esignsante.psc.api.DefaultApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.Operation;
-import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

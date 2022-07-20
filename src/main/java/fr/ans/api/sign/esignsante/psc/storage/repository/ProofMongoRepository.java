@@ -5,13 +5,10 @@ package fr.ans.api.sign.esignsante.psc.storage.repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 

@@ -97,7 +97,6 @@ public class CheckSignatureApiIntegrationTest {
 				Files.readAllBytes(
 						new ClassPathResource("EsignSanteWS/Xades/signedipsfra.xml").getFile().toPath()));
 
-    	//TODO argumentMatcher sur le début du nom de fichier
     	 Mockito.doReturn(report).when(esignWS).chekSignatureXades(any(File.class));
     		
   		ResultActions returned = mockMvc
@@ -126,7 +125,6 @@ public class CheckSignatureApiIntegrationTest {
 				Files.readAllBytes(
 						new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
 
-    	//TODO argumentMatcher sur le début du nom de fichier
     	 Mockito.doReturn(report).when(esignWS).chekSignaturePades(any(File.class));
   		
    		ResultActions returned = mockMvc

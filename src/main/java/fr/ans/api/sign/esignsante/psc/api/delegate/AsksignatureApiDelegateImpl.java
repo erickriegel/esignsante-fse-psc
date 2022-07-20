@@ -7,33 +7,25 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import javax.validation.Valid;
-
-import org.apache.tomcat.jni.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.client.RestClientException;
-import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.ans.api.sign.esignsante.psc.api.AsksignatureApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.api.sign.esignsante.psc.prosantedatas.PSCData;
+import fr.ans.api.sign.esignsante.psc.storage.entity.ProofStorage;
 import fr.ans.api.sign.esignsante.psc.storage.repository.PreuveDAO;
 import fr.ans.api.sign.esignsante.psc.utils.FileResource;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
@@ -41,7 +33,6 @@ import fr.ans.api.sign.esignsante.psc.utils.ParametresSign;
 import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
 import fr.ans.esignsante.model.Erreur;
-import io.swagger.annotations.ApiParam;
 import fr.ans.esignsante.model.OpenidToken;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,10 +67,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	PSCData pscApi;
 
 	private static final String SIGNER_XADES = "Délégataire de signature pour ";
-	//private static final String SIGNER_XADES = "Delegatiare de signature pour ";
 
 	private static final String SIGNER_PADES = "Signé pour le compte de ";
-	//private static final String SIGNER_PADES = "Signe pour le compte de ";
+
 
 	@Override
 	    public ResponseEntity<org.springframework.core.io.Resource> postAskSignaturePades(MultipartFile file,
@@ -229,31 +219,6 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 
 		    }
 	
-	
-	
-	
-//	private String checkPSCToken(String token) {
-//		var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-//		String msgError = "Exception sur vérfication de la validté du token PSC: " + token;
-//		var result = "Reponse ProSanteConnect inconnue";
-//	//	try {
-//			result = pscApi.getIntrospectionResult(token);
-//			httpStatus = Helper.parsePSCresponse(result);
-//			log.debug("Appel PSC intropesction: token= {}  reponse PSC = {} ", token, result);
-//			if (httpStatus == HttpStatus.UNAUTHORIZED) {
-//				msgError = "L'accessToken fourni dans la requête n'est pas reconnu comme un token actif par ProSanteConnect token: "
-//						+ token + " response PSC: " + result;
-//				throwExceptionRequestError(msgError, httpStatus);
-//			}
-////		} catch (JsonProcessingException | UnsupportedEncodingException | URISyntaxException e1) {
-////			msgError = msgError.concat(" , JsonProcessingException");
-////			log.debug(e1.toString());
-////			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;			throwExceptionRequestError(msgError, httpStatus);
-////		}
-//
-//		return result;
-//	}
-
 	private void archivagePreuveSiOK(ESignSanteSignatureReportWithProof report, String requestID, UserInfo userToPersit,
 			Date now) {
 		
@@ -318,21 +283,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 						HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 			}
 		
-
 		// construction du OpenIDToken
-		var user = params.getUserinfo();
-		
+		var user = params.getUserinfo();		
 		List<OpenidToken> openidTokens = setOpenIdTokens(params);
-//		List<OpenidToken> openidTokens = new ArrayList<>();
-//		var openidToken = new OpenidToken();
-//		openidToken.setAccessToken(params.getAccessToken());
-//		openidToken.setIntrospectionResponse(params.getJsonPscReponse());
-//		openidToken.setUserInfo(params.getJsonUserInfo());
-//		openidTokens.add(openidToken);
-//		log.error("openidtoken[0] transmis à esignWS:");
-//		log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
-//		log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
-//		log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
 
 		// liste des signataires
 		List<String> signers = setSigners(typeSignature, user);
@@ -414,16 +367,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		else { //Fonctionnement sans gravitee => appel à PSC pour vérifier le token et récupérer le userInfo
 				
 			log.debug("calling PSC to check validity of access token and get userInfo ...");
-			//lecture dans les headers => doublon les paramètres de la méthode ....
 			decodedIntro = pscApi.getIntrospectionResult(accessToken);
 			log.debug("responsePSC CALL PSC: {}", decodedIntro);
 			//HttpStatus tmpStatus = Helper.parsePSCresponse(decodedIntro);
 			Helper.parsePSCresponse(decodedIntro);
-			// si le token n'est pas valide, 
-//			if (tmpStatus != HttpStatus.OK) {
-//				throwExceptionRequestError("Problème sur la vérification de la validité du token",
-//						tmpStatus);
-//			}
 			decodedUserInfo = pscApi.getUserInfo(accessToken);
 			log.debug("userInfo CALL PSC: {}" ,decodedUserInfo);
 		}
@@ -451,20 +398,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	openidToken.setIntrospectionResponse(params.getJsonPscReponse());
 	openidToken.setUserInfo(params.getJsonUserInfo());
 	
-	//cas encodage base64
-//	try {
-//		openidToken.setIntrospectionResponse(Helper.encodeBase64(params.getJsonPscReponse()));
-//		openidToken.setUserInfo(Helper.encodeBase64(params.getJsonUserInfo()));
-//	} catch (UnsupportedEncodingException e) {
-//		throwExceptionRequestError("Erreur technique lors de la construction du xOpenId (pb encodage base64)", HttpStatus.INTERNAL_SERVER_ERROR);
-//		e.printStackTrace();
-//	}
-	
 	openidTokens.add(openidToken);
-//	log.error("openidtoken[0] transmis à esignWS:");
-//	log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
-//	log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
-//	log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
 	return openidTokens;
 	}
 	

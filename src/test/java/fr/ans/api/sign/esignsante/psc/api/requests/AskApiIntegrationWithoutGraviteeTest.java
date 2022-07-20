@@ -166,14 +166,7 @@ public class AskApiIntegrationWithoutGraviteeTest {
 				Files.readAllBytes(
 						new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
 
-//    	String userInfobase64 = Files.readString(
-//				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
-//    	
-    	Mockito.doReturn(reponsePSCNonActif).when(pscCall).getIntrospectionResult(any());
-//    	var erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
-//    	Mockito.doThrow(new EsignPSCRequestException(erreur,HttpStatus.UNAUTHORIZED )).when(pscCall).isPSCvalidateToken(any());
-//    
- //   	Mockito.doReturn(false).when(pscCall).isPSCvalidateToken(any());
+   	Mockito.doReturn(reponsePSCNonActif).when(pscCall).getIntrospectionResult(any());
     	  	
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
   				.file(fileXML)

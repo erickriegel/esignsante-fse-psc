@@ -13,7 +13,6 @@ import org.springframework.web.client.ResourceAccessException;
 
 import fr.ans.api.sign.esignsante.psc.api.CaApiDelegate;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
-import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

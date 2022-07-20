@@ -3,7 +3,6 @@
  */
 package fr.ans.api.sign.esignsante.psc.utils;
 
-import java.io.File;
 import java.util.Date;
 
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;

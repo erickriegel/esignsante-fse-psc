@@ -4,7 +4,6 @@
 package fr.ans.api.sign.esignsante.psc.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,18 +15,15 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import fr.ans.api.sign.esignsante.psc.api.delegate.AsksignatureApiDelegateImpl;
 import fr.ans.api.sign.esignsante.psc.api.delegate.ChecksignatureApiDelegateImpl;
-import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.model.Result;
 import fr.ans.api.sign.esignsante.psc.model.UserInfo;
 import fr.ans.api.sign.esignsante.psc.utils.TYPE_SIGNATURE;
