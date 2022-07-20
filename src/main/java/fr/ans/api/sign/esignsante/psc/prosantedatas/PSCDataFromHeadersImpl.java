@@ -20,9 +20,8 @@ public class PSCDataFromHeadersImpl implements PSCData{
 	}
 
 	@Override
-	public Boolean isPSCvalidateToken(String introspectionResult) {
+	public void isPSCvalidateToken(String introspectionResult) {
 		bouchon();
-		return null;
 	}
 
 	@Override
@@ -33,7 +32,7 @@ public class PSCDataFromHeadersImpl implements PSCData{
 	
 	private void bouchon() {
 		log.error("Les méthodes de PSCDataFromHeadersImpl ne doivent pas être appelées ..");
-		throwExceptionRequestError(" Les méthodes de PSCDataFromHeadersImpl ne doivent pas être appelées .." ,HttpStatus.INTERNAL_SERVER_ERROR);
+		throwExceptionRequestError(" Les méthodes de PSCDataFromHeadersImpl ne doivent pas être appelées .." ,HttpStatus.UNAUTHORIZED);
 	}
 	
 }

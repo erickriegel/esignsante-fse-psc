@@ -32,6 +32,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -51,9 +52,10 @@ import lombok.extern.slf4j.Slf4j;
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class }) // pour restdocs
 @SpringBootTest 
 @AutoConfigureMockMvc
-@ActiveProfiles("test-withgravitee")
+//@TestPropertySource(locations="classpath:application-test-withoutgravitee.properties")
+//@ActiveProfiles("test-withgravitee")
 @Slf4j
-public class AskApiIntegrationTest {
+public class AskApiIntegrationWithGraviteeTest {
 
 	
 	/** The mock mvc. */
@@ -74,6 +76,8 @@ public class AskApiIntegrationTest {
 	 */
 	@BeforeEach
 	public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) throws IOException {
+	// La requête client ne comprends pas les headers pour le userInfo et la réponse à l'introspection	
+	// => pour la génération de la doc, on utilise les tests 'sans gravitee'
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
 				.apply(documentationConfiguration(restDocumentation)).build();
 		
@@ -89,7 +93,7 @@ public class AskApiIntegrationTest {
 
 	@Test
 	@DisplayName("ask XADES 200")
-	public void askXADESTest() throws Exception {
+	public void askXADESWithGraviteeTest() throws Exception {
 		
 		ESignSanteSignatureReportWithProof report = new ESignSanteSignatureReportWithProof();
 		report.setValide(true);
@@ -131,53 +135,20 @@ public class AskApiIntegrationTest {
  		assertEquals("application/xml", returned.andReturn().getResponse().getContentType());	
 		    	 
     	 String content = returned.andReturn().getResponse().getContentAsString();
-    	 System.out.println("content  " + content);
     	 assertTrue(content.contains("<ds:X509SubjectName>"));
     	 assertTrue(content.contains("URI=\"#xades-id"));
     	 
 				
     	 //TODO contrôle de l'archivage
     	 
-  		returned.andDo(document("signXADES/OK"));
+  		//returned.andDo(document("signXADES/OK"));
                
 	}
 	
-	
-//	@Test
-//	@DisplayName("ask XADES token non actif")
-//	public void askXADESTokenKOTest() throws Exception {
-//		
-//		String reponsePSCNonActif = Files.readString(
-//				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
-//		
-//		
-//    	MockMultipartFile fileXML = new MockMultipartFile(
-//    			"file",
-//    			"ipsfra.xml",
-//    			null,
-//				Files.readAllBytes(
-//						new ClassPathResource("EsignSanteWS/Xades/ipsfra.xml").getFile().toPath()));
-//
-//    	String userInfobase64 = Files.readString(
-//				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
-//    	  	
-//    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/xades")
-//  				.file(fileXML)
-//  				.file("userinfo", userInfobase64.getBytes())
-//  				.header("access_token", accessToken)
-//                .accept("application/json,application/xml"))
-//  				.andExpect(status().isUnauthorized());
-// 				
-//    	
-//    	 
-//  		returned.andDo(document("signXADES/TokenKo"));
-//               
-//	}
-
 
 	@Test
 	@DisplayName("ask PADES 200")
-	public void askPADESTest() throws Exception {
+	public void askPADESWithGraviteeTest() throws Exception {
 		
 		ESignSanteSignatureReportWithProof report = new ESignSanteSignatureReportWithProof();
 		report.setValide(true);
@@ -216,50 +187,13 @@ public class AskApiIntegrationTest {
    	     			 
     			 //TODO contrôle de l'archivage
     			 
-  		returned.andDo(document("signPADES/OK"));
+  		//returned.andDo(document("signPADES/OK"));
                
 	}
-	
-	
-//	@Test
-//	@DisplayName("ask PADES token non actif")
-//	public void askPADESTokenKOTest() throws Exception {
-//		
-//		String reponsePSCNonActif = Files.readString(
-//				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
-//		
-//    	MockMultipartFile fileXML = new MockMultipartFile(
-//    			"file",
-//    			"ANS_SIGNED.pdf",
-//    			null,
-//				Files.readAllBytes(
-//						new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
-//
-//    	String userInfobase64 = Files.readString(
-//				new ClassPathResource("PSC/UserInfo_medecin_899700218896_UTF8_Base64.txt").getFile().toPath());
-//    	
-//    	 HttpHeaders httpHeaders = new HttpHeaders();
-//    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
-//    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
-//    	 acceptedMedia.add(MediaType.APPLICATION_XML);
-//    	 httpHeaders.setAccept(acceptedMedia);
-//    	 httpHeaders.add("access_token", accessToken);
-//    	 
-//    	  	
-//    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
-//  				.file(fileXML)
-//  				.file("userinfo", userInfobase64.getBytes())
-//  				.header("access_token",accessToken)
-//                .accept("application/json,application/pdf"))
-//  				.andExpect(status().isUnauthorized());
-// 				
-//  		returned.andDo(document("signPADES/TokenKo"));
-//               
-//	}
 
 	@Test
 	@DisplayName("ask PADES fichier non pdf")
-	public void askPADESNotPDF() throws Exception {
+	public void askPADESWithGraviteeNotPDF() throws Exception {
 				
     	MockMultipartFile fileXML = new MockMultipartFile(
     			"file",
@@ -285,7 +219,7 @@ public class AskApiIntegrationTest {
   				.headers(httpHeaders))
   				.andExpect(status().isUnsupportedMediaType());
  				
-  		returned.andDo(document("signPADES/BadFileFormat"));
+  		//returned.andDo(document("signPADES/BadFileFormat"));
                
 	}
 	

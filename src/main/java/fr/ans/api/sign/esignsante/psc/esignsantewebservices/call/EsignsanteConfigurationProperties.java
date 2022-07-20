@@ -27,7 +27,8 @@ public class EsignsanteConfigurationProperties {
 	
 	@Value("${esignsante.webservices.proofTag}")
 	private String proofTag;
-
+	
+	//Configuration de signature pour 'ADES 
 	@Value("${esignsante.webservices.signature.confId}")
 	private long signatureConfId;
 
@@ -39,6 +40,16 @@ public class EsignsanteConfigurationProperties {
 	
 	@Value("${esignsante.webservices.checksignature}")
 	private long checkSignatureConfId;
+	
+	//Configuration pkcs7 feuille de soin électronique
+	@Value("${esignsante.webservices.signature.fse.confId}")
+	private long signatureFSEConfId;
+
+	@Value("${esignsante.webservices.signature.fse.secret}")
+	private String secretFSE;
+	
+	@Value("${esignsante.webservices.signature.fse.checksignature}")
+	private long checkSignatureFSEConfId;
 		
 
 }

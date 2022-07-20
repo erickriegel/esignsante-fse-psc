@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -40,6 +41,7 @@ import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class }) // pour restdocs
 @SpringBootTest // (properties = "file.encoding=UTF-8")
 @AutoConfigureMockMvc
+@ActiveProfiles("test-withgravitee")
 
 public class CAApiIntegrationTest {
 

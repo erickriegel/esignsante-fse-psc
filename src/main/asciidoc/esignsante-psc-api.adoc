@@ -4,11 +4,8 @@
 == Introduction
 Ce site est la documentation de l'API esignsante-psc extraite des tests.
 
-Pour tester l'API, vous pouvez utiliser swagger: +
-http://localhost:8080:/esignsante-psc/v1/swagger-ui/ +
-Ne pas oublier d'activer le profil 'swagger' au démarrage de Spring: 
-java -jar *-Dspring.profiles.active=swagger* esignsante-psc-0.0.13-SNAPSHOT.jar .../application.properties ...
-
+== Note importante sur les headers
+Pour une demande de signature et uniquement pour une demande de signature que le webservice fonctionne ou non derrière Gravitee, les headers X-Userinfo et X-Introspectition-Response mentionnés ci-dessous ne doivent pas être renseigné par l'utilisateur. Par contre,  le Header 'Authorization', valorisé avec un token ProSante Connect valide est bien indispensable.
 
 == Interrogation de l'API
 Liste des services exposés
@@ -229,6 +226,9 @@ include::{snippets}/checkSignPADES/BadFileFormat/curl-request.adoc[]
 include::{snippets}/checkSignPADES/BadFileFormat/http-response.adoc[]
 
 == Demande de signature XADES
+=== Note omportante sur les headers
+Pour une demande de signature, que le webservice fonctionne ou non derrière Gravitee, les headers X-Userinfo et X-Introspectition-Response mentionnés ci-dessous ne doivent pas être renseigné par l'utilisateur.
+Par contre,  le Header 'Authorization' avec un token ProSante Connect valide est bien indispensable.
 
 === cas passant 200
 .request

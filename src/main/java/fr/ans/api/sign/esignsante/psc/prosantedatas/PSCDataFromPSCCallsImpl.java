@@ -85,12 +85,6 @@ public class PSCDataFromPSCCallsImpl implements PSCData{
 		return result.getBody();
 	}
 
-//	@Override
-//	public String getAccessToken(Map<String, String> headers) {
-//		throwExceptionRequestError("TODO A supprimer ...", HttpStatus.INTERNAL_SERVER_ERROR);
-//		return null;
-//	}
-
 	@Override
 	public String getIntrospectionResult(String accessToken) {
 		String result = null;
@@ -135,9 +129,8 @@ public class PSCDataFromPSCCallsImpl implements PSCData{
 	}
 
 	@Override
-	public Boolean isPSCvalidateToken(String introspectionResult) {
-		// TODO Auto-generated method stub
-		return false;
+	public void isPSCvalidateToken(String introspectionResult) {
+		Helper.parsePSCresponse(introspectionResult);
 	}
 
 }

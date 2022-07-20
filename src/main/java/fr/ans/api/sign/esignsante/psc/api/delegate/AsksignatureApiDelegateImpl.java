@@ -76,8 +76,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	PSCData pscApi;
 
 	private static final String SIGNER_XADES = "Délégataire de signature pour ";
+	//private static final String SIGNER_XADES = "Delegatiare de signature pour ";
 
 	private static final String SIGNER_PADES = "Signé pour le compte de ";
+	//private static final String SIGNER_PADES = "Signe pour le compte de ";
 
 	@Override
 	    public ResponseEntity<org.springframework.core.io.Resource> postAskSignaturePades(MultipartFile file,
@@ -202,9 +204,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				List<OpenidToken> openidTokens = setOpenIdTokens(params);
 				
 				TYPE_SIGNATURE typeSignature = TYPE_SIGNATURE.FSE;
-				// liste des signataires
-				List<String> signers = setSigners(TYPE_SIGNATURE.FSE, user);
-
+				
+				// liste des signataires => non utilisé dans le cas d'une FSE (signature non 'ADES)
+				List<String> signers = null;
+						
 				// Appel esignsante
 				log.debug("Appel esignWS pour une signature de type {}", typeSignature.getTypeSignature());
 				ESignSanteSignatureReportWithProof report = null;
@@ -229,27 +232,27 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	
 	
 	
-	private String checkPSCToken(String token) {
-		var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-		String msgError = "Exception sur vérfication de la validté du token PSC: " + token;
-		var result = "Reponse ProSanteConnect inconnue";
-	//	try {
-			result = pscApi.getIntrospectionResult(token);
-			httpStatus = Helper.parsePSCresponse(result);
-			log.debug("Appel PSC intropesction: token= {}  reponse PSC = {} ", token, result);
-			if (httpStatus == HttpStatus.UNAUTHORIZED) {
-				msgError = "L'accessToken fourni dans la requête n'est pas reconnu comme un token actif par ProSanteConnect token: "
-						+ token + " response PSC: " + result;
-				throwExceptionRequestError(msgError, httpStatus);
-			}
-//		} catch (JsonProcessingException | UnsupportedEncodingException | URISyntaxException e1) {
-//			msgError = msgError.concat(" , JsonProcessingException");
-//			log.debug(e1.toString());
-//			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;			throwExceptionRequestError(msgError, httpStatus);
-//		}
-
-		return result;
-	}
+//	private String checkPSCToken(String token) {
+//		var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+//		String msgError = "Exception sur vérfication de la validté du token PSC: " + token;
+//		var result = "Reponse ProSanteConnect inconnue";
+//	//	try {
+//			result = pscApi.getIntrospectionResult(token);
+//			httpStatus = Helper.parsePSCresponse(result);
+//			log.debug("Appel PSC intropesction: token= {}  reponse PSC = {} ", token, result);
+//			if (httpStatus == HttpStatus.UNAUTHORIZED) {
+//				msgError = "L'accessToken fourni dans la requête n'est pas reconnu comme un token actif par ProSanteConnect token: "
+//						+ token + " response PSC: " + result;
+//				throwExceptionRequestError(msgError, httpStatus);
+//			}
+////		} catch (JsonProcessingException | UnsupportedEncodingException | URISyntaxException e1) {
+////			msgError = msgError.concat(" , JsonProcessingException");
+////			log.debug(e1.toString());
+////			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;			throwExceptionRequestError(msgError, httpStatus);
+////		}
+//
+//		return result;
+//	}
 
 	private void archivagePreuveSiOK(ESignSanteSignatureReportWithProof report, String requestID, UserInfo userToPersit,
 			Date now) {
@@ -414,12 +417,13 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			//lecture dans les headers => doublon les paramètres de la méthode ....
 			decodedIntro = pscApi.getIntrospectionResult(accessToken);
 			log.debug("responsePSC CALL PSC: {}", decodedIntro);
-			HttpStatus tmpStatus = Helper.parsePSCresponse(decodedIntro);
+			//HttpStatus tmpStatus = Helper.parsePSCresponse(decodedIntro);
+			Helper.parsePSCresponse(decodedIntro);
 			// si le token n'est pas valide, 
-			if (tmpStatus != HttpStatus.OK) {
-				throwExceptionRequestError("Problème sur la vérification de la validité du token",
-						tmpStatus);
-			}
+//			if (tmpStatus != HttpStatus.OK) {
+//				throwExceptionRequestError("Problème sur la vérification de la validité du token",
+//						tmpStatus);
+//			}
 			decodedUserInfo = pscApi.getUserInfo(accessToken);
 			log.debug("userInfo CALL PSC: {}" ,decodedUserInfo);
 		}
@@ -457,10 +461,10 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 //	}
 	
 	openidTokens.add(openidToken);
-	log.error("openidtoken[0] transmis à esignWS:");
-	log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
-	log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
-	log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
+//	log.error("openidtoken[0] transmis à esignWS:");
+//	log.error("\t userinfo (base64): {} ", openidTokens.get(0).getUserInfo());
+//	log.error("\t accessToken: {} ", openidTokens.get(0).getAccessToken());
+//	log.error("\t PSCResponse: {} ", openidTokens.get(0).getIntrospectionResponse());
 	return openidTokens;
 	}
 	

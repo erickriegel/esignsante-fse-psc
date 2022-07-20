@@ -50,12 +50,12 @@ public class EsignsanteCall {
 		log.debug("fileToSign: {}", fileToSign.getName());
 
 		XadesApi api = new XadesApi(esignWSApiClient);
-		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n", esignWSApiClient.getBasePath(),
-				esignConf.getSignatureConfId(), esignConf.getProofConfId());
+		log.debug("paramètres: basePath: {} \n idSignConf: {} \n checkSignatureConfId: {} \n", esignWSApiClient.getBasePath(),
+				esignConf.getSignatureConfId(), esignConf.getCheckSignatureConfId());
 		ESignSanteSignatureReportWithProof report = null;
 
 		report = api.signatureXadesWithProof(esignConf.getSecret(), esignConf.getSignatureConfId(), fileToSign, signers,
-				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
+				esignConf.getCheckSignatureConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
 				openidTokens);
 
 		log.debug("nbError: " + report.getErreurs().size());
@@ -71,12 +71,12 @@ public class EsignsanteCall {
 		log.debug("fileToSign: {}", fileToSign.getName());
 
 		PadesApi api = new PadesApi(esignWSApiClient);
-		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n", esignWSApiClient.getBasePath(),
-				esignConf.getSignatureConfId(), esignConf.getProofConfId());
+		log.debug("paramètres: basePath: {} \n idSignConf: {} \n CheckSignatureConfId: {} \n", esignWSApiClient.getBasePath(),
+				esignConf.getSignatureConfId(), esignConf.getCheckSignatureConfId());
 		ESignSanteSignatureReportWithProof report = null;
 
 		report = api.signaturePadesWithProof(esignConf.getSecret(), esignConf.getSignatureConfId(), fileToSign, signers,
-				esignConf.getProofConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
+				esignConf.getCheckSignatureConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
 				openidTokens);
 
 		log.debug("nbError: " + report.getErreurs().size());
@@ -91,17 +91,14 @@ public class EsignsanteCall {
 		log.debug("appel esignsanteWebservices pour une demande de signature d'une FSE ");
 
 		FseApi api = new FseApi(esignWSApiClient);
-		log.debug("paramètres: basePath: {} \n idSignConf: {} \n proofConfId: {} \n", esignWSApiClient.getBasePath(),
-				esignConf.getSignatureConfId(), esignConf.getProofConfId());
+		log.debug("paramètres: basePath: {} \n id de conf signature pour FSE: {} \n Id CheckSignature pour FSE: {} \n", 
+				esignWSApiClient.getBasePath(),
+				esignConf.getSignatureFSEConfId(), esignConf.getCheckSignatureFSEConfId());
 		ESignSanteSignatureReportWithProof report = null;
 
-		/*
-		 * (String secret, Long idSignConf, String hash, String idFacturationPS, String typeFlux,
-		 *  List<String> signers, Long idVerifSignConf, String requestId, String proofTag, String applicantId, List<OpenidToken> xOpenidToken) throws RestClientException
-		 */
-		report = api.signatureFSEWithProof(esignConf.getSecret(), esignConf.getSignatureConfId(),
+		report = api.signatureFSEWithProof(esignConf.getSecretFSE(), esignConf.getSignatureFSEConfId(),
 				new String(hash),idFacturationPS,	typeFLux,	signers,
-				esignConf.getCheckSignatureConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
+				esignConf.getCheckSignatureFSEConfId(), requestId, esignConf.getProofTag(), esignConf.getAppliantId(),
 				openidTokens);
 		
 		log.debug("nbError: " + report.getErreurs().size());

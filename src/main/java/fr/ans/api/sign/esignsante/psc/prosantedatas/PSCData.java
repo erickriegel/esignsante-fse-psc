@@ -19,7 +19,7 @@ public interface PSCData {
 	 */
 	public String getIntrospectionResult(String accessToken);
 	
-	public Boolean isPSCvalidateToken(String introspectionResult);
+	public void isPSCvalidateToken(String introspectionResult);
 	
 	/*
 	 * Get the userInfo

@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.model.Error;
 import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.esignsante.model.Erreur;
@@ -156,14 +157,28 @@ public class HelperTest {
 		String reponsePSCKO = "Mauvaise réponse..";
 
 		// OK
-		assertEquals(HttpStatus.OK, Helper.parsePSCresponse(reponsePSCActif));
+		try {
+			Helper.parsePSCresponse(reponsePSCActif);
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		
 
 		// Non actif
-		assertEquals(HttpStatus.UNAUTHORIZED, Helper.parsePSCresponse(reponsePSCNonActif));
-
+		try {
+			Helper.parsePSCresponse(reponsePSCNonActif);
+			assertTrue(false);
+		} catch (Exception e) {
+			assertTrue(e instanceof fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException);
+		}
+	
 		// Erreur tech
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, Helper.parsePSCresponse(reponsePSCKO));
-
+		try {
+			Helper.parsePSCresponse(reponsePSCKO);
+			assertTrue(false);
+		} catch (Exception e) {
+			assertTrue(e instanceof fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException);
+		}
 	}
 
 	@Test
