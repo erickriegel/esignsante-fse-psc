@@ -45,7 +45,7 @@ import fr.ans.api.sign.esignsante.psc.prosantedatas.PSCData;
 @ExtendWith({ RestDocumentationExtension.class, SpringExtension.class }) // pour restdocs
 @SpringBootTest 
 @AutoConfigureMockMvc
-@TestPropertySource(locations="classpath:application-test-withoutgravitee.properties")
+@TestPropertySource(locations="classpath:application-test-withoutgravitee-nodef.properties")
 public class AskApiIntegrationEsignWSOFFTest {
 	
 	@MockBean
