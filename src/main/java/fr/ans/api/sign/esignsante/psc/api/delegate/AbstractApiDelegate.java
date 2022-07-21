@@ -85,9 +85,7 @@ public abstract class AbstractApiDelegate {
 
 	public HttpServletRequest getHttpRequest() {
 			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-			this.httpRequest = attrs.getRequest();
-			System.out.println(attrs.getAttributeNames(0));
-			
+			this.httpRequest = attrs.getRequest();			
 		return this.httpRequest;
 	}
 

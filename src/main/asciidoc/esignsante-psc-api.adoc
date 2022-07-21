@@ -182,6 +182,52 @@ include::{snippets}/checkSignPADES/BadFileFormat/curl-request.adoc[]
 .response
 include::{snippets}/checkSignPADES/BadFileFormat/http-response.adoc[]
 
+== Demande de signature pcks7 détachée (FSE)
+blabla..
+
+=== cas passant 200
+.request
+http:
+include::{snippets}/FSE/OK/http-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/FSE/OK/curl-request.adoc[]
+
+.response
+include::{snippets}/FSE/OK/http-response.adoc[]
+
+Payload:
+include::{snippets}/FSE/OK/response-body.adoc[]
+
+=== cas non passant 401
+Le token fourni n'est plus valide
+
+.request
+http:
+include::{snippets}/FSE/TokenKo/http-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/FSE/TokenKo/curl-request.adoc[]
+
+.response
+include::{snippets}/FSE/TokenKo/http-response.adoc[]
+
+
+=== Cas non passant 503 (WS OFF)
+Le webservices 'esignsanteWebservices' n'est pas disponible
+
+http:
+include::{snippets}/FSE/esginWS_OFF/http-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/FSE/esginWS_OFF/curl-request.adoc[]
+
+.response
+include::{snippets}/FSE/esginWS_OFF/http-response.adoc[]
+
+
+
+
 == Demande de signature XADES
 
 === cas passant 200
@@ -198,6 +244,18 @@ include::{snippets}/signXADES/OK/http-response.adoc[]
 Payload:
 include::{snippets}/signXADES/OK/response-body.adoc[]
 
+=== Cas non passant 401 (Token non valide)
+Le webservices 'esignsanteWebservices' n'est pas disponible
+
+http:
+include::{snippets}/signXADES/TokenKo/http-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/signXADES/TokenKo/curl-request.adoc[]
+
+.response
+include::{snippets}/signXADES/TokenKo/http-response.adoc[]
+
 === Cas non passant 503 (WS OFF)
 Le webservices 'esignsanteWebservices' n'est pas disponible
 
@@ -210,11 +268,10 @@ include::{snippets}/signXADES/esginWS_OFF/curl-request.adoc[]
 .response
 include::{snippets}/signXADES/esginWS_OFF/http-response.adoc[]
 
-
-
 == Demande de signature PADES
 
 === cas passant 200
+
 .request
 http:
 include::{snippets}/signPADES/OK/http-request.adoc[]
@@ -227,6 +284,19 @@ include::{snippets}/signPADES/OK/http-response.adoc[]
 
 Payload:
 include::{snippets}/signPADES/OK/response-body.adoc[]
+
+=== Cas non passant 401 (Token non valide)
+Le webservices 'esignsanteWebservices' n'est pas disponible
+
+http:
+include::{snippets}/signPADES/TokenKo/http-request.adoc[]
+
+Requête avec curl:
+include::{snippets}/signPADES/TokenKo/curl-request.adoc[]
+
+.response
+include::{snippets}/signPADES/TokenKo/http-response.adoc[]
+
 
 === Cas non passant 415 (fichier non pdf)
 Le fichier à signer fourni n'est pas reconnu comme un fichier PDF.

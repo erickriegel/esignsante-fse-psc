@@ -166,7 +166,7 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	        String xIntrospectionResponse,
 	        String typeFlux) {
 
-				log.error("postAskSignatureFse");
+				log.debug("postAskSignatureFse");
 				List<String> acceptedHeaders = getAcceptHeaders();
 				if (!isAcceptHeaderPresent(acceptedHeaders, APPLICATION_JSON)) {
 					return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -196,7 +196,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 				TYPE_SIGNATURE typeSignature = TYPE_SIGNATURE.FSE;
 				
 				// liste des signataires => non utilisé dans le cas d'une FSE (signature non 'ADES)
-				List<String> signers = null;
+				List<String> signers = new ArrayList<String>();
+				signers.add("Not used");
 						
 				// Appel esignsante
 				log.debug("Appel esignWS pour une signature de type {}", typeSignature.getTypeSignature());

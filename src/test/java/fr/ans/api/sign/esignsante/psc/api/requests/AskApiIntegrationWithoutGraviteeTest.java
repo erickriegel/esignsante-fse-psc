@@ -27,12 +27,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,14 +38,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 import fr.ans.api.sign.esignsante.psc.api.delegate.AbstractApiDelegate;
-import fr.ans.api.sign.esignsante.psc.api.delegate.AsksignatureApiDelegateImpl;
-import fr.ans.api.sign.esignsante.psc.api.exception.EsignPSCRequestException;
 import fr.ans.api.sign.esignsante.psc.esignsantewebservices.call.EsignsanteCall;
 import fr.ans.api.sign.esignsante.psc.prosantedatas.PSCData;
-import fr.ans.api.sign.esignsante.psc.utils.Helper;
 import fr.ans.esignsante.model.ESignSanteSignatureReportWithProof;
 import fr.ans.esignsante.model.Erreur;
 import lombok.extern.slf4j.Slf4j;
@@ -143,11 +137,7 @@ public class AskApiIntegrationWithoutGraviteeTest {
     	 assertTrue(content.contains("<ds:X509SubjectName>"));
     	 assertTrue(content.contains("URI=\"#xades-id"));
     	 
-				
-    	 //TODO contrôle de l'archivage
-    	 
-  		returned.andDo(document("signXADES/OK"));
-               
+  		returned.andDo(document("signXADES/OK"));              
 	}
 	
 	
@@ -180,8 +170,8 @@ public class AskApiIntegrationWithoutGraviteeTest {
 
 
 	@Test
-	@DisplayName("ask PADES 200")
-	public void askPADESTest() throws Exception {
+	@DisplayName("ask FSE 200")
+	public void askFSETest() throws Exception {
 		
 		ESignSanteSignatureReportWithProof report = new ESignSanteSignatureReportWithProof();
 		report.setValide(true);
@@ -189,40 +179,34 @@ public class AskApiIntegrationWithoutGraviteeTest {
 				
 		report.setDocSigne("bm9uRWRpdGFibGU=");
 		
-        	    	
-    	MockMultipartFile filePDF = new MockMultipartFile(
-    			"file",
-    			"ANS.pdf",
-    			null,
-				Files.readAllBytes(
-						new ClassPathResource("EsignSanteWS/Pades/ANS.pdf").getFile().toPath()));
-
     	Mockito.doReturn(reponsePSCActif).when(pscCall).getIntrospectionResult(any());
     	//Mockito.doReturn(true).when(pscCall).isPSCvalidateToken(any());
     	Mockito.doNothing().when(pscCall).isPSCvalidateToken(any());
     	Mockito.doReturn(userInfo).when(pscCall).getUserInfo(any());
     	
     	
-    	 Mockito.doReturn(report).when(esignWS).signaturePades(any(File.class),any(List.class),any(),any(List.class) );
+    	 Mockito.doReturn(report).when(esignWS).signatureFSE(any(byte[].class),any(String.class),any(String.class),any(List.class),any(String.class),any(List.class) );
     		
     	 HttpHeaders httpHeaders = new HttpHeaders();
     	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
     	 acceptedMedia.add(MediaType.APPLICATION_JSON);
-    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
+    	 acceptedMedia.add(MediaType.APPLICATION_OCTET_STREAM);
     	 httpHeaders.setAccept(acceptedMedia);
     	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION, accessToken);
  
-    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
-  				.file(filePDF)		
+    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/fse")
+    			.param("hashFSE","DB++RDAHvzNDmkzag95fiZCQ1raVWE1QcZqb7gNDlws=")
+ 				.param("idFacturationPS","987654")
+ 				.param("typeFlux","T")
   				.headers(httpHeaders))
   				.andExpect(status().isOk());
  				
-    	 assertEquals("application/pdf", returned.andReturn().getResponse().getContentType());
+    	 assertEquals("application/octet-stream", returned.andReturn().getResponse().getContentType());
     	
    	     			 
     			 //TODO contrôle de l'archivage
     			 
-  		returned.andDo(document("signPADES/OK"));
+  		returned.andDo(document("signFSE/OK"));
                
 	}
 	
@@ -242,18 +226,7 @@ public class AskApiIntegrationWithoutGraviteeTest {
 						new ClassPathResource("EsignSanteWS/Pades/ANS_SIGNED.pdf").getFile().toPath()));
     	    	
     	Mockito.doReturn(reponsePSCNonActif).when(pscCall).getIntrospectionResult(any());
-//    	var erreur = new fr.ans.api.sign.esignsante.psc.model.Error();
-//    	Mockito.doThrow(new EsignPSCRequestException(erreur,HttpStatus.UNAUTHORIZED )).when(pscCall).isPSCvalidateToken(any());
-//    	
-    	
-//    	 HttpHeaders httpHeaders = new HttpHeaders();
-//    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
-//    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
-//    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
-//    	 httpHeaders.setAccept(acceptedMedia);
-//    	 httpHeaders.add("access_token", accessToken);
-//    	 
-    	  	
+
     	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
   				.file(fileXML)
   				.header(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION,accessToken)
@@ -298,4 +271,69 @@ public class AskApiIntegrationWithoutGraviteeTest {
                
 	}
 	
+	@Test
+	@DisplayName("ask PADES 200")
+	public void askPADESTest() throws Exception {
+		
+		ESignSanteSignatureReportWithProof report = new ESignSanteSignatureReportWithProof();
+		report.setValide(true);
+		report.setErreurs(new ArrayList<Erreur>());
+				
+		report.setDocSigne("bm9uRWRpdGFibGU=");
+		
+        	    	
+    	MockMultipartFile filePDF = new MockMultipartFile(
+    			"file",
+    			"ANS.pdf",
+    			null,
+				Files.readAllBytes(
+						new ClassPathResource("EsignSanteWS/Pades/ANS.pdf").getFile().toPath()));
+
+    	Mockito.doReturn(reponsePSCActif).when(pscCall).getIntrospectionResult(any());
+    	//Mockito.doReturn(true).when(pscCall).isPSCvalidateToken(any());
+    	Mockito.doNothing().when(pscCall).isPSCvalidateToken(any());
+    	Mockito.doReturn(userInfo).when(pscCall).getUserInfo(any());
+    	
+    	
+    	 Mockito.doReturn(report).when(esignWS).signaturePades(any(File.class),any(List.class),any(),any(List.class) );
+    		
+    	 HttpHeaders httpHeaders = new HttpHeaders();
+    	 List<MediaType> acceptedMedia = new ArrayList<MediaType>();
+    	 acceptedMedia.add(MediaType.APPLICATION_JSON);
+    	 acceptedMedia.add(MediaType.APPLICATION_PDF);
+    	 httpHeaders.setAccept(acceptedMedia);
+    	 httpHeaders.add(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION, accessToken);
+ 
+    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/pades")
+  				.file(filePDF)		
+  				.headers(httpHeaders))
+  				.andExpect(status().isOk());
+ 				
+    	 assertEquals("application/pdf", returned.andReturn().getResponse().getContentType());
+    	    			 
+  		returned.andDo(document("signPADES/OK"));
+               
+	}
+	
+	
+	@Test
+	@DisplayName("ask FSE token non actif")
+	public void askFSETokenKOTest() throws Exception {
+		
+		String reponsePSCNonActif = Files.readString(
+				new ClassPathResource("PSC/PSC200_activefalse.json").getFile().toPath());    	
+		    
+    	Mockito.doReturn(reponsePSCNonActif).when(pscCall).getIntrospectionResult(any());
+
+    	 ResultActions returned = mockMvc.perform(MockMvcRequestBuilders.multipart("/v1/asksignature/fse")
+    			.param("hashFSE","DB++RDAHvzNDmkzag95fiZCQ1raVWE1QcZqb7gNDlws=")
+ 				.param("idFacturationPS","987654")
+  				.header(AbstractApiDelegate.HEADER_NAME_AUTHORIZATION,accessToken)
+                .accept("application/json,application/octet-stream"))
+  				.andExpect(status().isUnauthorized());
+ 				
+  		returned.andDo(document("signPADES/TokenKo"));
+               
+	}
+
 }
