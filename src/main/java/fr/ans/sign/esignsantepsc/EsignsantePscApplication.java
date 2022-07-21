@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-@EnableWebSecurity
+@EnableWebSecurity 
 @SpringBootApplication 
 @ComponentScan(basePackages = {"fr.ans.api.sign.esignsante.psc"})
 

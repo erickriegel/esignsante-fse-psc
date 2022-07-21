@@ -4,8 +4,6 @@
 == Introduction
 Ce site est la documentation de l'API esignsante-psc extraite des tests.
 
-== Note importante sur les headers
-Pour une demande de signature et uniquement pour une demande de signature que le webservice fonctionne ou non derrière Gravitee, les headers X-Userinfo et X-Introspectition-Response mentionnés ci-dessous ne doivent pas être renseigné par l'utilisateur. Par contre,  le Header 'Authorization', valorisé avec un token ProSante Connect valide est bien indispensable.
 
 == Interrogation de l'API
 Liste des services exposés
@@ -15,27 +13,20 @@ Liste des services exposés
 http:
 include::{snippets}/Liste_des_services/OK/http-request.adoc[]
 
-httpIE:
-include::{snippets}/Liste_des_services/OK/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/Liste_des_services/OK/curl-request.adoc[]
 
 .response
 include::{snippets}/Liste_des_services/OK/http-response.adoc[]
 
-Payload:
+payload:
 include::{snippets}/Liste_des_services/OK/response-body.adoc[]
 
 === cas non passant 406
 Header 'accept' de la requête non supporté 
 
-
 http:
 include::{snippets}/Liste_des_services/KO_NotAcceptable/http-request.adoc[]
-
-httpIE:
-include::{snippets}/Liste_des_services/KO_NotAcceptable/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/Liste_des_services/KO_NotAcceptable/curl-request.adoc[]
@@ -43,15 +34,11 @@ include::{snippets}/Liste_des_services/KO_NotAcceptable/curl-request.adoc[]
 .response
 include::{snippets}/Liste_des_services/KO_NotAcceptable/http-response.adoc[]
 
-
 == Demande de la liste des Cas
 
 === Cas passant 200
 .request
 include::{snippets}/CA/OK/http-request.adoc[]
-
-httpIE:
-include::{snippets}/CA/OK/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/CA/OK/curl-request.adoc[]
@@ -68,9 +55,6 @@ Header 'accept' de la requête non supporté
 http:
 include::{snippets}/CA/KO_NotAcceptable/http-request.adoc[]
 
-httpIE:
-include::{snippets}/CA/KO_NotAcceptable/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/CA/KO_NotAcceptable/curl-request.adoc[]
 
@@ -84,9 +68,6 @@ Le webservices 'esignsanteWebservices' n'est pas disponible
 http:
 include::{snippets}/CA/esginWS_OFF/http-request.adoc[]
 
-httpIE:
-include::{snippets}/CA/esginWS_OFF/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/CA/esginWS_OFF/curl-request.adoc[]
 
@@ -98,9 +79,6 @@ include::{snippets}/CA/esginWS_OFF/http-response.adoc[]
 === Cas passant 200
 .request
 include::{snippets}/checkSignXADES/OK/http-request.adoc[]
-
-httpIE:
-include::{snippets}/checkSignXADES/OK/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/checkSignXADES/OK/curl-request.adoc[]
@@ -117,9 +95,6 @@ Header 'accept' de la requête non supporté
 http:
 include::{snippets}/checkSignXADES/KO_NotAcceptable/http-request.adoc[]
 
-httpIE:
-include::{snippets}/checkSignXADES/KO_NotAcceptable/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/checkSignXADES/KO_NotAcceptable/curl-request.adoc[]
 
@@ -131,9 +106,6 @@ Le webservices 'esignsanteWebservices' n'est pas disponible
 
 http:
 include::{snippets}/checkSignXADES/esginWS_OFF/http-request.adoc[]
-
-httpIE:
-include::{snippets}/checkSignXADES/esginWS_OFF/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/checkSignXADES/esginWS_OFF/curl-request.adoc[]
@@ -149,9 +121,6 @@ Service non implémenté. Une cause possible est que le fichier signé à contr�
 http:
 include::{snippets}/checkSignXADES/BadFileFormat/http-request.adoc[]
 
-httpIE:
-include::{snippets}/checkSignXADES/BadFileFormat/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/checkSignXADES/BadFileFormat/curl-request.adoc[]
 
@@ -164,9 +133,6 @@ include::{snippets}/checkSignXADES/BadFileFormat/http-response.adoc[]
 === Cas passant 200
 .request
 include::{snippets}/checkSignPADES/OK/http-request.adoc[]
-
-httpIE:
-include::{snippets}/checkSignPADES/OK/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/checkSignPADES/OK/curl-request.adoc[]
@@ -183,9 +149,6 @@ Header 'accept' de la requête non supporté
 http:
 include::{snippets}/checkSignPADES/KO_NotAcceptable/http-request.adoc[]
 
-httpIE:
-include::{snippets}/checkSignPADES/KO_NotAcceptable/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/checkSignPADES/KO_NotAcceptable/curl-request.adoc[]
 
@@ -197,9 +160,6 @@ Le webservices 'esignsanteWebservices' n'est pas disponible
 
 http:
 include::{snippets}/checkSignPADES/esginWS_OFF/http-request.adoc[]
-
-httpIE:
-include::{snippets}/checkSignPADES/esginWS_OFF/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/checkSignPADES/esginWS_OFF/curl-request.adoc[]
@@ -216,9 +176,6 @@ Service non implémenté. Une cause possible est que le fichier signé à contr�
 http:
 include::{snippets}/checkSignPADES/BadFileFormat/http-request.adoc[]
 
-httpIE:
-include::{snippets}/checkSignPADES/BadFileFormat/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/checkSignPADES/BadFileFormat/curl-request.adoc[]
 
@@ -226,17 +183,11 @@ include::{snippets}/checkSignPADES/BadFileFormat/curl-request.adoc[]
 include::{snippets}/checkSignPADES/BadFileFormat/http-response.adoc[]
 
 == Demande de signature XADES
-=== Note omportante sur les headers
-Pour une demande de signature, que le webservice fonctionne ou non derrière Gravitee, les headers X-Userinfo et X-Introspectition-Response mentionnés ci-dessous ne doivent pas être renseigné par l'utilisateur.
-Par contre,  le Header 'Authorization' avec un token ProSante Connect valide est bien indispensable.
 
 === cas passant 200
 .request
 http:
 include::{snippets}/signXADES/OK/http-request.adoc[]
-
-httpIE:
-include::{snippets}/signXADES/OK/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/signXADES/OK/curl-request.adoc[]
@@ -253,9 +204,6 @@ Le webservices 'esignsanteWebservices' n'est pas disponible
 http:
 include::{snippets}/signXADES/esginWS_OFF/http-request.adoc[]
 
-httpIE:
-include::{snippets}/signXADES/esginWS_OFF/httpie-request.adoc[]
-
 Requête avec curl:
 include::{snippets}/signXADES/esginWS_OFF/curl-request.adoc[]
 
@@ -270,9 +218,6 @@ include::{snippets}/signXADES/esginWS_OFF/http-response.adoc[]
 .request
 http:
 include::{snippets}/signPADES/OK/http-request.adoc[]
-
-httpIE:
-include::{snippets}/signPADES/OK/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/signPADES/OK/curl-request.adoc[]
@@ -302,9 +247,6 @@ Le webservices 'esignsanteWebservices' n'est pas disponible
 
 http:
 include::{snippets}/signPADES/esginWS_OFF/http-request.adoc[]
-
-httpIE:
-include::{snippets}/signPADES/esginWS_OFF/httpie-request.adoc[]
 
 Requête avec curl:
 include::{snippets}/signPADES/esginWS_OFF/curl-request.adoc[]
