@@ -23,7 +23,7 @@
 		<dist>docker</dist>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<embededMongoDownloadUrl>http://fastdl.mongodb.org/</embededMongoDownloadUrl>
+		<embededMongoDownloadUrl>http://repo.proxy-dev-forge.asip.hst.fluxus.net/artifactory/embededMongoDownloadUrl/</embededMongoDownloadUrl>
 	</properties>
 	<dependencies>
 		<dependency>
