@@ -6,7 +6,7 @@ runner {
     enabled = true
     data_source "git" {
         url = "https://github.com/erickriegel/esignsante-fse-psc"
-        ref = "var.datacenter"
+        ref = "main"
     }
     poll {
         enabled = true
