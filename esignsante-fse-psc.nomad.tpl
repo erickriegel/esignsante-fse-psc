@@ -6,7 +6,7 @@ job "esignsante_psc" {
 		change_mode = "restart"
 	}
 
-	group "esignsante_psc-servers" {
+	group "esignsante_fse_psc-servers" {
 		count = "1"
 		restart {
 			attempts = 3
@@ -29,7 +29,7 @@ job "esignsante_psc" {
 			auto_promote      = false
 		}
 			
-		task "esignsante_psc" {
+		task "esignsante_fse_psc" {
 			env {
 				JAVA_TOOL_OPTIONS="${user_java_opts} -Dspring.config.location=/secrets/application.properties -Dspring.profiles.active=${swagger_ui} -Dhttp.proxyHost=${proxy_host} -Dhttps.proxyHost=${proxy_host} -Dhttp.proxyPort=${proxy_port} -Dhttps.proxyPort=${proxy_port} -Dhttp.nonProxyHosts=${non_proxy_host_list}"
 			}
@@ -56,11 +56,11 @@ esignsante.webservices.checksignature={{.Data.data.checksignature}}
 esignsante.webservices.appliantId={{.Data.data.appliantid}}
 esignsante.webservices.proofTag={{.Data.data.prooftag}}
 
-{{range service ("esignsante") }}
+{{range service ("esignsante-fse") }}
 esignsante.webservices.basepath=http://{{.Address}}:{{.Port}}{{end}}{{.Data.data.base_path}}
 {{end}}
 
-{{range service ( "esignsante-psc-mongodb-server") }}
+{{range service ( "esignsante-fse-psc-mongodb-server") }}
 spring.data.mongodb.host={{.Address}}
 spring.data.mongodb.port={{.Port}}{{end}}
 
@@ -82,11 +82,11 @@ EOF
 			}
 			resources {
 				cpu = 1000
-				memory = ${esignsantepsc_appserver_mem_size}
+				memory = ${esignsantefsepsc_appserver_mem_size}
 			}
 			service {
-				name = "esignsante-psc"
-				tags = ["urlprefix-/esignsante-psc"]
+				name = "esignsante-fse-psc"
+				tags = ["urlprefix-/esignsante-fse-psc"]
 				canary_tags = ["canary instance to promote"]
 				port = "http"
 				check {
