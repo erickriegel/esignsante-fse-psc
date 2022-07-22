@@ -44,7 +44,7 @@ app "cybersante/esignsante-fse-psc" {
 				esignsantews_host = var.esignsantews_host
 				esignsantews_port = var.esignsantews_port
 				psc_bypass = var.psc_bypass
-				esignsantepsc_appserver_mem_size = var.esignsantepsc_appserver_mem_size
+				esignsantefsepsc_appserver_mem_size = var.esignsantefsepsc_appserver_mem_size
 				logstash_host = var.logstash_host
 			})
 		}
@@ -121,7 +121,7 @@ variable "psc_bypass" {
   default = false
 }
 
-variable "esignsantepsc_appserver_mem_size" {
+variable "esignsantefsepsc_appserver_mem_size" {
   type = string
   default = "2048"
 }
