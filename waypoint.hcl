@@ -1,11 +1,11 @@
-project = "cybersante/esignsante-psc"
+project = "cybersante/esignsante-fse-psc"
 
-labels = { "domaine" = "esignsante-psc" }
+labels = { "domaine" = "esignsante-fse-psc" }
 
 runner {
     enabled = true
     data_source "git" {
-        url = "https://github.com/ansforge/esignsante-psc"
+        url = "https://github.com/erickriegel/esignsante-fse-psc"
         ref = "var.datacenter"
     }
     poll {
@@ -15,7 +15,7 @@ runner {
 }
 
 # An application to deploy.
-app "cybersante/esignsante-psc" {
+app "cybersante/esignsante-fse-psc" {
     build {
         use "docker" {
            dockerfile = "${path.app}/${var.dockerfile_path}"
@@ -31,7 +31,7 @@ app "cybersante/esignsante-psc" {
 
 	deploy {
 		use "nomad-jobspec" {
-			jobspec = templatefile("${path.app}/esignsante-psc.nomad.tpl", {
+			jobspec = templatefile("${path.app}/esignsante-fse-psc.nomad.tpl", {
 				datacenter = var.datacenter
 				proxy_host = var.proxy_host
 				proxy_port = var.proxy_port
