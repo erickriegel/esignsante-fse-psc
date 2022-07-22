@@ -1,4 +1,4 @@
-job "esignsante_psc" {
+job "esignsante_fse_psc" {
 	datacenters = ["${datacenter}"]
 	type = "service"
 	vault {
