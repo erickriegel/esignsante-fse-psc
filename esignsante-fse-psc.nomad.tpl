@@ -95,7 +95,7 @@ EOF
 			service {
 				name = "esignsante-fse-psc"
 				meta {
-				       gravitee_path = "/esignsante-psc/v1"
+				       gravitee_path = "/esignsante-psc"
 				       gravitee_ssl = false
 				}
 				tags = ["urlprefix-/esignsante-psc"]
