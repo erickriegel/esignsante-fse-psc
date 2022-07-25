@@ -81,7 +81,8 @@ psc.url.userinfo={{.Data.data.url_userinfo}}
 psc.clientID={{.Data.data.client_id}}
 psc.clientSecret={{.Data.data.clientsecret}}
 {{end}}
-psc.bypass=${psc_bypass}
+#psc.bypass=${psc_bypass}
+with.gravitee={{.Data.data.with_gravitee}}
 management.endpoints.web.exposure.include=prometheus,metrics
 EOF
 			destination = "secrets/application.properties"
