@@ -76,7 +76,8 @@ spring.data.mongodb.password={{.Data.data.password}}
 {{end}}
 
 {{with secret "esignsante_psc/psc"}}
-psc.url={{.Data.data.url}}
+psc.url.introspection={{.Data.data.url_introspection}}
+psc.url.userinfo={{.Data.data.url_userinfo}}
 psc.clientID={{.Data.data.client_id}}
 psc.clientSecret={{.Data.data.clientsecret}}
 {{end}}
