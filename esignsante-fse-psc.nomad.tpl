@@ -93,7 +93,7 @@ EOF
 			}
 			service {
 				name = "esignsante-fse-psc"
-				tags = ["urlprefix-/esignsante-fse-psc"]
+				tags = ["urlprefix-/esignsante-psc"]
 				canary_tags = ["canary instance to promote"]
 				port = "http"
 				check {
