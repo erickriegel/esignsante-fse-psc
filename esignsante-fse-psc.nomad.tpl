@@ -94,6 +94,10 @@ EOF
 			}
 			service {
 				name = "esignsante-fse-psc"
+				meta {
+				       gravitee_path = "/esignsante-psc/v1"
+				       gravitee_ssl = false
+				}
 				tags = ["urlprefix-/esignsante-psc"]
 				canary_tags = ["canary instance to promote"]
 				port = "http"
