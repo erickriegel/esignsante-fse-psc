@@ -56,6 +56,11 @@ esignsante.webservices.checksignature={{.Data.data.checksignature}}
 esignsante.webservices.appliantId={{.Data.data.appliantid}}
 esignsante.webservices.proofTag={{.Data.data.prooftag}}
 
+#Conf. pour fse (pkcs7)
+esignsante.webservices.signature.fse.confId={{.Data.data.signature_confid_fse}}
+esignsante.webservices.signature.fse.secret={{.Data.data.signature_secret_fse}}
+esignsante.webservices.signature.fse.checksignature={{.Data.data.checksignature_fse}}
+
 {{range service ("esignsante-fse") }}
 esignsante.webservices.basepath=http://{{.Address}}:{{.Port}}{{end}}{{.Data.data.base_path}}
 {{end}}
