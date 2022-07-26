@@ -172,6 +172,6 @@ public class AskApiIntegrationEsignWSOFFTest {
 				
 		assertEquals("application/json",returned.andReturn().getResponse().getContentType());	
 				returned.andExpect(content().json(body));
-		returned.andDo(document("FSE/esginWS_OFF")); 
+		returned.andDo(document("signFSE/esginWS_OFF")); 
 	}
 }

@@ -183,47 +183,47 @@ include::{snippets}/checkSignPADES/BadFileFormat/curl-request.adoc[]
 include::{snippets}/checkSignPADES/BadFileFormat/http-response.adoc[]
 
 == Demande de signature pcks7 détachée (FSE)
-blabla..
+Signature du hash d'un document au format pkcs7 du GIE. Le document n'est pas fourni.
 
 === cas passant 200
 .request
 http:
-include::{snippets}/FSE/OK/http-request.adoc[]
+include::{snippets}/signFSE/OK/http-request.adoc[]
 
 Requête avec curl:
-include::{snippets}/FSE/OK/curl-request.adoc[]
+include::{snippets}/signFSE/OK/curl-request.adoc[]
 
 .response
-include::{snippets}/FSE/OK/http-response.adoc[]
+include::{snippets}/signFSE/OK/http-response.adoc[]
 
 Payload:
-include::{snippets}/FSE/OK/response-body.adoc[]
+include::{snippets}/signFSE/OK/response-body.adoc[]
 
 === cas non passant 401
-Le token fourni n'est plus valide
+Le jeton (token) ProSante Connect  fourni n'est pas ou plus valide
 
 .request
 http:
-include::{snippets}/FSE/TokenKo/http-request.adoc[]
+include::{snippets}/signFSE/TokenKo/http-request.adoc[]
 
 Requête avec curl:
-include::{snippets}/FSE/TokenKo/curl-request.adoc[]
+include::{snippets}/signFSE/TokenKo/curl-request.adoc[]
 
 .response
-include::{snippets}/FSE/TokenKo/http-response.adoc[]
+include::{snippets}/signFSE/TokenKo/http-response.adoc[]
 
 
 === Cas non passant 503 (WS OFF)
 Le webservices 'esignsanteWebservices' n'est pas disponible
 
 http:
-include::{snippets}/FSE/esginWS_OFF/http-request.adoc[]
+include::{snippets}/signFSE/esginWS_OFF/http-request.adoc[]
 
 Requête avec curl:
-include::{snippets}/FSE/esginWS_OFF/curl-request.adoc[]
+include::{snippets}/signFSE/esginWS_OFF/curl-request.adoc[]
 
 .response
-include::{snippets}/FSE/esginWS_OFF/http-response.adoc[]
+include::{snippets}/signFSE/esginWS_OFF/http-response.adoc[]
 
 
 

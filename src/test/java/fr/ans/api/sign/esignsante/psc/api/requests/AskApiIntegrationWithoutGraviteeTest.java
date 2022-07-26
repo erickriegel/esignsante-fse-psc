@@ -329,7 +329,7 @@ public class AskApiIntegrationWithoutGraviteeTest {
                 .accept("application/json,application/octet-stream"))
   				.andExpect(status().isUnauthorized());
  				
-  		returned.andDo(document("signPADES/TokenKo"));
+  		returned.andDo(document("signFSE/TokenKo"));
                
 	}
 
