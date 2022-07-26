@@ -66,9 +66,9 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 	@Autowired
 	PSCData pscApi;
 
-	private static final String SIGNER_XADES = "Délégataire de signature pour ";
+	public static final String SIGNER_XADES = "Délégataire de signature pour ";
 
-	private static final String SIGNER_PADES = "Signé pour le compte de ";
+	public static final String SIGNER_PADES = "Signé pour le compte de ";
 
 
 	@Override
@@ -237,6 +237,8 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 			}
 			throwExceptionRequestError("La signature n'est pas valide. Erreur(s): " + err.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		
+		checkExistMetadataInUserInfo(userToPersit);
 		
 		log.debug(" START archivage de la preuve en BDD pour request id: {}", requestID);
 		ProofStorage proof = new ProofStorage(requestID, userToPersit.getSubjectOrganization(),
@@ -412,5 +414,30 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		if ((xIntrospectionResponse == null) || (xIntrospectionResponse.isEmpty()) || (xIntrospectionResponse.isBlank()) ){
 			throwExceptionRequestError("Erreur technique sur lecture du  header X-Introspection-Response", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	//vérifie que les champs à persister existen dans le UserInfo (conséquence de l'annotation JsonIgnoreProperties)
+	public void checkExistMetadataInUserInfo(UserInfo userToPersit) {
+		if (!checkNotEmptyData(userToPersit.getFamilyName())) {
+			throwExceptionRequestError("Le champ 'FamilyName' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
+		}
+		if (!checkNotEmptyData(userToPersit.getGivenName())) {
+			throwExceptionRequestError("Le champ 'GivenName' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
+		}
+		if (!checkNotEmptyData(userToPersit.getPreferredUsername())) {
+			throwExceptionRequestError("Le champ 'PreferredUsername' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
+		}
+		if (!checkNotEmptyData(userToPersit.getSubjectOrganization())) {
+			throwExceptionRequestError("Le champ 'SubjectOrganization' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	
+	public  Boolean checkNotEmptyData(String userInfoField) {	
+		Boolean response = true;
+		if ((userInfoField == null) || (userInfoField.isEmpty()) || (userInfoField.isBlank()) ){
+			response = false;
+		}
+       return response;
 	}
 }

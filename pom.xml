@@ -320,10 +320,11 @@
 								<useBeanValidation>true</useBeanValidation>
 								<skipOverwrite>true</skipOverwrite>
 								<disableHtmlEscaping>true</disableHtmlEscaping>
-
+								<additionalModelTypeAnnotations>@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)</additionalModelTypeAnnotations>
 							</configOptions>
 							<withXml>true</withXml>
 						</configuration>
+						
 					</execution>
 				</executions>
 			</plugin>

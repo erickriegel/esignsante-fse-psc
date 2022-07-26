@@ -36,10 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DelegateMethodeTest {
 
-	private static final String SIGNER_XADES = "Délégataire de signature pour ";
-
-	private static final String SIGNER_PADES = "Signé pour le compte de ";
-
 	@InjectMocks
 	ChecksignatureApiDelegateImpl checkDelegate = new ChecksignatureApiDelegateImpl();
 
@@ -80,13 +76,13 @@ public class DelegateMethodeTest {
 		List<String> signers = ReflectionTestUtils.invokeMethod(askDelegate, "setSigners", TYPE_SIGNATURE.XADES,
 				userinfo);
 		assertEquals(1, signers.size());
-		assertTrue(signers.get(0).contains(SIGNER_XADES));
+		assertTrue(signers.get(0).contains(AsksignatureApiDelegateImpl.SIGNER_XADES));
 		assertTrue(signers.get(0).contains(userinfo.getFamilyName()));
 		assertTrue(signers.get(0).contains(userinfo.getSubjectNameID()));
 
 		signers = ReflectionTestUtils.invokeMethod(askDelegate, "setSigners", TYPE_SIGNATURE.PADES, userinfo);
 		assertEquals(1, signers.size());
-		assertTrue(signers.get(0).contains(SIGNER_PADES));
+		assertTrue(signers.get(0).contains(AsksignatureApiDelegateImpl.SIGNER_PADES));
 		assertTrue(signers.get(0).contains(userinfo.getFamilyName()));
 		assertTrue(signers.get(0).contains(userinfo.getSubjectNameID()));
 	}
