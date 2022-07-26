@@ -98,7 +98,7 @@ EOF
 				       gravitee_path = "/esignsante-psc"
 				       gravitee_ssl = false
 				}
-				tags = ["urlprefix-/esignsante-psc"]
+				tags = ["urlprefix-/esignsante-psc/"]
 				canary_tags = ["canary instance to promote"]
 				port = "http"
 				check {
