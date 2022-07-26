@@ -427,9 +427,11 @@ public class AsksignatureApiDelegateImpl extends AbstractApiDelegate implements 
 		if (!checkNotEmptyData(userToPersit.getPreferredUsername())) {
 			throwExceptionRequestError("Le champ 'PreferredUsername' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
 		}
-		if (!checkNotEmptyData(userToPersit.getSubjectOrganization())) {
-			throwExceptionRequestError("Le champ 'SubjectOrganization' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
-		}
+		
+		//champ inexistant si le RPPS est crée par "EDIT"
+//		if (!checkNotEmptyData(userToPersit.getSubjectOrganization())) {
+//			throwExceptionRequestError("Le champ 'SubjectOrganization' du USerInfo est vide ou n'existe pas", HttpStatus.BAD_REQUEST);
+//		}
 		
 	}
 	
