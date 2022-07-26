@@ -2,7 +2,7 @@ job "esignsante_fse_psc" {
 	datacenters = ["${datacenter}"]
 	type = "service"
 	vault {
-		policies = ["esignsante_psc"]
+		policies = ["esignsante-fse-psc"]
 		change_mode = "restart"
 	}
 
@@ -48,7 +48,7 @@ spring.servlet.multipart.max-request-size=${spring_http_multipart_max_request_si
 spring.application.name=esignsante_psc
 
 server.servlet.context-path=/esignsante-psc
-{{with secret "esignsante_psc/esignsante_ws"}}
+{{with secret "esignsante-fse-psc/esignsante_ws"}}
 esignsante.webservices.signature.confId={{.Data.data.signature_confid}}
 esignsante.webservices.signature.secret={{.Data.data.signature_secret}}
 esignsante.webservices.proof.confId={{.Data.data.proof_confid}}
@@ -69,13 +69,13 @@ esignsante.webservices.basepath=http://{{.Address}}:{{.Port}}{{end}}{{.Data.data
 spring.data.mongodb.host={{.Address}}
 spring.data.mongodb.port={{.Port}}{{end}}
 
-{{with secret "esignsante_psc/mongodb"}}
+{{with secret "esignsante-fse-psc/mongodb"}}
 spring.data.mongodb.database=esignsante_psc
 spring.data.mongodb.user={{.Data.data.user}}
 spring.data.mongodb.password={{.Data.data.password}}
 {{end}}
 
-{{with secret "esignsante_psc/psc"}}
+{{with secret "esignsante-fse-psc/psc"}}
 psc.url.introspection={{.Data.data.url_introspection}}
 psc.url.userinfo={{.Data.data.url_userinfo}}
 psc.clientID={{.Data.data.client_id}}
