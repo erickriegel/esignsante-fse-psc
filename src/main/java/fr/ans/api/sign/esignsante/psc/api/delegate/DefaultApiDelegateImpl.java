@@ -63,15 +63,21 @@ public class DefaultApiDelegateImpl extends AbstractApiDelegate implements Defau
 				"", 
 				ACCEPT_HEADER_JSON));
 
+		setOperations.add(setOperation("/asksignature/fse",
+				"Opération qui permet au client de demander la signature d'un hash d'une feuille de soin.",
+				"[\"hashFSE: hashToSign\", \"idFacturationPS: 123456\", \"typeFlux: T\"]",
+				"[\"accept:application/json\", \"accept:application/octet-stream\", \"Authorization: PSCVAlidAccessToken\"]"));
+
+		
 		setOperations.add(setOperation("/asksignature/xades",
 				"Opération qui permet au client de demander de signer un document au format XADES Baseline-B.",
-				"[\"file: docXMLToSign\", \"userToken:userToken\"]",
-				"[\"accept:application/json\", \"accept:application/json\", \"access_token: PSCVAlidAccessToken\"]"));
+				"[\"file: docXMLToSign\"]",
+				"[\"accept:application/json\", \"accept:application/xml\", \"Authorization: PSCVAlidAccessToken\"]"));
 
 		setOperations.add(setOperation("/asksignature/pades",
 				"Opération qui permet au client de demander de signer un document au format PADES Baseline-B.", 
-				"[\"file: docXMLToSign\", \"userToken:userToken\"]",
-				"[\"accept:application/json\", \"accept:application/json\", \"access_token: PSCVAlidAccessToken\"]"));
+				"[\"file: docXMLToSign\"]",
+				"[\"accept:application/json\", \"accept:application/pdf\", \"Authorization: PSCVAlidAccessToken\"]"));
 
 		setOperations.add(setOperation("/checksignature/xades",
 				"Opération qui permet de vérifier un document signé au format XADES Baseline-B.", 
